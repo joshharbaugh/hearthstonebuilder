@@ -90,10 +90,10 @@ app.use(express.session({ secret: 'this is a secret' }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
-app.use(express.static(path.join(__dirname, 'app')));
+app.use(express.static(path.join(__dirname, 'dist')));
 app.use(express.static(path.join(__dirname, '.tmp')));
 app.use(function(req, res) {
-  res.sendfile(__dirname + '/app/index.html');
+  res.sendfile(__dirname + '/dist/index.html');
 });
 
 // development only
