@@ -1,0 +1,91 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <link href="http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700,900" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="http://cdn.oesmith.co.uk/morris-0.4.3.min.css">        
+
+        <link rel="stylesheet" href="styles/addons.css">
+
+        <link rel="stylesheet" href="styles/main.css">
+
+        <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
+        <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>
+</head>
+  <body data-state="{{ $state.current.name }}" data-status="{{ status }}" data-version="{{ app.version }}" data-ng-cloak="">
+    <!--[if lt IE 7]>
+      <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+      <script src="bower_components/es5-shim/es5-shim.js"></script>
+      <script src="bower_components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+
+    <div class="app-loading-container" data-ng-show="loading">
+        <div class="app-loading-animation" data-ng-class="status">{{ status | uppercase }} VIEW</div>
+    </div>
+
+    <div id="wrapper" class="row-fluid">
+
+        <aside id="sidebar-wrapper" class="collapsed" data-ng-controller="SidebarCtrl">
+            <ul class="sidebar-icon">
+                <li class="sidebar-header">
+                    <img src="" alt="logo" border="0">
+                </li>
+                <li>
+                    <a href="#/">
+                        <i class="icon-home icon-white"></i>
+                    </a>
+                </li>
+                <li>
+                    <a data-target="#tabcards" data-toggle="tab" data-ng-click="toggleNav()">
+                        <i class="icon-book icon-white"></i>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <ul class="sidebar-group tab-pane" id="tabcards">
+                    <li class="navigation-header">Cards</li>
+                    <li><a href="#/cards/ability">Ability</a></li>
+                    <li><a href="#/cards/hero">Hero</a></li>
+                    <li><a href="#/cards/hero-power">Hero Power</a></li>
+                    <li><a href="#/cards/minion">Minion</a></li>
+                    <li><a href="#/cards/weapon">Weapon</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <div id="content-wrapper" class="collapsed" ui-view=""></div>
+        
+    </div>
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <script>
+      var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+      (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src='//www.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+
+        <script src="scripts/plugins.js"></script>
+
+        <script src="scripts/addons.js"></script>
+
+        <script src="scripts/modules.js"></script>
+
+        <script src="scripts/scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<div class="span12 panel">
+	<h2 class="panel-title">Messages
+		<ul class="nav-pills pull-right nav-messages">
+			<li class="active"><a data-target="#inbox" data-toggle="tab">Inbox</a></li>
+			<li><a data-target="#sent" data-toggle="tab">Sent</a></li>
+		</ul>
+	</h2>
+	<div class="panel-content pill-content">
+		<div class="pill-pane active" id="inbox">
+			<table class="table table-hover" id="messages">
+				<thead>
+					<tr>
+						<th style="width:50px"></th>
+						<th>From</th>
+						<th>Subject</th>
+						<th>Received</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-ng-show="messages.length == 0">
+						<td colspan="4">No messages</td>
+					</tr>
+					<tr data-ng-show="messages.length > 0" data-ng-repeat="message in messages" data-ng-class="{'new': message.status == 'new', 'read': message.status == 'read'}">
+						<td><span data-ng-show="message.status=='new'" class="label label-important">{{ message.status }}</span></td>
+						<td>{{ message.from }}</td>
+						<td>{{ message.subject }}</td>
+						<td>{{ message.created | date }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="pill-pane" id="sent">
+			<table class="table table-hover" id="sent_messages">
+				<thead>
+					<tr>
+						<th style="width:50px"></th>
+						<th>To</th>
+						<th>Subject</th>
+						<th>Sent</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-ng-show="sent.length == 0">
+						<td colspan="4">No sent messages</td>
+					</tr>
+					<tr data-ng-show="sent.length > 0" data-ng-repeat="message in sent" data-ng-class="{'new': message.status == 'new', 'read': message.status == 'read'}">
+						<td><span data-ng-show="message.status=='new'" class="label label-important">{{ message.status }}</span></td>
+						<td>{{ message.username }}</td>
+						<td>{{ message.subject }}</td>
+						<td>{{ message.created | date }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,19 @@
+<div class="row-fluid">
+	<div data-ng-include="'/templates/partials/view_header.html'"></div>	
+</div>
+<div class="container-fluid">
+	<div class="span12">
+		<form id="register_form" data-ng-submit="register()">
+			<label for="username">Username:</label>
+			<input type="text" name="username" data-ng-model="username">
+
+			<label for="password">Password:</label>
+			<input type="password" name="password" data-ng-model="password">
+
+			<label for="display_name">Display Name:</label>
+			<input type="text" name="display_name" data-ng-model="display_name">
+
+			<input type="submit" value="Register">
+		</form>
+	</div>
+</div>
