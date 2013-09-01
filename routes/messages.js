@@ -1,0 +1,17 @@
+exports.getByUsername = function(req, res){
+	res.app.db.models.Message.find({username:req.params.username}).exec(function(err, response) {
+		if (err) res.send(500, err);
+		else {
+			res.json(200, response);
+		}
+	});
+};
+
+exports.getSentByUsername = function(req, res){
+	res.app.db.models.Message.find({from:req.params.username}).exec(function(err, response) {
+		if (err) res.send(500, err);
+		else {
+			res.json(200, response);
+		}
+	});
+};

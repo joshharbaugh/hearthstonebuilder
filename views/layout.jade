@@ -1,0 +1,15 @@
+doctype 5
+html
+	head
+		title= title
+		link(rel='stylesheet', href='/styles/main.css')
+	body
+		if !user
+			a(href="/home") Home |
+			a(href="/login") Log In
+		else
+			a(href="/home") Home |
+			a(href="/account") Account |
+			a(href="/logout") Log Out
+
+		block content

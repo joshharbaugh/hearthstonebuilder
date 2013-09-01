@@ -1,0 +1,9 @@
+extends layout
+
+block content
+	div.container
+		if !user
+			h2 Welcome, please login!
+		else
+			h2 Hello 
+				= user.profile.username

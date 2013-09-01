@@ -1,0 +1,25 @@
+<div class="span6 panel">
+	<h2 class="panel-title">{{ deck.name }}</h2>
+	<div class="panel-content">
+		<div class="description" data-ng-show="deck.description">
+			<p>{{ deck.description }}</p>
+		</div>
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Qty</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr data-ng-repeat="card in deck.cards">
+					<td><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip">{{ card.name }}</a></td>
+					<td>{{ card.qty }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div class="span6" ui-view="summary"></div>
+<div class="span6" ui-view="stats"></div>

@@ -1,0 +1,23 @@
+<div class="panel">
+	<h2 class="panel-title">Summary</h2>
+	<div class="panel-content">
+		<table class="table table-hover">
+			<tr>
+				<td><strong>Class</strong></td>
+				<td>{{ deck.class }}</td>
+			</tr>
+			<tr>
+				<td><strong>Author</strong></td>
+				<td>{{ deck.author }}</td>
+			</tr>
+			<tr>
+				<td><strong>Created</strong></td>
+				<td>{{ deck.created | date }}</td>
+			</tr>
+			<tr>
+				<td><strong>Rating</strong></td>
+				<td><strong>{{ deck.rating }}</strong> <small>/ 100</small></td>
+			</tr>
+		</table>
+	</div>
+</div>

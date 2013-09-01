@@ -1,0 +1,14 @@
+extends layout
+
+block content
+	h1 Hello, 
+		= user.profile.display_name
+	p= user.profile
+
+	h4 Decks
+	if user.saved_decks.length > 0
+		each deck in user.saved_decks
+			p= deck.deck_id
+			p= deck.resource_uri
+	else
+		p No decks
