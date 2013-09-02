@@ -173,9 +173,43 @@ angular.module('hsbApp.Routes', [])
 			.state('deckbuilder.default', {
 				url: '/:deckClass',
 				resolve: {
-					cards: ['$cards',
-					function( $cards ){
-						return $cards.get();
+					cards: ['$cards','$stateParams',
+					function( $cards, $stateParams ){
+						console.log($stateParams.deckClass);
+						var classId = 0;
+						switch($stateParams.deckClass)
+						{
+							case 'druid':
+								classId = 11;
+								break;
+							case 'hunter':
+								classId = 3;
+								break;
+							case 'mage':
+								classId = 8;
+								break;
+							case 'paladin':
+								classId = 2;
+								break;
+							case 'priest':
+								classId = 5;
+								break;
+							case 'rogue':
+								classId = 4;
+								break;
+							case 'shaman':
+								classId = 7;
+								break;
+							case 'warlock':
+								classId = 9;
+								break;
+							case 'warrior':
+								classId = 1;
+								break;
+							default:
+								classId = 0;
+						}
+						return $cards.getByClass( classId );
 					}]
 				},
 				views: {
