@@ -144,9 +144,10 @@ angular.module('hsbApp.Routes', [])
 			.state('decks.detail', {
 				url: '/{deckId:[0-9]{1,4}}',
 				resolve: {
-					deck: function($stateParams, $decks) {
+					deck: ['$stateParams', '$decks',
+					function($stateParams, $decks) {
 						return $decks.getById($stateParams.deckId);
-					}
+					}]
 				},
 				views: {
 					'': {
