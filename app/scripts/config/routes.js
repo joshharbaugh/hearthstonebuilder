@@ -173,9 +173,12 @@ angular.module('hsbApp.Routes', [])
 			.state('deckbuilder.default', {
 				url: '/:deckClass',
 				resolve: {
-					cards: ['$cards','$stateParams',
-					function( $cards, $stateParams ){
-						console.log($stateParams.deckClass);
+					user: ['$users',
+					function( $users ){
+						return $users.getCurrent();
+					}],
+					classId: ['$stateParams','$appScope',
+					function( $stateParams, $appScope ) {
 						var classId = 0;
 						switch($stateParams.deckClass)
 						{
@@ -209,7 +212,31 @@ angular.module('hsbApp.Routes', [])
 							default:
 								classId = 0;
 						}
-						return $cards.getByClass( classId );
+						$appScope.classId = classId;
+					}],
+					abilityCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 5, $appScope.classId );
+					}],
+					heroCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 3, $appScope.classId );
+					}],
+					heroPowerCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 10, $appScope.classId );
+					}],
+					minionCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 4, $appScope.classId );
+					}],
+					weaponCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 7, $appScope.classId );
+					}],
+					allCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByClass( $appScope.classId );
 					}]
 				},
 				views: {

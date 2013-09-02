@@ -1,45 +1,235 @@
 <div class="span12 panel">
-	<h2 class="panel-title">Cards <input type="text" data-ng-model="searchText" class="pull-right" placeholder="Search within results..."></h2>
+	<h2 class="panel-title">Cards
+		<ul class="nav-pills pull-right nav-messages">
+			<li class="active"><a data-target="#all" data-toggle="tab">All</a></li>
+			<li><a data-target="#ability" data-toggle="tab">Ability</a></li>
+			<li><a data-target="#hero" data-toggle="tab">Hero</a></li>
+			<li><a data-target="#hero-power" data-toggle="tab">Hero Power</a></li>
+			<li><a data-target="#minion" data-toggle="tab">Minion</a></li>
+			<li><a data-target="#weapon" data-toggle="tab">Weapon</a></li>
+		</ul>
+		<input type="text" data-ng-model="searchText" class="pull-right" placeholder="Search within results...">
+	</h2>
 	<div class="panel-content">
-		<table class="table table-hover table-striped">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Name</th>
-					<th>Class</th>
-					<th>Cost</th>
-					<th>Attack</th>
-					<th>Health</th>
-					<th>Type</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr data-ng-repeat="card in cards | filter:searchText">
-					<td><button type="button" data-ng-click="addCard()">Add</button></td>
-					<td><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></td>
-					<td data-ng-switch on="card.classs">
-						<span data-ng-switch-when="1">Warrior</span>
-						<span data-ng-switch-when="2">Paladin</span>
-						<span data-ng-switch-when="3">Hunter</span>
-						<span data-ng-switch-when="4">Rogue</span>
-						<span data-ng-switch-when="5">Priest</span>
-						<span data-ng-switch-when="7">Shaman</span>
-						<span data-ng-switch-when="8">Mage</span>
-						<span data-ng-switch-when="9">Warlock</span>
-						<span data-ng-switch-when="11">Druid</span>
-					</td>
-					<td data-ng-bind="card.cost"></td>
-					<td data-ng-bind="card.attack"></td>
-					<td data-ng-bind="card.health"></td>
-					<td data-ng-switch on="card.type">
-						<span data-ng-switch-when="5">Ability</span>
-						<span data-ng-switch-when="3">Hero</span>
-						<span data-ng-switch-when="10">Hero Power</span>
-						<span data-ng-switch-when="4">Minion</span>
-						<span data-ng-switch-when="7">Weapon</span>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		<div class="pill-content">
+			<div class="pill-pane active" id="all">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>Class</th>
+							<th>Cost</th>
+							<th>Attack</th>
+							<th>Health</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in cards.all | filter:searchText">
+							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td data-ng-switch on="card.classs">
+								<span data-ng-switch-when="1">Warrior</span>
+								<span data-ng-switch-when="2">Paladin</span>
+								<span data-ng-switch-when="3">Hunter</span>
+								<span data-ng-switch-when="4">Rogue</span>
+								<span data-ng-switch-when="5">Priest</span>
+								<span data-ng-switch-when="7">Shaman</span>
+								<span data-ng-switch-when="8">Mage</span>
+								<span data-ng-switch-when="9">Warlock</span>
+								<span data-ng-switch-when="11">Druid</span>
+							</td>
+							<td data-ng-bind="card.cost"></td>
+							<td data-ng-bind="card.attack"></td>
+							<td data-ng-bind="card.health"></td>
+							<td data-ng-switch on="card.type">
+								<span data-ng-switch-when="5">Ability</span>
+								<span data-ng-switch-when="3">Hero</span>
+								<span data-ng-switch-when="10">Hero Power</span>
+								<span data-ng-switch-when="4">Minion</span>
+								<span data-ng-switch-when="7">Weapon</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="pill-pane" id="ability">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>Class</th>
+							<th>Cost</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in cards.ability | filter:searchText">
+							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td data-ng-switch on="card.classs">
+								<span data-ng-switch-when="1">Warrior</span>
+								<span data-ng-switch-when="2">Paladin</span>
+								<span data-ng-switch-when="3">Hunter</span>
+								<span data-ng-switch-when="4">Rogue</span>
+								<span data-ng-switch-when="5">Priest</span>
+								<span data-ng-switch-when="7">Shaman</span>
+								<span data-ng-switch-when="8">Mage</span>
+								<span data-ng-switch-when="9">Warlock</span>
+								<span data-ng-switch-when="11">Druid</span>
+							</td>
+							<td data-ng-bind="card.cost"></td>
+							<td>
+								<span>Ability</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="pill-pane" id="hero">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>Class</th>
+							<th>Health</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in cards.hero | filter:searchText">
+							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td data-ng-switch on="card.classs">
+								<span data-ng-switch-when="1">Warrior</span>
+								<span data-ng-switch-when="2">Paladin</span>
+								<span data-ng-switch-when="3">Hunter</span>
+								<span data-ng-switch-when="4">Rogue</span>
+								<span data-ng-switch-when="5">Priest</span>
+								<span data-ng-switch-when="7">Shaman</span>
+								<span data-ng-switch-when="8">Mage</span>
+								<span data-ng-switch-when="9">Warlock</span>
+								<span data-ng-switch-when="11">Druid</span>
+							</td>
+							<td data-ng-bind="card.health"></td>
+							<td>
+								<span>Hero</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="pill-pane" id="hero-power">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>Class</th>
+							<th>Cost</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in cards.heroPower | filter:searchText">
+							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td data-ng-switch on="card.classs">
+								<span data-ng-switch-when="1">Warrior</span>
+								<span data-ng-switch-when="2">Paladin</span>
+								<span data-ng-switch-when="3">Hunter</span>
+								<span data-ng-switch-when="4">Rogue</span>
+								<span data-ng-switch-when="5">Priest</span>
+								<span data-ng-switch-when="7">Shaman</span>
+								<span data-ng-switch-when="8">Mage</span>
+								<span data-ng-switch-when="9">Warlock</span>
+								<span data-ng-switch-when="11">Druid</span>
+							</td>
+							<td data-ng-bind="card.cost"></td>
+							<td>
+								<span>Hero Power</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="pill-pane" id="minion">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>Class</th>
+							<th>Cost</th>
+							<th>Attack</th>
+							<th>Health</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in cards.minion | filter:searchText">
+							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td data-ng-switch on="card.classs">
+								<span data-ng-switch-when="1">Warrior</span>
+								<span data-ng-switch-when="2">Paladin</span>
+								<span data-ng-switch-when="3">Hunter</span>
+								<span data-ng-switch-when="4">Rogue</span>
+								<span data-ng-switch-when="5">Priest</span>
+								<span data-ng-switch-when="7">Shaman</span>
+								<span data-ng-switch-when="8">Mage</span>
+								<span data-ng-switch-when="9">Warlock</span>
+								<span data-ng-switch-when="11">Druid</span>
+							</td>
+							<td data-ng-bind="card.cost"></td>
+							<td data-ng-bind="card.attack"></td>
+							<td data-ng-bind="card.health"></td>
+							<td>
+								<span>Minion</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="pill-pane" id="weapon">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Name</th>
+							<th>Class</th>
+							<th>Cost</th>
+							<th>Attack</th>
+							<th>Type</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in cards.weapon | filter:searchText">
+							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td data-ng-switch on="card.classs">
+								<span data-ng-switch-when="1">Warrior</span>
+								<span data-ng-switch-when="2">Paladin</span>
+								<span data-ng-switch-when="3">Hunter</span>
+								<span data-ng-switch-when="4">Rogue</span>
+								<span data-ng-switch-when="5">Priest</span>
+								<span data-ng-switch-when="7">Shaman</span>
+								<span data-ng-switch-when="8">Mage</span>
+								<span data-ng-switch-when="9">Warlock</span>
+								<span data-ng-switch-when="11">Druid</span>
+							</td>
+							<td data-ng-bind="card.cost"></td>
+							<td data-ng-bind="card.attack"></td>
+							<td>
+								<span>Weapon</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 </div>

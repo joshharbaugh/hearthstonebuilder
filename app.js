@@ -161,6 +161,8 @@ app.get('/logout', function(req, res){
 // RESTful API
 app.get('/api/cards', cards.list);
 app.get('/api/cards/class/:classId', cards.getCardsByClass);
+app.get('/api/cards/type/:typeId', cards.getCardsByType);
+app.get('/api/cards/type/:typeId/class/:classId', cards.getCardsByTypeAndClass);
 
 app.get('/api/users', users.list);
 app.get('/api/user', ensureAuthenticated, function(req, res){
