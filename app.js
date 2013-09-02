@@ -93,6 +93,7 @@ app.use(app.router);
 
 // development only
 if ('development' == app.get('env')) {
+	console.log('dev');
 	app.use(express.static(path.join(__dirname, 'app')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
@@ -100,6 +101,7 @@ if ('development' == app.get('env')) {
 	});
 	app.use(express.errorHandler());
 } else {
+	console.log('prod');
 	app.use(express.static(path.join(__dirname, 'dist')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
