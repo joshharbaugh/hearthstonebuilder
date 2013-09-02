@@ -2,6 +2,14 @@
 	<div data-ng-include="'/templates/partials/view_header.html'"></div>	
 </div>
 <div class="container-fluid">
-	<div class="span6" ui-view="cards"></div>
-	<div class="span6" ui-view="decks"></div>
+	<div class="span6">
+		<div class="row-fluid">
+			<div class="span12" ui-view="build"></div>
+		</div>
+	</div>
+	<div class="span6">
+		<div class="row-fluid">
+			<div class="span12" ui-view="decks"></div>	
+		</div>
+	</div>		
 </div>
