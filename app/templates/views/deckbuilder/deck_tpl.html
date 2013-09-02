@@ -1,0 +1,10 @@
+<div class="span12 panel">
+	<h2 class="panel-title">{{ deckClass }} Deck <span class="pull-right">{{ cards.length || 0 }} / 30</span></h2>
+	<div class="panel-content">
+		<table class="table table-hover table-striped">
+			<tr data-ng-repeat="card in deckCards">
+				<td>{{ card.name }}</td>
+			</tr>
+		</table>		
+	</div>
+</div>

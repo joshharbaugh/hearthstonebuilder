@@ -10,19 +10,6 @@ angular.module('hsbApp.DashboardControllers', [])
 			}
 		});
 
-		$scope.gridOptions = { 
-			data: 'cards',
-			columnDefs: [ 
-				{ field:'name', displayName:'Name' },
-				{ field:'class', displayName:'Class' },
-				{ field:'cost', displayName:'Cost' },
-				{ field:'attack', displayName:'Attack' },
-				{ field:'health', displayName:'Health' },
-				{ field:'type', displayName:'Type' }
-			],
-			showFilter: true
-		};
-
 		$scope.$on('$viewContentLoaded', function() {
 			// when the view is loaded
 		});

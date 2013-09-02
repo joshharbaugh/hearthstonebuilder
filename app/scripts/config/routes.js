@@ -44,13 +44,12 @@ angular.module('hsbApp.Routes', [])
 			.state('dashboard.default', {
 				url: '',
 				views: {
-					"cards": {
-						controller: 'DashboardModuleCtrl',
-						templateUrl: CONFIG.prepareViewTemplateUrl('home/dashboard/cards')
-					},
 					"decks": {
 						controller: 'TopDecksCtrl',
 						templateUrl: CONFIG.prepareViewTemplateUrl('deck/top')
+					},
+					"build": {
+						templateUrl: CONFIG.prepareViewTemplateUrl('deck/build')
 					}
 				}
 			})
@@ -160,6 +159,33 @@ angular.module('hsbApp.Routes', [])
 					'stats@decks.detail': {
 						templateUrl: CONFIG.prepareViewTemplateUrl('deck/stats'),
 						controller: 'DeckStatsCtrl'
+					}
+				}
+			})
+			.state('deckbuilder', {
+				abstract: true,
+				url: '/deckbuilder',				
+				templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/main'),
+				controller: ['$scope', function($scope) {
+					$scope.viewTitle = 'DeckBuilder';
+				}]			
+			})
+			.state('deckbuilder.default', {
+				url: '/:deckClass',
+				resolve: {
+					cards: ['$cards',
+					function( $cards ){
+						return $cards.get();
+					}]
+				},
+				views: {
+					'deck': {
+						templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/deck'),
+						controller: 'DeckBuilderCtrl'
+					},
+					'classCards': {
+						controller: 'DeckBuilderCardsCtrl',
+						templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/cards')
 					}
 				}
 			})

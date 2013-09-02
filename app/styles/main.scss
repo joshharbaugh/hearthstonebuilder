@@ -47,9 +47,23 @@ body {
     }
 }
 
-.quality-legendary { color: #ff8000 !important; }
-.quality-epic { color: #a335ee !important; }
-.quality-rare { color: #0070dd !important; }
+.quality-legendary, .quality-5 { color: #ff8000 !important; }
+.quality-epic, .quality-4 { color: #a335ee !important; }
+.quality-rare, .quality-3 { color: #0070dd !important; }
+.quality-1 { color: #444 !important; }
+.quality-0 { color: #9d9d9d !important; }
+
+.btn-flat {
+    background: #eee;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border: none;
+    line-height: 30px;
+}
 
 /* Sidebar */
 #sidebar-wrapper {
@@ -57,7 +71,7 @@ body {
     position: fixed;
     height: 100%;
     width: 64px;
-    overflow-y: auto;
+    overflow: visible;
     z-index: 1000;
 
     &.collapsed {
@@ -87,12 +101,22 @@ body {
             height: 64px;
             line-height: 60px;
 
-            &:hover, &.active {
+            .btn-group {
+                vertical-align: top;
+                display: inline;
+                font-size: 14px;
+            }
+
+            &:hover, &:active, &:focus, &.active {
                 background: #2b3035;
+                outline: none;
             }
 
             a {
                 cursor: pointer;
+                height: 64px;
+                width: 64px;
+                display: inline-block;
 
                 &:hover {
                     background: #2b3035;
@@ -113,31 +137,42 @@ body {
 
     .sidebar-group {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 220px;
-        list-style: none;
+        top: -23px;
+        left: 63px;
         margin: 0;
         padding: 0;
+        -webkit-border-radius: 0px;
+        -moz-border-radius: 0px;
+        border-radius: 0px;
 
         li {
+            height: 40px;
             line-height: 40px;
-            text-indent: 20px;
             color: #8693a0;
             font-size: 18px;
             font-weight: lighter;
             font-family: "Maven Pro", sans-serif;
 
-            &.navigation-header {
+            &.navigation-header, &.nav-header {
                 text-transform: uppercase;
                 color: #c9d5e0;
                 height: 64px;
                 line-height: 60px;
+                background: #f9f9f9;
+
+                &:hover {
+                    background: #f9f9f9;
+                }
             }
 
             a {
                 color: #8693a0;
-                display: block;
+                display: inline-block;
+                line-height: 40px;
+                height: 40px;
+                padding: 0;
+                margin: 0;
+                width: 100%;
             }
         }
     }
@@ -232,6 +267,7 @@ body {
         margin: 0;
         padding: 5px 20px;
         font-size: 1.5em;
+        text-transform: capitalize;
 
         input {
             margin: 5px 0 0 0;

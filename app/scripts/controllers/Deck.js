@@ -40,4 +40,44 @@ angular.module('hsbApp.DeckControllers', [])
 			hideHover: true
 		});
 
+	}])
+
+	.controller('DeckBuilderCtrl',['$scope','$stateParams', function ($scope, $stateParams){
+
+		$scope.deckClass = $stateParams.deckClass;
+		$scope.deckCards = [];
+
+		$scope.$on('addCard', function(event, args) {
+			$scope.deckCards.push(args.data);
+		});
+
+	}])
+
+	.controller('DeckBuilderCardsCtrl',['$scope','cards', function ($scope, cards) {
+
+		var types = {
+			5: "Ability",
+			3: "Hero",
+			10: "Hero Power",
+			4: "Minion",
+			7: "Weapon"
+		};
+
+		$scope.cards = cards;
+
+		$scope.$watch('cards', function(newVal, oldVal) {
+			if(newVal) {
+				$scope.cards = newVal;
+			}
+		});
+
+		$scope.$on('$viewContentLoaded', function() {
+			// when the view is loaded
+		});
+
+		$scope.addCard = function() {
+			console.log(this.card);
+			$scope.$parent.$broadcast('addCard', {data:this.card});
+		};
+
 	}]);
