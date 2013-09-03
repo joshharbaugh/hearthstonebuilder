@@ -11,6 +11,7 @@ angular.module('hsbApp.DeckControllers', [])
 
 		// GET deck from resolved promise
 		$scope.deck = deck;
+		console.log($scope.deck);
 
 	}])
 
@@ -70,13 +71,21 @@ angular.module('hsbApp.DeckControllers', [])
 			}
 		}, true);
 
-		$scope.saveDeck = function() {			
+		$scope.saveDeck = function() {
 			$scope.createdDeck.username = $scope.deckUser.profile.username;
 			$scope.createdDeck.author = $scope.deckUser.profile.display_name;
 			$scope.createdDeck.name = this.deckName;
 			$scope.createdDeck.description = this.deckDescription;
-			console.log('Saving deck...', $scope.createdDeck);
-			$decks.saveDeck($scope.createdDeck);
+			var saveDeckPromise = $decks.saveDeck($scope.createdDeck);
+			saveDeckPromise.then(function(data) {
+				if(data) {
+					if(data.success == 'success') {
+						$('#deckModal').modal('hide');
+					} else {
+						alert('There was a problem. Try saving again.');
+					}				
+				}
+			});
 		};
 
 	}])

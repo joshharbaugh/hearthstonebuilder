@@ -1,7 +1,7 @@
 exports = module.exports = function(app, mongoose, bcrypt, SALT_WORK_FACTOR) {
 	
 	// card db schema
-	require('./schema/Card')(app, mongoose);
+	//require('./schema/Card')(app, mongoose);
 
 	// deck db schema
 	require('./schema/Deck')(app, mongoose);

@@ -2,18 +2,34 @@
 	<div data-ng-include="'/templates/partials/view_header.html'"></div>	
 </div>
 <div class="container-fluid">
-	<div class="span12">
-		<form id="register_form" data-ng-submit="register()">
-			<label for="username">Username:</label>
-			<input type="text" name="username" data-ng-model="username">
-
-			<label for="password">Password:</label>
-			<input type="password" name="password" data-ng-model="password">
-
-			<label for="display_name">Display Name:</label>
-			<input type="text" name="display_name" data-ng-model="display_name">
-
-			<input type="submit" value="Register">
-		</form>
+	<div class="span6 panel">
+		<h2 class="panel-title">Create an account</h2>
+		<div class="panel-content">
+			<form class="form-horizontal" id="register_form" data-ng-submit="register()" style="margin-top:20px">
+				<div class="control-group">
+					<label class="control-label" for="username">Username:</label>
+					<div class="controls">
+						<input type="text" name="username" id="username" data-ng-model="username">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="password">Password:</label>
+					<div class="controls">
+						<input type="password" name="password" id="password" data-ng-model="password">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="display_name">Display Name:</label>
+					<div class="controls">
+						<input type="text" name="display_name" id="display_name" data-ng-model="display_name">
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="controls">
+						<button type="submit" class="btn btn-flat btn-flat-green">Register</button>
+					</div>
+				</div>				
+			</form>
+		</div>
 	</div>
 </div>

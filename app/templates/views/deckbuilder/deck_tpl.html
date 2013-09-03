@@ -31,7 +31,9 @@
 				</tbody>
 			</table>
 
-			<button type="button" class="btn btn-flat" data-toggle="modal" data-target="#deckModal">Save Deck</button>
+			<button type="button" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px;">Save Deck</button>
+
+			<button type="button" class="btn btn-flat btn-flat-red pull-right" style="margin:20px;">Clear Deck</button>
 
 			<div id="deckModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deckModalLabel" aria-hidden="true">
 				<div class="modal-header">
@@ -44,7 +46,7 @@
 						<input type="text" data-ng-model="deckName" name="deckName" required>
 						<label for="deckDescription">Description: <small class="muted">Optional</small></label>
 						<textarea name="deckDescription" id="deckDescription" cols="10" rows="10" data-ng-model="deckDescription"></textarea>
-						<button type="submit" class="btn btn-flat">Save Changes</button>
+						<button type="submit" class="btn btn-flat btn-flat-green">Save Changes</button>
 						<button class="btn btn-flat" data-dismiss="modal" aria-hidden="true">Close</button>
 					</form>
 				</div>

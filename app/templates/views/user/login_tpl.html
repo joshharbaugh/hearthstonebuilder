@@ -2,15 +2,28 @@
 	<div data-ng-include="'/templates/partials/view_header.html'"></div>	
 </div>
 <div class="container-fluid">
-	<div class="span12">
-		<form action="/login" method="post">
-			<label for="username">Username:</label>
-			<input type="text" name="username" data-ng-model="username">
-
-			<label for="password">Password:</label>
-			<input type="password" name="password" data-ng-model="password">
-
-			<input type="submit" value="Log in">
-		</form>
+	<div class="span6 panel">
+		<h2 class="panel-title">Login</h2>
+		<div class="panel-content">
+			<form class="form-horizontal" action="/login" method="post" style="margin-top:20px">
+				<div class="control-group">
+					<label class="control-label" for="username">Username:</label>
+					<div class="controls">
+						<input type="text" name="username" id="username" data-ng-model="username">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="password">Password:</label>
+					<div class="controls">
+						<input type="password" name="password" id="password" data-ng-model="password">
+					</div>
+				</div>
+				<div class="control-group">
+					<div class="controls">
+						<button type="submit" class="btn btn-flat btn-flat-green">Log in</button>
+					</div>
+				</div>
+			</form>
+		</div>
 	</div>
 </div>

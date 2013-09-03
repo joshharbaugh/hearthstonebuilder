@@ -37,7 +37,7 @@ angular.module('hsbApp.Routes', [])
 					}]
 				},
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'Dashboard';
+					$scope.viewTitle = 'HearthStone Builder: Dashboard';
 					$scope.user = user;
 				}]
 			})
@@ -64,7 +64,7 @@ angular.module('hsbApp.Routes', [])
 					}]					
 				},
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'Users';
+					$scope.viewTitle = 'HearthStone Builder: Users';
 					$scope.user = user;
 				}]			
 			})
@@ -82,7 +82,7 @@ angular.module('hsbApp.Routes', [])
 						controller: 'UserProfileCtrl'
 					},
 					'decks@users.profile': {
-						templateUrl: CONFIG.prepareViewTemplateUrl('user/decks'),
+						templateUrl: CONFIG.prepareViewTemplateUrl('user/profile_decks'),
 						controller: 'UserDecksCtrl'
 					}
 				}
@@ -141,11 +141,33 @@ angular.module('hsbApp.Routes', [])
 				}]			
 			})
 			.state('decks.detail', {
-				url: '/{deckId:[0-9]{1,4}}',
+				url: '/:deckId',
 				resolve: {
 					deck: ['$stateParams', '$decks',
 					function($stateParams, $decks) {
 						return $decks.getById($stateParams.deckId);
+					}],
+					cards: ['$stateParams', '$cards', '$decks',
+					function($stateParams, $cards, $decks) {
+						var _deck = $decks.getById($stateParams.deckId);
+						_deck.then(function(data) {
+							if(data) {
+								var cards = data.cards;
+								console.log(cards.length);
+								angular.forEach(cards, function(value, idx) {
+									var cardPromise = $cards.getById(value);
+									cardPromise.then(function(cardData) {
+										if(cardData) {
+											cards[idx] = cardData[0];
+										}
+									});
+									if(idx == (cards.length - 1)) {
+										console.log(cards);
+										return cards;
+									}
+								});
+							}
+						});
 					}]
 				},
 				views: {
@@ -173,7 +195,7 @@ angular.module('hsbApp.Routes', [])
 				},
 				templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/main'),
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'DeckBuilder';
+					$scope.viewTitle = 'HearthStone Builder: Deck Builder';
 					$scope.user = user;
 				}]			
 			})
@@ -263,7 +285,7 @@ angular.module('hsbApp.Routes', [])
 					}]
 				},
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'Login';
+					$scope.viewTitle = 'HearthStone Builder';
 					$scope.user = user;
 				}]			
 			})

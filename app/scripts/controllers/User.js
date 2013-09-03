@@ -5,7 +5,7 @@ angular.module('hsbApp.UserControllers', [])
 
 	.controller('UserRegisterCtrl',['$scope','$http','$state','$rootScope', function ($scope, $http, $state, $rootScope){
 
-		$scope.viewTitle = 'Create an account';
+		$scope.viewTitle = 'HearthStone Builder';
 		$scope.register = function() {
 
 			try {
@@ -18,7 +18,6 @@ angular.module('hsbApp.UserControllers', [])
 
 				$http({method: 'POST', url: '/api/user', data: payload}).success(function(data, status) {
 						if(data.status == "success") {
-							console.log(data.message);
 							$rootScope.$state.transitionTo('login', {});
 						} else {
 							console.log(data.message);
@@ -36,14 +35,23 @@ angular.module('hsbApp.UserControllers', [])
 		$scope.sent     = sent;
 	}])
 
-	.controller('UserDecksCtrl',['$scope','user','decks','$stateParams', function ($scope, user, decks, $stateParams){
+	.controller('UserDecksCtrl',['$scope','user','decks','$stateParams','$rootScope','$decks', function ($scope, user, decks, $stateParams, $rootScope, $decks){
 		if(typeof user !== "object") {
-			$rootScope.$state.transitionTo('dashboard', {});
+			$rootScope.$state.transitionTo('dashboard.default', {});
 		} else {
 			var currentUser = user.profile;
 			if(currentUser.username === $stateParams.username)
 				$scope.userDecks = decks;
 			else
-				$rootScope.$state.transitionTo('dashboard', {});
+				$rootScope.$state.transitionTo('dashboard.default', {});
 		}
+
+		$scope.editDeck = function(deck) {
+			console.log('edit', deck);
+		};
+
+		$scope.deleteDeck = function(deck) {
+			console.log('delete', deck._id);
+			$decks.deleteById(deck._id);
+		};
 	}]);

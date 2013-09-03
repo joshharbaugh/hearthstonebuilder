@@ -27,18 +27,18 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.all | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
-								<span data-ng-switch-when="1">Warrior</span>
-								<span data-ng-switch-when="2">Paladin</span>
-								<span data-ng-switch-when="3">Hunter</span>
-								<span data-ng-switch-when="4">Rogue</span>
-								<span data-ng-switch-when="5">Priest</span>
-								<span data-ng-switch-when="7">Shaman</span>
-								<span data-ng-switch-when="8">Mage</span>
-								<span data-ng-switch-when="9">Warlock</span>
-								<span data-ng-switch-when="11">Druid</span>
+								<span data-ng-switch-when="1" class="class-warrior">Warrior</span>
+								<span data-ng-switch-when="2" class="class-paladin">Paladin</span>
+								<span data-ng-switch-when="3" class="class-hunter">Hunter</span>
+								<span data-ng-switch-when="4" class="class-rogue">Rogue</span>
+								<span data-ng-switch-when="5" class="class-priest">Priest</span>
+								<span data-ng-switch-when="7" class="class-shaman">Shaman</span>
+								<span data-ng-switch-when="8" class="class-mage">Mage</span>
+								<span data-ng-switch-when="9" class="class-warlock">Warlock</span>
+								<span data-ng-switch-when="11" class="class-druid">Druid</span>
 							</td>
 							<td data-ng-bind="card.cost"></td>
 							<td data-ng-bind="card.attack"></td>

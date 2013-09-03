@@ -47,11 +47,16 @@ body {
     }
 }
 
+/* Colors */
 .quality-legendary, .quality-5 { color: #ff8000 !important; }
 .quality-epic, .quality-4 { color: #a335ee !important; }
 .quality-rare, .quality-3 { color: #0070dd !important; }
 .quality-1 { color: #444 !important; }
 .quality-0 { color: #9d9d9d !important; }
+
+.btn {
+    text-shadow: none !important;
+}
 
 .btn-flat {
     background: #eee;
@@ -64,6 +69,120 @@ body {
     border: none;
     line-height: 30px;
 }
+
+.btn-flat-green { 
+    background: #62c462;
+    color: #fff;
+    
+    &:hover {
+        background: lighten(#62c462, 10%);
+        color: #fff;
+    }
+}
+.btn-flat-teal { background: #5bc0de; text-shadow: none !important; }
+.btn-flat-blue { background: #0088cc; text-shadow: none !important; }
+.btn-flat-yellow { background: #fbb450; text-shadow: none !important; }
+.btn-flat-red { 
+    background: #ee5f5b; 
+    color: #fff;
+
+    &:hover {
+        background: lighten(#ee5f5b, 10%);
+        color: #fff;
+    }
+}
+.btn-flat-black { background: #222; text-shadow: none !important; }
+
+/* class colors */
+.btn-flat-druid {
+    background: #FF7C0A !important;
+    color: lighten(#FF7C0A, 35%);
+
+    &:hover {
+        background: lighten(#FF7C0A, 5%) !important;
+        color: lighten(#FF7C0A, 65%);
+    }
+}
+.class-druid { color: #FF7C0A !important; }
+.btn-flat-hunter { 
+    background: #AAD372 !important; 
+    color: lighten(#AAD372, 35%);
+
+    &:hover {
+        background: lighten(#AAD372, 5%) !important;
+        color: lighten(#AAD372, 65%);
+    }
+}
+.class-hunter { color: #AAD372 !important; }
+.btn-flat-mage { 
+    background: #68CCEF !important; 
+    color: lighten(#68CCEF, 35%);
+
+    &:hover {
+        background: lighten(#68CCEF, 5%) !important;
+        color: lighten(#68CCEF, 65%);
+    }
+}
+.class-mage { color: #68CCEF !important; }
+.btn-flat-paladin { 
+    background: #F48CBA !important; 
+    color: lighten(#F48CBA, 25%);
+
+    &:hover {
+        background: lighten(#F48CBA, 5%) !important;
+        color: lighten(#F48CBA, 55%);
+    }
+}
+.class-paladin { color: #F48CBA !important; }
+.btn-flat-priest { 
+    background: #f9f9f9 !important; 
+    color: #999;
+
+    &:hover {
+        color: darken(#999, 5%);
+    }
+}
+.class-priest { color: #f9f9f9 !important; }
+.btn-flat-rogue { 
+    background: #FFF468 !important; 
+    color: darken(#FFF468, 30%);
+
+    &:hover {
+        background: lighten(#FFF468, 5%) !important;
+        color: darken(#FFF468, 35%);
+    } 
+}
+.class-rogue { color: #FFF468 !important; }
+.btn-flat-shaman { 
+    background: #2359FF !important; 
+    color: lighten(#2359FF, 35%);
+
+    &:hover {
+        background: lighten(#2359FF, 5%) !important;
+        color: lighten(#2359FF, 65%);
+    }
+}
+.class-shaman { color: #2359FF !important; }
+.btn-flat-warlock { 
+    background: #9382C9 !important; 
+    color: lighten(#9382C9, 35%);
+
+    &:hover {
+        background: lighten(#9382C9, 5%) !important;
+        color: lighten(#9382C9, 65%);
+    }
+}
+.class-warlock { color: #9382C9 !important; }
+.btn-flat-warrior { 
+    background: #C69B6D !important; 
+    color: lighten(#C69B6D, 35%);
+
+    &:hover {
+        background: lighten(#C69B6D, 5%) !important;
+        color: lighten(#C69B6D, 65%);
+    }
+}
+.class-warrior { color: #C69B6D !important; }
 
 /* Sidebar */
 #sidebar-wrapper {
@@ -292,6 +411,24 @@ body {
 
     .table {
         margin: 0;
+    }
+}
+#build-deck {
+    .panel-content {
+        .row-fluid {
+            padding-bottom: 20px;
+
+            &:first-child {
+                padding-top: 20px;
+            }
+        }
+        .span4 {
+            text-align: center;
+
+            a {
+                width: 100px;
+            }
+        }
     }
 }
 
