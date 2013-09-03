@@ -1,7 +1,6 @@
 exports = module.exports = function(app, mongoose) {
 
     var DeckSchema = new mongoose.Schema({
-        _id: String,
         name: String,
         id: Number,
         resource_uri: String,

@@ -1,33 +1,54 @@
-<div class="span12 panel">
-	<h2 class="panel-title">{{ deckClass }} Deck <span class="pull-right">{{ deckCards.length || 0 }} / 30</span></h2>
-	<div class="panel-content">
-		<table class="table table-hover table-striped">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Name</th>
-					<th>Cost</th>
-					<th>Attack</th>
-					<th>Health</th>
-					<th>Type</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr data-ng-repeat="card in deckCards">
-					<td style="vertical-align:middle;width:92px;"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
-					<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
-					<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
-					<td style="vertical-align:middle" data-ng-bind="card.attack"></td>
-					<td style="vertical-align:middle" data-ng-bind="card.health"></td>
-					<td style="vertical-align:middle" data-ng-switch on="card.type">
-						<span data-ng-switch-when="5">Ability</span>
-						<span data-ng-switch-when="3">Hero</span>
-						<span data-ng-switch-when="10">Hero Power</span>
-						<span data-ng-switch-when="4">Minion</span>
-						<span data-ng-switch-when="7">Weapon</span>
-					</td>
-				</tr>
-			</tbody>
-		</table>		
+<div class="row-fluid">
+	<div class="span12 panel">
+		<h2 class="panel-title">{{ deckClass }} Deck <span class="pull-right">{{ deckCards.length || 0 }} / 30</span></h2>
+		<div class="panel-content">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Name</th>
+						<th>Cost</th>
+						<th>Attack</th>
+						<th>Health</th>
+						<th>Type</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-ng-repeat="card in deckCards">
+						<td style="vertical-align:middle;width:92px;"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
+						<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+						<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
+						<td style="vertical-align:middle" data-ng-bind="card.attack"></td>
+						<td style="vertical-align:middle" data-ng-bind="card.health"></td>
+						<td style="vertical-align:middle" data-ng-switch on="card.type">
+							<span data-ng-switch-when="5">Ability</span>
+							<span data-ng-switch-when="3">Hero</span>
+							<span data-ng-switch-when="10">Hero Power</span>
+							<span data-ng-switch-when="4">Minion</span>
+							<span data-ng-switch-when="7">Weapon</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<button type="button" class="btn btn-flat" data-toggle="modal" data-target="#deckModal">Save Deck</button>
+
+			<div id="deckModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deckModalLabel" aria-hidden="true">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h3 id="deckModalLabel">Save Your Deck</h3>
+				</div>
+				<div class="modal-body">
+					<form data-ng-show="user.profile" data-ng-submit="saveDeck()">
+						<label for="deckName">Deck name: <span class="muted">Required</span></label>
+						<input type="text" data-ng-model="deckName" name="deckName" required>
+						<label for="deckDescription">Description: <small class="muted">Optional</small></label>
+						<textarea name="deckDescription" id="deckDescription" cols="10" rows="10" data-ng-model="deckDescription"></textarea>
+						<button type="submit" class="btn btn-flat">Save Changes</button>
+						<button class="btn btn-flat" data-dismiss="modal" aria-hidden="true">Close</button>
+					</form>
+				</div>
+			</div>					
+		</div>
 	</div>
 </div>

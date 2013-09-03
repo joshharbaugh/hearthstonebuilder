@@ -36,6 +36,14 @@ angular.module('hsbApp.UserControllers', [])
 		$scope.sent     = sent;
 	}])
 
-	.controller('UserDecksCtrl',['$scope','$users','decks', function ($scope, $users, decks){
-		$scope.userDecks = decks;
+	.controller('UserDecksCtrl',['$scope','user','decks','$stateParams', function ($scope, user, decks, $stateParams){
+		if(typeof user !== "object") {
+			$rootScope.$state.transitionTo('dashboard', {});
+		} else {
+			var currentUser = user.profile;
+			if(currentUser.username === $stateParams.username)
+				$scope.userDecks = decks;
+			else
+				$rootScope.$state.transitionTo('dashboard', {});
+		}
 	}]);

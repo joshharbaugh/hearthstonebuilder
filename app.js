@@ -181,8 +181,10 @@ app.post('/api/user', function(req, res){
 app.get('/api/user/:id', users.getById);
 
 app.get('/api/deck/:id', decks.getDeckById);
+app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 app.get('/api/decks', decks.list);
 app.get('/api/decks/:username', decks.getDecksByUsername);
+app.post('/api/decks/:username', decks.saveDeckToUsername);
 
 app.get('/api/messages/:username', messages.getByUsername);
 app.get('/api/messages/:username/sent', messages.getSentByUsername);

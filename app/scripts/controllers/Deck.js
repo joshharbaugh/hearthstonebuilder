@@ -42,7 +42,7 @@ angular.module('hsbApp.DeckControllers', [])
 
 	}])
 
-	.controller('DeckBuilderCtrl',['$scope','$stateParams','user','$appStorage', function ($scope, $stateParams, user, $appStorage){
+	.controller('DeckBuilderCtrl',['$scope','$stateParams','user','$appStorage','$decks', function ($scope, $stateParams, user, $appStorage, $decks){
 
 		$scope.deckUser = user;
 		$scope.deckClass = $stateParams.deckClass;
@@ -53,9 +53,7 @@ angular.module('hsbApp.DeckControllers', [])
 		if(!localDeckStorage) {
 			$scope.createdDeck = {
 				"class": $scope.deckClass,
-				"cards": $scope.deckCards,
-				"username": $scope.deckUser.username,
-				"author": $scope.deckUser.display_name
+				"cards": $scope.deckCards
 			};
 		} else {
 			$scope.createdDeck = localDeckStorage;
@@ -72,6 +70,15 @@ angular.module('hsbApp.DeckControllers', [])
 			}
 		}, true);
 
+		$scope.saveDeck = function() {			
+			$scope.createdDeck.username = $scope.deckUser.profile.username;
+			$scope.createdDeck.author = $scope.deckUser.profile.display_name;
+			$scope.createdDeck.name = this.deckName;
+			$scope.createdDeck.description = this.deckDescription;
+			console.log('Saving deck...', $scope.createdDeck);
+			$decks.saveDeck($scope.createdDeck);
+		};
+
 	}])
 
 	.controller('DeckBuilderCardsCtrl',['$scope','allCards','abilityCards','heroCards','heroPowerCards','minionCards','weaponCards', function ($scope, allCards, abilityCards, heroCards, heroPowerCards, minionCards, weaponCards) {
@@ -87,8 +94,6 @@ angular.module('hsbApp.DeckControllers', [])
 		$scope.$watch('cards', function(newVal, oldVal) {
 			if(newVal) {
 				$scope.cards = newVal;
-
-				console.log($scope.cards);
 			}
 		});
 

@@ -27,7 +27,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.all | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -67,7 +67,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.ability | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -101,7 +101,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.hero | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -135,7 +135,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.heroPower | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -171,7 +171,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.minion | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -208,7 +208,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.weapon | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>

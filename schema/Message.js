@@ -1,7 +1,6 @@
 exports = module.exports = function(app, mongoose) {
 
     var MessageSchema = new mongoose.Schema({
-        _id: String,
         username: String,
         id: Number,
         resource_uri: String,

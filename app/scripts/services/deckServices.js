@@ -35,6 +35,17 @@ angular.module('hsbApp.DeckServices', [])
 						deferred.reject(status);
 					});
 				return deferred.promise;
+			},
+			saveDeck: function(deckToSave) {
+				var deferred = $q.defer();				
+				$http({ method:'POST', url:'/api/decks/' + deckToSave.username, data: deckToSave })
+					.success(function(data,status,headers,request) {
+						deferred.resolve(data);
+					})
+					.error(function(data,status) {
+						deferred.reject(status);
+					});
+				return deferred.promise;
 			}
 		};
 

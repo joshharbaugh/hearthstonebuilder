@@ -164,19 +164,22 @@ angular.module('hsbApp.Routes', [])
 			})
 			.state('deckbuilder', {
 				abstract: true,
-				url: '/deckbuilder',				
-				templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/main'),
-				controller: ['$scope', function($scope) {
-					$scope.viewTitle = 'DeckBuilder';
-				}]			
-			})
-			.state('deckbuilder.default', {
-				url: '/:deckClass',
+				url: '/deckbuilder',
 				resolve: {
 					user: ['$users',
 					function( $users ){
 						return $users.getCurrent();
 					}],
+				},
+				templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/main'),
+				controller: ['$scope','user', function($scope, user) {
+					$scope.viewTitle = 'DeckBuilder';
+					$scope.user = user;
+				}]			
+			})
+			.state('deckbuilder.default', {
+				url: '/:deckClass',
+				resolve: {					
 					classId: ['$stateParams','$appScope',
 					function( $stateParams, $appScope ) {
 						var classId = 0;
