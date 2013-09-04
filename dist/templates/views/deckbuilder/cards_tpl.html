@@ -1,18 +1,20 @@
 <div class="span12 panel">
 	<h2 class="panel-title">Cards
 		<ul class="nav-pills pull-right nav-messages">
-			<li class="active"><a data-target="#all" data-toggle="tab">All</a></li>
+			<li data-ng-class="{'active': !$stateParams.cardType}"><a data-target="#all" data-toggle="tab">All</a></li>
 			<li><a data-target="#ability" data-toggle="tab">Ability</a></li>
 			<li><a data-target="#hero" data-toggle="tab">Hero</a></li>
 			<li><a data-target="#hero-power" data-toggle="tab">Hero Power</a></li>
 			<li><a data-target="#minion" data-toggle="tab">Minion</a></li>
 			<li><a data-target="#weapon" data-toggle="tab">Weapon</a></li>
-		</ul>
-		<input type="text" data-ng-model="searchText" class="pull-right" placeholder="Search within results...">
+		</ul>		
 	</h2>
 	<div class="panel-content">
+		<div class="description">
+			<input type="text" data-ng-model="searchText" placeholder="Search within results...">
+		</div>
 		<div class="pill-content">
-			<div class="pill-pane active" id="all">
+			<div class="pill-pane" data-ng-class="{'active': !$stateParams.cardType}" id="all">
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
@@ -54,7 +56,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="pill-pane" id="ability">
+			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='ability'}" id="ability">
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
@@ -67,7 +69,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.ability | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -88,7 +90,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="pill-pane" id="hero">
+			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='hero'}" id="hero">
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
@@ -101,7 +103,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.hero | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -122,7 +124,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="pill-pane" id="hero-power">
+			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='hero-power'}" id="hero-power">
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
@@ -135,7 +137,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.heroPower | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -156,7 +158,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="pill-pane" id="minion">
+			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='minion'}" id="minion">
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
@@ -171,7 +173,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.minion | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
@@ -194,7 +196,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="pill-pane" id="weapon">
+			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='weapon'}" id="weapon">
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
@@ -208,7 +210,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.weapon | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>

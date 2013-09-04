@@ -11,7 +11,7 @@
 			<tbody>
 				<tr data-ng-repeat="deck in userDecks">
 					<td><a ui-sref="decks.detail({ deckId:deck._id })" data-ng-href="#/decks/{{ deck._id }}">{{ deck.name }}</a></td>
-					<td><strong>{{ deck.rating }}</strong> <small>/ 100</small></td>
+					<td><strong>{{ deck.rating }}</strong></td>
 				</tr>
 			</tbody>
 		</table>

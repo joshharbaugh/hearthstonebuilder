@@ -2,6 +2,9 @@
 	<div class="span12 panel">
 		<h2 class="panel-title">{{ deckClass }} Deck <span class="pull-right">{{ deckCards.length || 0 }} / 30</span></h2>
 		<div class="panel-content">
+			<div class="description" data-ng-show="createdDeck.description">
+				<p>{{ createdDeck.description }}</p>
+			</div>
 			<table class="table table-hover table-striped">
 				<thead>
 					<tr>
@@ -31,9 +34,9 @@
 				</tbody>
 			</table>
 
-			<button type="button" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px;">Save Deck</button>
+			<button type="button" data-ng-show="deckCards.length==30" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px;">Save Deck</button>
 
-			<button type="button" class="btn btn-flat btn-flat-red pull-right" style="margin:20px;">Clear Deck</button>
+			<button type="button" class="btn btn-flat btn-flat-red pull-right" style="margin:20px;" data-ng-click="clearDeck()">Clear Deck</button>
 
 			<div id="deckModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deckModalLabel" aria-hidden="true">
 				<div class="modal-header">

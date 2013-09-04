@@ -1,10 +1,10 @@
 <div class="panel">
 	<h2 class="panel-title">Summary</h2>
 	<div class="panel-content">
-		<table class="table table-hover">
+		<table class="table">
 			<tr>
 				<td><strong>Class</strong></td>
-				<td>{{ deck.class }}</td>
+				<td style="text-transform:capitalize;">{{ deck.class }}</td>
 			</tr>
 			<tr>
 				<td><strong>Author</strong></td>
@@ -14,9 +14,17 @@
 				<td><strong>Created</strong></td>
 				<td>{{ deck.created | date }}</td>
 			</tr>
+			<tr data-ng-show="deck.last_modified">
+				<td><strong>Updated</strong></td>
+				<td>{{ deck.last_modified | date }}</td>
+			</tr>
 			<tr>
 				<td><strong>Rating</strong></td>
-				<td><strong>{{ deck.rating }}</strong> <small>/ 100</small></td>
+				<td><strong>{{ deck.rating }}</strong></td>
+			</tr>
+			<tr>
+				<td><strong>Link to Deck</strong></td>
+				<td><input class="span9" type="text" readonly="readonly" value="http://localhost:3000/#/decks/{{ deck._id }}" onclick="this.select()"></td>
 			</tr>
 		</table>
 	</div>

@@ -186,6 +186,7 @@ app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 app.get('/api/decks', decks.list);
 app.get('/api/decks/:username', decks.getDecksByUsername);
 app.post('/api/decks/:username', decks.saveDeckToUsername);
+app.put('/api/decks/:id', decks.updateDeck);
 
 app.get('/api/messages/:username', messages.getByUsername);
 app.get('/api/messages/:username/sent', messages.getSentByUsername);

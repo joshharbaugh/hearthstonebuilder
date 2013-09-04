@@ -2,11 +2,11 @@
 	<h2 class="panel-title">Cards
 		<ul class="nav-pills pull-right nav-messages">
 			<li data-ng-class="{'active': !$stateParams.cardType}"><a data-target="#all" data-toggle="tab">All</a></li>
-			<li><a data-target="#ability" data-toggle="tab">Ability</a></li>
-			<li><a data-target="#hero" data-toggle="tab">Hero</a></li>
-			<li><a data-target="#hero-power" data-toggle="tab">Hero Power</a></li>
-			<li><a data-target="#minion" data-toggle="tab">Minion</a></li>
-			<li><a data-target="#weapon" data-toggle="tab">Weapon</a></li>
+			<li data-ng-class="{'active': $stateParams.cardType=='ability'}"><a data-target="#ability" data-toggle="tab">Ability</a></li>
+			<li data-ng-class="{'active': $stateParams.cardType=='hero'}"><a data-target="#hero" data-toggle="tab">Hero</a></li>
+			<li data-ng-class="{'active': $stateParams.cardType=='hero-power'}"><a data-target="#hero-power" data-toggle="tab">Hero Power</a></li>
+			<li data-ng-class="{'active': $stateParams.cardType=='minion'}"><a data-target="#minion" data-toggle="tab">Minion</a></li>
+			<li data-ng-class="{'active': $stateParams.cardType=='weapon'}"><a data-target="#weapon" data-toggle="tab">Weapon</a></li>
 		</ul>		
 	</h2>
 	<div class="panel-content">
@@ -29,9 +29,9 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.all | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
+							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1" class="class-warrior">Warrior</span>
 								<span data-ng-switch-when="2" class="class-paladin">Paladin</span>
 								<span data-ng-switch-when="3" class="class-hunter">Hunter</span>
@@ -42,10 +42,10 @@
 								<span data-ng-switch-when="9" class="class-warlock">Warlock</span>
 								<span data-ng-switch-when="11" class="class-druid">Druid</span>
 							</td>
-							<td data-ng-bind="card.cost"></td>
-							<td data-ng-bind="card.attack"></td>
-							<td data-ng-bind="card.health"></td>
-							<td data-ng-switch on="card.type">
+							<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
+							<td style="vertical-align:middle" data-ng-bind="card.attack"></td>
+							<td style="vertical-align:middle" data-ng-bind="card.health"></td>
+							<td style="vertical-align:middle" data-ng-switch="" on="card.type">
 								<span data-ng-switch-when="5">Ability</span>
 								<span data-ng-switch-when="3">Hero</span>
 								<span data-ng-switch-when="10">Hero Power</span>
@@ -60,7 +60,6 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th></th>
 							<th>Name</th>
 							<th>Class</th>
 							<th>Cost</th>
@@ -68,10 +67,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.ability | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+						<tr data-ng-repeat="card in cards.ability | filter:searchText">							
+							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
+							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -82,8 +81,8 @@
 								<span data-ng-switch-when="9">Warlock</span>
 								<span data-ng-switch-when="11">Druid</span>
 							</td>
-							<td data-ng-bind="card.cost"></td>
-							<td>
+							<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
+							<td style="vertical-align:middle">
 								<span>Ability</span>
 							</td>
 						</tr>
@@ -94,7 +93,6 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th></th>
 							<th>Name</th>
 							<th>Class</th>
 							<th>Health</th>
@@ -103,9 +101,9 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.hero | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
+							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -116,8 +114,8 @@
 								<span data-ng-switch-when="9">Warlock</span>
 								<span data-ng-switch-when="11">Druid</span>
 							</td>
-							<td data-ng-bind="card.health"></td>
-							<td>
+							<td style="vertical-align:middle" data-ng-bind="card.health"></td>
+							<td style="vertical-align:middle">
 								<span>Hero</span>
 							</td>
 						</tr>
@@ -128,7 +126,6 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th></th>
 							<th>Name</th>
 							<th>Class</th>
 							<th>Cost</th>
@@ -137,9 +134,9 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.heroPower | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
+							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -150,8 +147,8 @@
 								<span data-ng-switch-when="9">Warlock</span>
 								<span data-ng-switch-when="11">Druid</span>
 							</td>
-							<td data-ng-bind="card.cost"></td>
-							<td>
+							<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
+							<td style="vertical-align:middle">
 								<span>Hero Power</span>
 							</td>
 						</tr>
@@ -162,7 +159,6 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th></th>
 							<th>Name</th>
 							<th>Class</th>
 							<th>Cost</th>
@@ -173,9 +169,9 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.minion | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
+							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -186,10 +182,10 @@
 								<span data-ng-switch-when="9">Warlock</span>
 								<span data-ng-switch-when="11">Druid</span>
 							</td>
-							<td data-ng-bind="card.cost"></td>
-							<td data-ng-bind="card.attack"></td>
-							<td data-ng-bind="card.health"></td>
-							<td>
+							<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
+							<td style="vertical-align:middle" data-ng-bind="card.attack"></td>
+							<td style="vertical-align:middle" data-ng-bind="card.health"></td>
+							<td style="vertical-align:middle">
 								<span>Minion</span>
 							</td>
 						</tr>
@@ -200,7 +196,6 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th></th>
 							<th>Name</th>
 							<th>Class</th>
 							<th>Cost</th>
@@ -210,9 +205,9 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.weapon | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'btn-flat-disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="http://wow.zamimg.com/images/hearthstone/cards/enus/original/{{ card.image }}.png" alt=""></td>
+							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -223,9 +218,9 @@
 								<span data-ng-switch-when="9">Warlock</span>
 								<span data-ng-switch-when="11">Druid</span>
 							</td>
-							<td data-ng-bind="card.cost"></td>
-							<td data-ng-bind="card.attack"></td>
-							<td>
+							<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
+							<td style="vertical-align:middle" data-ng-bind="card.attack"></td>
+							<td style="vertical-align:middle">
 								<span>Weapon</span>
 							</td>
 						</tr>

@@ -292,6 +292,11 @@ body {
                 padding: 0;
                 margin: 0;
                 width: 100%;
+
+                &:hover {
+                    color: #fff;
+                    background: #767197;
+                }
             }
         }
     }
@@ -405,6 +410,14 @@ body {
         .stats-container {
             .caption {
                 text-align: center;
+                background: #f9f9f9;
+                margin: 0;
+                padding: 14px 0;
+                border-top: 1px solid #eee;
+                border-bottom: 1px solid #eee;
+            }
+            div[id*="stats-"] {
+                margin: 20px 0 40px;
             }
         }
     }

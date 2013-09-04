@@ -26,6 +26,7 @@ exports = module.exports = function(app, mongoose) {
         author: String,
         username: String,
         created: Date,
+        last_modified: Date,
         rating: Number,
         cards: [CardSchema]
     });

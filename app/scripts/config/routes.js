@@ -53,6 +53,60 @@ angular.module('hsbApp.Routes', [])
 					}
 				}
 			})
+			.state('cards', {
+				abstract: true,
+				url: "/cards",
+				templateUrl: CONFIG.prepareViewTemplateUrl('card/main'),
+				resolve: {
+					cards: ['$cards',
+					function( $cards ){
+						return $cards.get();
+					}],
+					user: ['$users',
+					function( $users ){
+						return $users.getCurrent();
+					}]
+				},
+				controller: ['$scope','user', function($scope, user) {
+					$scope.viewTitle = 'HearthStone Builder: Cards';
+					$scope.user = user;
+				}]
+			})
+			.state('cards.type', {
+				url: '/:cardType',
+				resolve: {
+					abilityCards: ['$cards','$stateParams',
+					function( $cards, $stateParams ){
+						return $cards.getByType( 5 );
+					}],
+					heroCards: ['$cards','$stateParams',
+					function( $cards, $stateParams ){
+						return $cards.getByType( 3 );
+					}],
+					heroPowerCards: ['$cards','$stateParams',
+					function( $cards, $stateParams ){
+						return $cards.getByType( 10 );
+					}],
+					minionCards: ['$cards','$stateParams',
+					function( $cards, $stateParams ){
+						return $cards.getByType( 4 );
+					}],
+					weaponCards: ['$cards','$stateParams',
+					function( $cards, $stateParams ){
+						return $cards.getByType( 7 );
+					}],
+					allCards: ['$cards','$stateParams',
+					function( $cards, $stateParams ){
+						return $cards.get();
+					}]
+				},
+				views: {
+					'': {
+						controller: 'CardCtrl',
+						templateUrl: CONFIG.prepareViewTemplateUrl('card/list')
+					}
+				}
+			})
 			.state('users', {
 				abstract: true,
 				url: '/users',
@@ -147,25 +201,13 @@ angular.module('hsbApp.Routes', [])
 					function($stateParams, $decks) {
 						return $decks.getById($stateParams.deckId);
 					}],
-					cards: ['$stateParams', '$cards', '$decks',
-					function($stateParams, $cards, $decks) {
-						var _deck = $decks.getById($stateParams.deckId);
-						_deck.then(function(data) {
+					cards: ['$stateParams', '$decks',
+					function($stateParams, $decks) {
+						var deckPromise = $decks.getById($stateParams.deckId);
+						deckPromise.then(function(data) {
 							if(data) {
 								var cards = data.cards;
-								console.log(cards.length);
-								angular.forEach(cards, function(value, idx) {
-									var cardPromise = $cards.getById(value);
-									cardPromise.then(function(cardData) {
-										if(cardData) {
-											cards[idx] = cardData[0];
-										}
-									});
-									if(idx == (cards.length - 1)) {
-										console.log(cards);
-										return cards;
-									}
-								});
+								return cards;
 							}
 						});
 					}]
@@ -268,6 +310,86 @@ angular.module('hsbApp.Routes', [])
 					'deck': {
 						templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/deck'),
 						controller: 'DeckBuilderCtrl'
+					},
+					'classCards': {
+						controller: 'DeckBuilderCardsCtrl',
+						templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/cards')
+					}
+				}
+			})
+			.state('deckbuilder.edit', {
+				url: '/:deckId/:deckClass/edit',
+				resolve: {
+					deck: ['$stateParams', '$decks',
+					function($stateParams, $decks) {
+						return $decks.getById($stateParams.deckId);
+					}],
+					classId: ['$stateParams','$appScope',
+					function( $stateParams, $appScope ) {
+						var classId = 0;
+						switch($stateParams.deckClass)
+						{
+							case 'druid':
+								classId = 11;
+								break;
+							case 'hunter':
+								classId = 3;
+								break;
+							case 'mage':
+								classId = 8;
+								break;
+							case 'paladin':
+								classId = 2;
+								break;
+							case 'priest':
+								classId = 5;
+								break;
+							case 'rogue':
+								classId = 4;
+								break;
+							case 'shaman':
+								classId = 7;
+								break;
+							case 'warlock':
+								classId = 9;
+								break;
+							case 'warrior':
+								classId = 1;
+								break;
+							default:
+								classId = 0;
+						}
+						$appScope.classId = classId;
+					}],				
+					abilityCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 5, $appScope.classId );
+					}],
+					heroCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 3, $appScope.classId );
+					}],
+					heroPowerCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 10, $appScope.classId );
+					}],
+					minionCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 4, $appScope.classId );
+					}],
+					weaponCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByTypeAndClass( 7, $appScope.classId );
+					}],
+					allCards: ['$cards','$stateParams','$appScope',
+					function( $cards, $stateParams, $appScope ){
+						return $cards.getByClass( $appScope.classId );
+					}]
+				},
+				views: {
+					'deck': {
+						templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/deck'),
+						controller: 'DeckBuilderEditCtrl'
 					},
 					'classCards': {
 						controller: 'DeckBuilderCardsCtrl',
