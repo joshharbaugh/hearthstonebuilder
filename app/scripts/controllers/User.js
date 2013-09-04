@@ -46,10 +46,6 @@ angular.module('hsbApp.UserControllers', [])
 				$rootScope.$state.transitionTo('dashboard.default', {});
 		}
 
-		$scope.editDeck = function(deck) {
-			console.log('edit', deck);
-		};
-
 		$scope.deleteDeck = function(deck) {
 			console.log('delete', deck._id);
 			$decks.deleteById(deck._id);

@@ -6,6 +6,7 @@
 				<tr>
 					<th>Name</th>
 					<th>Rating</th>
+					<th>Win / Loss</th>
 					<th style="width:130px;"></th>
 				</tr>
 			</thead>
@@ -13,10 +14,10 @@
 				<tr data-ng-repeat="deck in userDecks">
 					<td><a ui-sref="decks.detail({ deckId:deck._id })" data-ng-href="#/decks/{{ deck._id }}">{{ deck.name }}</a></td>
 					<td><strong>{{ deck.rating }}</strong></td>
+					<td></td>
 					<td>						
 						<button data-ng-click="deleteDeck(deck)" type="button" class="btn btn-flat btn-flat-red pull-right"><i class="icon-remove icon-white"></i></button>
 						<a data-ng-href="#/deckbuilder/{{ deck._id }}/{{ deck.class }}/edit" title="Edit deck" class="btn btn-flat btn-flat-green pull-right" style="margin-right:10px;"><i class="icon-edit icon-white"></i></a>
-						<!--<button data-ng-click="editDeck(deck)" type="button" class="btn btn-flat btn-flat-green pull-right" style="margin-right:10px;"><i class="icon-edit icon-white"></i></button>-->
 					</td>
 				</tr>
 			</tbody>
