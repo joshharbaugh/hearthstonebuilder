@@ -21,12 +21,12 @@ body {
     left: 0;
     top: 0;
     opacity: 0.75;
-    background-color: #000;
+    background-color: #fff;
 }
 
 .app-loading-animation {
     -webkit-transition: all 0.25s linear;
-    background: url(../images/spinner.gif) top center no-repeat;
+    background: #000 url(../images/spinner.gif) 50% 37% no-repeat;
     width: 25px;
     height: 25px;
     display: block;
@@ -36,14 +36,23 @@ body {
     width: 300px;
     color: #fff;
 
+    p {
+        margin: 19px 0 0 0;
+    }
+
     &.ready {
         opacity: 0;
         display: none;
+        margin: 50px auto;
     }
 
     &.loading {
         opacity: 1;
         margin: 100px auto;
+        padding: 40px 0;
+        -webkit-border-radius: 8px;
+        -moz-border-radius: 8px;
+        border-radius: 8px;
     }
 }
 

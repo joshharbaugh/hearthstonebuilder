@@ -409,6 +409,7 @@ angular.module('hsbApp.Routes', [])
 				controller: ['$scope','user', function($scope, user) {
 					$scope.viewTitle = 'HearthStone Builder';
 					$scope.user = user;
+					$scope.onReady();
 				}]			
 			})
 			.state('register', {

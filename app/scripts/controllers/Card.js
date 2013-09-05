@@ -20,4 +20,6 @@ angular.module('hsbApp.CardControllers', [])
 			$scope.$parent.$broadcast('addCard', {data:this.card});
 		};
 
+		$scope.onReady();
+
 	}]);

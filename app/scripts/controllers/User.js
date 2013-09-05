@@ -28,11 +28,15 @@ angular.module('hsbApp.UserControllers', [])
 
 		};
 
+		$scope.onReady();
+
 	}])
 
 	.controller('UserMessagesCtrl',['$scope','$users','messages','sent', function ($scope, $users, messages, sent){
 		$scope.messages = messages;
 		$scope.sent     = sent;
+
+		$scope.onReady();
 	}])
 
 	.controller('UserDecksCtrl',['$scope','user','decks','$stateParams','$rootScope','$decks', function ($scope, user, decks, $stateParams, $rootScope, $decks){

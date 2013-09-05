@@ -5,6 +5,10 @@ angular.module('hsbApp.AppControllers', [])
 			$appScope.topScope().onLoading();
 		});
 
+		$rootScope.$on("$stateChangeStart", function(event, next, current) {
+			$appScope.topScope().onLoading();
+		});
+
 		$rootScope.onLoading = function() {
 			var $scope = $appScope.topScope();
 			$appScope.safeApply(function() {

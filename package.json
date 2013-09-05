@@ -15,7 +15,8 @@
     "http-agent": "*",
     "passport": "*",
     "passport-local": "*",
-    "bcrypt": "*"
+    "bcrypt": "*",
+    "request": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

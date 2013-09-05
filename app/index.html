@@ -11,20 +11,20 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-        <link href="http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700,900" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" href="scripts/lib/morris-0.4.3.min.css">        
+    <link href="http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700,900" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="scripts/lib/morris-0.4.3.min.css">        
 
-        <!-- build:css styles/addons.css -->
-        <link rel="stylesheet" href="bower_components/angular-ui/build/angular-ui.min.css">
-        <link rel="stylesheet" href="bower_components/ng-grid/ng-grid.min.css">
-        <!-- endbuild -->
+    <!-- build:css styles/addons.css -->
+    <link rel="stylesheet" href="bower_components/angular-ui/build/angular-ui.min.css">
+    <link rel="stylesheet" href="bower_components/ng-grid/ng-grid.min.css">
+    <!-- endbuild -->
 
-        <!-- build:css({.tmp,app}) styles/main.css -->
-        <link rel="stylesheet" href="styles/main.css">
-        <!-- endbuild -->
+    <!-- build:css({.tmp,app}) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
 
-        <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
-        <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>
+    <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
+    <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>
 </head>
   <body data-state="{{ $state.current.name }}" data-status="{{ status }}" data-version="{{ app.version }}" data-ng-cloak>
     <!--[if lt IE 7]>
@@ -37,7 +37,9 @@
     <![endif]-->
 
     <div class="app-loading-container" data-ng-show="loading">
-        <div class="app-loading-animation" data-ng-class="status">{{ status | uppercase }} VIEW</div>
+        <div class="app-loading-animation" data-ng-class="status">
+            <p>{{ status | uppercase }}</p>
+        </div>
     </div>
 
     <div id="wrapper" class="row-fluid">
@@ -70,7 +72,7 @@
             </ul>
         </aside>
 
-        <div id="content-wrapper" class="collapsed" ui-view></div>
+        <div id="content-wrapper" class="collapsed" data-ng-cloak ui-view></div>
         
     </div>
 

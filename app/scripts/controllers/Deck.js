@@ -5,12 +5,16 @@ angular.module('hsbApp.DeckControllers', [])
 		// GET top decks from resolved promise
 		$scope.topDecks = decks;
 
+		$scope.onReady();
+
 	}])
 
 	.controller('DeckDetailCtrl',['$scope','$stateParams','deck', function ($scope, $stateParams, deck){
 
 		// GET deck from resolved promise
 		$scope.deck = deck;
+
+		$scope.onReady();
 
 	}])
 
@@ -267,6 +271,8 @@ angular.module('hsbApp.DeckControllers', [])
 			}
 		};
 
+		$scope.onReady();
+
 	}])
 
 	.controller('DeckBuilderEditCtrl',['$scope','$stateParams','user','$appStorage','$decks','deck','$rootScope', function ($scope, $stateParams, user, $appStorage, $decks, deck, $rootScope){
@@ -323,7 +329,9 @@ angular.module('hsbApp.DeckControllers', [])
 
 			} else {
 				$rootScope.$state.transitionTo('dashboard.default', {});
-			}			
+			}
+
+			$scope.onReady();			
 		}
 
 	}])

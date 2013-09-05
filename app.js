@@ -16,6 +16,8 @@ var express  = require('express'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     bcrypt   = require('bcrypt'),
+    fs       = require('fs'),
+    request  = require('request'),
     SALT_WORK_FACTOR = 10;
 
 var app = express();
@@ -160,6 +162,26 @@ app.get('/logout', function(req, res){
 
 // RESTful API
 app.get('/api/cards', cards.list);
+app.get('/api/cards/images', cards.images);
+app.get('/api/cards/images/download', function(req, res) {
+	res.app.db.models.Card.find({}, { _id: false, image: true }).exec(function(err, response) {
+		if (err) res.send(500, err);
+		else {
+			var download = function(uri, filename){
+				request({ 'uri': uri, 'encoding': 'binary' }, function(err, res, body) {
+					if(err) throw err;
+					console.log('content-type:', res.headers['content-type']);
+					console.log('content-length:', res.headers['content-length']);
+					console.log('file:', filename);
+					fs.writeFileSync(filename, body, 'binary');
+				});
+			};
+			for(var idx in response) {
+				download('http://wow.zamimg.com/images/hearthstone/cards/enus/original/' + response[idx].image + '.png', 'app/images/cards/' + response[idx].image + '.png');
+			}
+		}
+	});
+});
 app.get('/api/cards/class/:classId', cards.getCardsByClass);
 app.get('/api/cards/type/:typeId', cards.getCardsByType);
 app.get('/api/cards/type/:typeId/class/:classId', cards.getCardsByTypeAndClass);
