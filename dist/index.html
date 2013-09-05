@@ -20,7 +20,11 @@
 
     <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
     <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>
-</head>
+
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="scripts/lib/raphael-min.js"></script>
+    <script src="scripts/lib/morris-0.4.3.min.js"></script>
+  </head>
   <body data-state="{{ $state.current.name }}" data-status="{{ status }}" data-version="{{ app.version }}" data-ng-cloak="">
     <!--[if lt IE 7]>
       <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
@@ -70,6 +74,8 @@
         <div id="content-wrapper" class="collapsed" data-ng-cloak="" ui-view=""></div>
         
     </div>
+
+    <script src="bower_components/angular/angular.min.js"></script>
 
     <script src="scripts/plugins.js"></script>
 
