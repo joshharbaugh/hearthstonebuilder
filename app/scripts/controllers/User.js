@@ -54,4 +54,6 @@ angular.module('hsbApp.UserControllers', [])
 			console.log('delete', deck._id);
 			$decks.deleteById(deck._id);
 		};
+
+		$scope.onReady();
 	}]);

@@ -204,6 +204,7 @@ angular.module('hsbApp.DeckControllers', [])
 			labels: ['Cost'],
 			barRatio: 1,
 			xLabelAngle: 35,
+			hideHover: true,
 			barColors: function (row, series, type) {
 				if (type === 'bar') {
 					var blue = Math.ceil(80 * row.y / this.ymax);
@@ -214,6 +215,8 @@ angular.module('hsbApp.DeckControllers', [])
 				}
 			}
 		});
+
+		$scope.onReady();
 
 	}])
 
@@ -355,5 +358,7 @@ angular.module('hsbApp.DeckControllers', [])
 		$scope.addCard = function() {
 			$scope.$parent.$broadcast('addCard', {data:this.card});
 		};
+
+		$scope.onReady();
 
 	}]);
