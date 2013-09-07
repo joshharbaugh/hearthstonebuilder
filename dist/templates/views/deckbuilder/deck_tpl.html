@@ -1,6 +1,6 @@
 <div class="row-fluid">
 	<div class="span12 panel">
-		<h2 class="panel-title">{{ deckClass }} Deck <span class="pull-right">{{ deckCounter }} / 30</span></h2>
+		<h2 class="panel-title"><span data-ng-show="!createdDeck.name">{{ deckClass }} Deck</span><span style="text-transform:capitalize" data-ng-show="createdDeck.name">{{ createdDeck.name }}</span> <span class="pull-right">{{ deckCounter }} / 30</span></h2>
 		<div class="panel-content">
 			<div class="description" data-ng-show="createdDeck.description">
 				<p>{{ createdDeck.description }}</p>
@@ -34,7 +34,7 @@
 				</tbody>
 			</table>
 
-			<button type="button" data-ng-show="deckCards.length==30" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px">Save Deck</button>
+			<button type="button" data-ng-show="deckCounter==30" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px">Save Deck</button>
 
 			<button type="button" class="btn btn-flat btn-flat-red pull-right" style="margin:20px" data-ng-click="clearDeck()">Clear Deck</button>
 
