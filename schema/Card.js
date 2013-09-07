@@ -14,7 +14,8 @@ exports = module.exports = function(app, mongoose) {
         health: Number,
         quality: Number,
         image: String,
-        icon: String
+        icon: String,
+        limit: Number
     });
 
     app.db.model('Card', CardSchema);

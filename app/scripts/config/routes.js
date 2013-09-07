@@ -37,7 +37,7 @@ angular.module('hsbApp.Routes', [])
 					}]
 				},
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'HearthStone Builder: Dashboard';
+					$scope.viewTitle = 'Dashboard';
 					$scope.user = user;
 				}]
 			})
@@ -68,7 +68,7 @@ angular.module('hsbApp.Routes', [])
 					}]
 				},
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'HearthStone Builder: Cards';
+					$scope.viewTitle = 'Cards';
 					$scope.user = user;
 				}]
 			})
@@ -118,7 +118,7 @@ angular.module('hsbApp.Routes', [])
 					}]					
 				},
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'HearthStone Builder: Users';
+					$scope.viewTitle = 'Users';
 					$scope.user = user;
 				}]			
 			})
@@ -237,7 +237,7 @@ angular.module('hsbApp.Routes', [])
 				},
 				templateUrl: CONFIG.prepareViewTemplateUrl('deckbuilder/main'),
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'HearthStone Builder: Deck Builder';
+					$scope.viewTitle = 'Deck Builder';
 					$scope.user = user;
 				}]			
 			})

@@ -14,6 +14,19 @@ angular.module('hsbApp.DeckControllers', [])
 		// GET deck from resolved promise
 		$scope.deck = deck;
 
+		var cards = $scope.deck.cards;
+		cards.sort( function(a,b) { return a.id - b.id; } );
+
+		// delete all duplicates from the array
+		for( var i=0; i<cards.length-1; i++ ) {
+			if ( cards[i].id == cards[i+1].id ) {
+				cards[i+1].qty = 2;
+				delete cards[i];
+			}
+		}
+
+		$scope.deck.cards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
+
 		$scope.onReady();
 
 	}])
@@ -220,11 +233,12 @@ angular.module('hsbApp.DeckControllers', [])
 
 	}])
 
-	.controller('DeckBuilderCtrl',['$scope','$stateParams','user','$appStorage','$decks', function ($scope, $stateParams, user, $appStorage, $decks){
+	.controller('DeckBuilderCtrl',['$scope','$stateParams','user','$appStorage','$decks','$rootScope', function ($scope, $stateParams, user, $appStorage, $decks, $rootScope){
 		
 		$scope.deckUser = user;
 		$scope.deckClass = $stateParams.deckClass;
 		$scope.deckCards = [];
+		$scope.deckCounter = 0;
 
 		var localDeckStorage = $appStorage.get('Deck-' + $stateParams.deckClass);
 		
@@ -236,14 +250,40 @@ angular.module('hsbApp.DeckControllers', [])
 		} else {
 			$scope.createdDeck = localDeckStorage;
 			$scope.deckCards = $scope.createdDeck.cards;
+			
+			// clean up empty objects
+			angular.forEach($scope.deckCards, function(card, idx) {
+				if(card == null) {
+					$scope.deckCards.splice(idx,1);
+				} else {
+					$scope.deckCounter = ($scope.deckCounter + parseInt(card.qty || 1));
+				}
+			});
 		}
 
-		$scope.$on('addCard', function(event, args) {
-			$scope.deckCards.push(args.data);
+		$scope.$on('addCard', function(event, args) {		
+			if ($scope.deckCards.length == 0) {
+				$scope.deckCards.push(args.data);
+			} else {
+				$scope.deckCards.push(args.data);
+				var cards = $scope.deckCards;
+				cards.sort( function(a,b) { return a.id - b.id; } );
+
+				for( var i=0; i<cards.length-1; i++ ) {
+					if ( cards[i].id == cards[i+1].id ) {
+						cards[i+1].qty = 2;
+						delete cards[i];
+					}
+				}
+
+				$scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
+			}
+			$scope.deckCounter++;								
 		});
 
 		$scope.$watch('createdDeck', function(newVal, oldVal) {
 			if(newVal) {
+				console.log(newVal);
 				$appStorage.put('Deck-' + $stateParams.deckClass, newVal);
 			}
 		}, true);
@@ -290,12 +330,52 @@ angular.module('hsbApp.DeckControllers', [])
 				$scope.deckCards       = [];
 				$scope.deckName        = deck.name;
 				$scope.deckDescription = deck.description;
+				$scope.deckCounter     = 0;
 
 				$scope.createdDeck = deck;
 				$scope.deckCards   = $scope.createdDeck.cards;
+
+				// prettify our view
+				var cards = $scope.deckCards;
+				cards.sort( function(a,b) { return a.id - b.id; } );
+
+				// delete all duplicates from the array
+				for( var i=0; i<cards.length-1; i++ ) {
+					if ( cards[i].id == cards[i+1].id ) {
+						cards[i+1].qty = 2;
+						delete cards[i];
+					}
+				}
+
+				$scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
+
+				// clean up empty objects
+				angular.forEach($scope.deckCards, function(card, idx) {
+					if(card == null) {
+						$scope.deckCards.splice(idx,1);
+					} else {
+						$scope.deckCounter = ($scope.deckCounter + parseInt(card.qty || 1));
+					}
+				});
 				
 				$scope.$on('addCard', function(event, args) {
-					$scope.deckCards.push(args.data);
+					if ($scope.deckCards.length == 0) {
+						$scope.deckCards.push(args.data);
+					} else {
+						$scope.deckCards.push(args.data);
+						var cards = $scope.deckCards;
+						cards.sort( function(a,b) { return a.id - b.id; } );
+
+						for( var i=0; i<cards.length-1; i++ ) {
+							if ( cards[i].id == cards[i+1].id ) {
+								cards[i+1].qty = 2;
+								delete cards[i];
+							}
+						}
+
+						$scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
+					}
+					$scope.deckCounter++;
 				});
 
 				$scope.$watch('createdDeck', function(newVal, oldVal) {
@@ -339,7 +419,7 @@ angular.module('hsbApp.DeckControllers', [])
 
 	}])
 
-	.controller('DeckBuilderCardsCtrl',['$scope','allCards','abilityCards','heroCards','heroPowerCards','minionCards','weaponCards', function ($scope, allCards, abilityCards, heroCards, heroPowerCards, minionCards, weaponCards) {
+	.controller('DeckBuilderCardsCtrl',['$rootScope','$scope','allCards','abilityCards','heroCards','heroPowerCards','minionCards','weaponCards', function ($rootScope, $scope, allCards, abilityCards, heroCards, heroPowerCards, minionCards, weaponCards) {
 
 		$scope.cards = {};
 		$scope.cards.all = allCards;
@@ -351,13 +431,145 @@ angular.module('hsbApp.DeckControllers', [])
 
 		$scope.$watch('cards', function(newVal, oldVal) {
 			if(newVal) {
-				$scope.cards = newVal;
+				$scope.cards = newVal;		
 			}
 		});
 
 		$scope.addCard = function() {
-			$scope.$parent.$broadcast('addCard', {data:this.card});
+			if(this.card.disabled) {
+				return;
+			} else {
+				this.card.remaining = this.card.limit - 1;
+				this.card.limit = this.card.remaining;
+				if(this.card.limit == 0) {
+					this.card.disabled = true;
+				}		
+				$scope.$parent.$broadcast('addCard', {data:this.card});
+			}
 		};
+
+		$scope.createdDeck = $scope.$parent.$$childHead.createdDeck;
+
+		$scope.$watch('createdDeck', function(newVal, oldVal) {
+			if(newVal) {
+				angular.forEach(newVal.cards, function(card, idx) {
+
+					if(card.limit && card.limit > 0) {
+						switch(parseInt(card.type))
+						{
+							case 5:
+								angular.forEach($scope.cards.ability, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.limit = 1;
+										_card.remaining = 1;
+									}
+								});
+								break;
+							case 3:
+								angular.forEach($scope.cards.hero, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.limit = 1;
+										_card.remaining = 1;
+									}
+								});
+								break;
+							case 10:
+								angular.forEach($scope.cards.heroPower, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.limit = 1;
+										_card.remaining = 1;
+									}
+								});
+								break;
+							case 4:
+								angular.forEach($scope.cards.minion, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.limit = 1;
+										_card.remaining = 1;
+									}
+								});
+								break;
+							case 7:
+								angular.forEach($scope.cards.weapon, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.limit = 1;
+										_card.remaining = 1;
+									}
+								});
+								break;
+							default:
+								return;
+						}
+						angular.forEach($scope.cards.all, function(_card, i) {
+							if(_card.id == card.id) {
+								_card.limit = 1;
+								_card.remaining = 1;
+							}
+						});
+					}
+
+					if(card.disabled) {
+						switch(parseInt(card.type))
+						{
+							case 5:
+								angular.forEach($scope.cards.ability, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.disabled = true;
+										_card.remaining = 0;
+										_card.limit = 0;
+									}
+								});
+								break;
+							case 3:
+								angular.forEach($scope.cards.hero, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.disabled = true;
+										_card.remaining = 0;
+										_card.limit = 0;
+									}
+								});
+								break;
+							case 10:
+								angular.forEach($scope.cards.heroPower, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.disabled = true;
+										_card.remaining = 0;
+										_card.limit = 0;
+									}
+								});
+								break;
+							case 4:
+								angular.forEach($scope.cards.minion, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.disabled = true;
+										_card.remaining = 0;
+										_card.limit = 0;
+									}
+								});
+								break;
+							case 7:
+								angular.forEach($scope.cards.weapon, function(_card, i) {
+									if(_card.id == card.id) {
+										_card.disabled = true;
+										_card.remaining = 0;
+										_card.limit = 0;
+									}
+								});
+								break;
+							default:
+								return;
+						}
+						angular.forEach($scope.cards.all, function(_card, i) {
+							if(_card.id == card.id) {
+								_card.disabled = true;
+								_card.remaining = 0;
+								_card.limit = 0;
+							}
+						});
+					}
+				});
+			}
+		});
 
 		$scope.onReady();
 

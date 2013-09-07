@@ -21,8 +21,8 @@
 			</thead>
 			<tbody>
 				<tr data-ng-repeat="card in deck.cards | filter:deckFilterText">
-					<td style="vertical-align:middle;width:92px;"><img width="92" data-ng-src="images/cards/{{ card.image }}.png" alt=""></td>
-					<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
+					<td style="vertical-align:middle;width:92px;"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
+					<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.qty">x{{ card.qty }}</span></strong> <p class="muted">{{ card.description }}</p></td>
 					<td style="vertical-align:middle" data-ng-switch on="card.classs">
 						<span data-ng-switch-when="1" class="class-warrior">Warrior</span>
 						<span data-ng-switch-when="2" class="class-paladin">Paladin</span>
