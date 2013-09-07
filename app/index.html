@@ -23,13 +23,7 @@
     <!-- endbuild -->
 
     <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
-    <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>
-
-    <!-- build:js scripts/jquery.js -->
-    <script src="bower_components/jquery/jquery.min.js"></script>
-    <script src="scripts/lib/raphael-min.js"></script>
-    <script src="scripts/lib/morris-0.4.3.min.js"></script>
-    <!-- endbuild -->
+    <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>    
   </head>
   <body data-state="{{ $state.current.name }}" data-status="{{ status }}" data-version="{{ app.version }}" data-ng-cloak>
     <!--[if lt IE 7]>
@@ -75,6 +69,10 @@
         <div id="content-wrapper" class="collapsed" data-ng-cloak ui-view></div>
         
     </div>
+
+    <!-- build:js scripts/jquery.js -->
+    <script src="bower_components/jquery/jquery.min.js"></script>    
+    <!-- endbuild -->    
 
     <script src="bower_components/angular/angular.min.js"></script>
     <!-- build:js scripts/modules.js -->

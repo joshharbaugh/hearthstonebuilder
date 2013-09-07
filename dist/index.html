@@ -18,9 +18,7 @@
     <link rel="stylesheet" href="styles/main.css">
 
     <script type="text/javascript" src="http://static.wowhead.com/widgets/power.js"></script>
-    <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>
-
-    <script src="scripts/jquery.js"></script>
+    <script>var wowhead_tooltips = { "colorlinks": true, "iconizelinks": true, "renamelinks": true }</script>    
   </head>
   <body data-state="{{ $state.current.name }}" data-status="{{ status }}" data-version="{{ app.version }}" data-ng-cloak="">
     <!--[if lt IE 7]>
@@ -66,6 +64,8 @@
         <div id="content-wrapper" class="collapsed" data-ng-cloak="" ui-view=""></div>
         
     </div>
+
+    <script src="scripts/jquery.js"></script>
 
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="scripts/modules.js"></script>
