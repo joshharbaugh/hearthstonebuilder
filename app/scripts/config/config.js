@@ -19,8 +19,8 @@ CONFIG = {
 
   routing : {
 
-    prefix : '',
-    html5Mode : false
+    prefix : '!',
+    html5Mode : true
 
   },
 

@@ -1,8 +1,8 @@
 <header>
 	<h1 class="span9 page-title"><span style="color:#32383d;">HearthStone Builder:</span> <span style="color:#767197;">{{ viewTitle }}</span> <span class="muted" style="font-size: 14px" data-ng-show="$stateParams.username">{{ $stateParams.username }}</span></h1>
 	<nav data-ng-show="!user.profile" class="span3" style="padding-top:13px;">
-		<a href="/#/login" class="btn btn-flat span6">Login</a>
-		<a href="/#/register" class="btn btn-flat btn-flat-red span6">Create an account</a>
+		<a href="/login" class="btn btn-flat span6">Login</a>
+		<a href="/register" class="btn btn-flat btn-flat-red span6">Create an account</a>
 	</nav>
 	<nav data-ng-show="user.profile" class="span2 user-profile" data-ng-controller="UserProfileCtrl">
 		<a href="#" class="user-dropdown" data-toggle="dropdown">
@@ -11,9 +11,9 @@
 			<i class="icon-chevron-down"></i>
 		</a>
 		<ul class="dropdown-menu" role="menu">
-			<li><a ui-sref="users.decks({username:user.profile.username})" data-ng-href="#/users/{{ user.profile.username }}/decks">Decks</a></li>
+			<li><a ui-sref="users.decks({username:user.profile.username})" data-ng-href="/users/{{ user.profile.username }}/decks">Decks</a></li>
 			<li class="divider"></li>
-			<li><a ui-sref="users.profile({username:user.profile.username})" data-ng-href="#/users/{{ user.profile.username }}">Profile</a></li>
+			<li><a ui-sref="users.profile({username:user.profile.username})" data-ng-href="/users/{{ user.profile.username }}">Profile</a></li>
 			<!--<li><a ui-sref="users.messages({username:user.profile.username})" data-ng-href="#/users/{{ user.profile.username }}/messages">Messages</a></li>-->
 			<li><a href="/logout">Logout</a></li>
 		</ul>
