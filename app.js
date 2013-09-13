@@ -18,6 +18,7 @@ var express  = require('express'),
     bcrypt   = require('bcrypt'),
     fs       = require('fs'),
     request  = require('request'),
+    AWS      = require('aws-sdk'),
     SALT_WORK_FACTOR = 10;
 
 var app = express();
@@ -192,7 +193,7 @@ app.get('/api/user', ensureAuthenticated, function(req, res){
 	res.json(200, req.user);
 });
 app.post('/api/user', function(req, res){
-	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name }, "saved_decks": [] });
+	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": req.body.avatar }, "saved_decks": [] });
 	new_user.save(function(err) {
 	  if(err) {
 	    res.json(200, { 'status': 'error', 'message': err });
@@ -202,6 +203,7 @@ app.post('/api/user', function(req, res){
 	});
 });
 app.get('/api/user/:id', users.getById);
+app.put('/api/user/:id', users.updateUser);
 
 app.get('/api/deck/:id', decks.getDeckById);
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
@@ -212,6 +214,22 @@ app.put('/api/decks/:id', decks.updateDeck);
 
 app.get('/api/messages/:username', messages.getByUsername);
 app.get('/api/messages/:username/sent', messages.getSentByUsername);
+
+// upload to S3
+app.post('/api/upload', ensureAuthenticated, function(req, res){
+	AWS.config.loadFromPath('./aws.json');
+	
+	var s3 = new AWS.S3({computeChecksums: true});
+	var params = { 
+		Bucket: 'hearthstonebuilder', 
+		Key: req.body.File, 
+		ACL: 'private',
+		ContentType: req.body.ContentType 
+	};
+	s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+		res.json(200, { 'status': 'success', 'upload_url': signedUrl });
+	});	
+});
 
 // catch-all redirect to homepage
 app.get('/api/*', routes.index);

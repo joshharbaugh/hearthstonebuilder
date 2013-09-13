@@ -1,20 +1,33 @@
 <div class="span6 panel">
 	<h2 class="panel-title">Profile</h2>
 	<div class="panel-content">
-		<table class="table table-hover table-striped">
-			<thead>
-				<tr>
-					<th>Username</th>
-					<th>Display Name</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>{{ user.profile.username }}</td>
-					<td>{{ user.profile.display_name }}</td>
-				</tr>
-			</tbody>
-		</table>
+		<form name="profile" data-ng-submit="saveProfile()">
+			<table class="table table-hover table-striped">
+				<tbody>
+					<tr>
+						<td>Display Name</td>
+						<td><input type="text" disabled="disabled" data-ng-model="user.profile.display_name" class="no-margin"></td>
+					</tr>
+					<tr>
+						<td>Username</td>
+						<td><input type="text" disabled="disabled" data-ng-model="user.profile.username" class="no-margin"></td>
+					</tr>
+					<tr>
+						<td>Avatar</td>
+						<td>
+							<img data-ng-src="{{ user.profile.avatar }}">
+							<div file-upload=""></div>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<button type="submit" class="btn btn-flat btn-flat-red">Save</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
 	</div>
 </div>
 

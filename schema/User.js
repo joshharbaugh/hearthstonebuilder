@@ -2,7 +2,7 @@ exports = module.exports = function(app, mongoose, bcrypt, SALT_WORK_FACTOR) {
 
     var UserSchema = new mongoose.Schema({
         password: {type: String, required: true},
-        profile: {username: {type: String, required: true, unique: true}, display_name: String},
+        profile: {username: {type: String, required: true, unique: true}, display_name: String, avatar: String},
         saved_decks: [{deck_id: Number, resource_uri: String}]
     });
 
