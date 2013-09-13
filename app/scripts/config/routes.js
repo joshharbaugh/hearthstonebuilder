@@ -412,6 +412,18 @@ angular.module('hsbApp.Routes', [])
 					$scope.onReady();
 				}]			
 			})
+			.state('logout', {
+				url: '/logout',
+				controller: ['$scope','$http','$state','$rootScope', function($scope, $http, $state, $rootScope) {
+					$scope.viewTitle = 'HearthStone Builder';
+					
+					$http.post('/api/logout').success(function(response) {
+						$rootScope.$state.transitionTo('dashboard.default', {});
+					});
+
+					$scope.onReady();
+				}]			
+			})
 			.state('register', {
 				url: '/register',
 				templateUrl: CONFIG.prepareViewTemplateUrl('user/register'),
