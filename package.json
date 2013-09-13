@@ -16,7 +16,8 @@
     "passport": "*",
     "passport-local": "*",
     "bcrypt": "*",
-    "request": "*"
+    "request": "*",
+    "aws-sdk": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
