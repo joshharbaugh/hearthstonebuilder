@@ -46,32 +46,6 @@ angular.module('hsbApp.FileDirectives', [])
                   // preview image
                   scope.file.src = evt.target.result;
 
-                  /* NOTE: moved to next release
-                  scope.files.push({
-                    'name': file.name, 
-                    'type': file.type,
-                    'contents': evt.target.result
-                  });
-
-                  if (scope.files[0].type == 'text/csv') {                
-                    scope.parsedCSV = $filter('csv2array')(scope.files[0].contents);                  
-                  }
-                  else {
-                    alert('Please upload a valid CSV file.');
-                    scope.files = [];
-                    return;
-                  }
-
-                  // add modal with sample data
-                  var $modal = $('<div/>').appendTo('body');
-                  $modal.addClass('modal fade');
-                  $modal.html('<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h3>Sample Data</h3></div><div class="modal-body"><table class="table"><thead><tr><th data-ng-repeat="col in parsedCSV[0]">{{ col }}</th></tr></thead><tbody><tr><td data-ng-repeat="cell in parsedCSV[1]">{{ cell }}</td></tr><tr><td data-ng-repeat="cell in parsedCSV[2]">{{ cell }}</td></tr><tr><td data-ng-repeat="cell in parsedCSV[3]">{{ cell }}</td></tr></tbody></table></div><div class="modal-footer"><a data-dismiss="modal" aria-hidden="true" class="btn">Cancel</a><a data-dismiss="modal" aria-hidden="true" class="btn btn-primary">Accept</a></div>');
-                  $compile($modal.contents())(scope);
-                  $modal.modal('show');
-                  $modal.on('hidden', function() {
-                    $modal.remove();
-                  });*/
-
                   // manually update our view              
                   scope.$apply(function() {
                     scope.$emit('resizeContent');

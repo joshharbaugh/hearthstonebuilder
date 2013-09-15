@@ -29,7 +29,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in cards.all | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
+							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}" data-ng-hide="disableAllCards">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs">
 								<span data-ng-switch-when="1" class="class-warrior">Warrior</span>

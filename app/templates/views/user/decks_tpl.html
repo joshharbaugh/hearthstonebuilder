@@ -12,7 +12,7 @@
 			</thead>
 			<tbody>
 				<tr data-ng-repeat="deck in userDecks">
-					<td><a ui-sref="decks.detail({ deckId:deck._id })" data-ng-href="/decks/{{ deck._id }}">{{ deck.name }}</a></td>
+					<td><a ui-sref="decks.detail({ deckId:deck._id })" data-ng-href="/decks/{{ deck._id }}">{{ deck.name }}</a> <span data-ng-show="deck.length < 30" class="label label-warning">incomplete</span></td>
 					<td><strong>{{ deck.rating }}</strong></td>
 					<td></td>
 					<td>						

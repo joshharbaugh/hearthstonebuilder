@@ -34,7 +34,7 @@
 				</tbody>
 			</table>
 
-			<button type="button" data-ng-show="deckCounter==30" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px">Save Deck</button>
+			<button type="button" data-ng-show="deckCounter > 0" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px">Save Deck</button>
 
 			<button type="button" class="btn btn-flat btn-flat-red pull-right" style="margin:20px" data-ng-click="clearDeck()">Clear Deck</button>
 
@@ -46,11 +46,11 @@
 				<div class="modal-body">
 					<form data-ng-show="user.profile" data-ng-submit="saveDeck()">
 						<label for="deckName">Deck name: <span class="muted">Required</span></label>
-						<input type="text" data-ng-model="deckName" name="deckName" required="">
+						<input type="text" data-ng-model="deckName" name="deckName" required="" class="span12">
 						<label for="deckDescription">Description: <small class="muted">Optional</small></label>
-						<textarea name="deckDescription" id="deckDescription" cols="10" rows="10" data-ng-model="deckDescription"></textarea>
-						<button type="submit" class="btn btn-flat btn-flat-green">Save Changes</button>
-						<button class="btn btn-flat" data-dismiss="modal" aria-hidden="true">Close</button>
+						<textarea name="deckDescription" id="deckDescription" cols="10" rows="10" class="span12" data-ng-model="deckDescription"></textarea>
+						<button type="submit" class="btn btn-flat btn-flat-green pull-left">Save Changes</button>
+						<button class="btn btn-flat pull-right" data-dismiss="modal" aria-hidden="true">Close</button>
 					</form>
 				</div>
 			</div>					

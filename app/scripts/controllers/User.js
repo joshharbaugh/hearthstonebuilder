@@ -1,8 +1,13 @@
 angular.module('hsbApp.UserControllers', [])
 
-    .controller('UserProfileCtrl',['$scope','$http', function ($scope, $http){
+    .controller('UserProfileCtrl',['$scope','$http','$growl', function ($scope, $http, $growl){
 
         $scope.saveProfile = function() {
+
+            if(!$scope.files[0]) {
+              $growl.msg('Hey!', 'Nothing changed, so nothing\'s been saved.');
+              return;
+            }
 
             var file = $scope.files[0];
 
@@ -30,7 +35,7 @@ angular.module('hsbApp.UserControllers', [])
 
                   if (!xhr) {
 
-                    console.log('Oops! CORS not supported');
+                    $growl.msg('Oops!', 'CORS not supported by your browser');
                     return;
                   
                   }
@@ -56,11 +61,12 @@ angular.module('hsbApp.UserControllers', [])
                       // Event listener for when the file completed uploading
                       $scope.$apply(function() {                                
                         if (xhr.status === 200) {
-                          $scope.uploading     = 'Upload complete!';
-                          console.log('Uploaded to Amazon S3');
-
+                          $scope.uploading = 'Upload complete!';
+                          
                           $http({method: 'PUT', url: '/api/user/' + $scope.user._id, data: { 'avatar': upload_url }}).success(function(response) {
-                            console.log(response);
+                            
+                            $growl.msg('Success!', 'Your profile has been updated');
+                          
                           });
 
                           setTimeout(function() {
@@ -71,7 +77,7 @@ angular.module('hsbApp.UserControllers', [])
                         }
                         else {
 
-                          console.log('Oops! There was an error uploading to Amazon S3');
+                          $growl.msg('Oops!', 'There was an error uploading to Amazon S3. Try again later.');
 
                         }
                       });
@@ -87,20 +93,20 @@ angular.module('hsbApp.UserControllers', [])
 
                 } catch(e) {
 
-                  console.log('Error!', e);
+                  $growl.msg('Error', e);
                   return;
 
                 }
 
             }).error(function(data) {
-                console.log('Something went wrong.');
+                $growl.msg('Error', 'Something went wrong. :(');
             });
 
         };
 
     }])
 
-    .controller('UserRegisterCtrl',['$scope','$http','$state','$rootScope', function ($scope, $http, $state, $rootScope){
+    .controller('UserRegisterCtrl',['$scope','$http','$state','$rootScope','$growl', function ($scope, $http, $state, $rootScope, $growl){
 
         $scope.viewTitle = 'Register';
         $scope.register = function() {
@@ -117,7 +123,7 @@ angular.module('hsbApp.UserControllers', [])
                         if(data.status == "success") {
                             $rootScope.$state.transitionTo('login', {});
                         } else {
-                            console.log(data.message);
+                            $growl.msg('Error', data.message);
                         }
                 }).error(function(data, status) {});
 
@@ -136,7 +142,7 @@ angular.module('hsbApp.UserControllers', [])
         $scope.onReady();
     }])
 
-    .controller('UserDecksCtrl',['$scope','user','decks','$stateParams','$rootScope','$decks', function ($scope, user, decks, $stateParams, $rootScope, $decks){
+    .controller('UserDecksCtrl',['$scope','user','decks','$stateParams','$rootScope','$decks','$growl','$timeout', function ($scope, user, decks, $stateParams, $rootScope, $decks, $growl, $timeout){
         if(typeof user !== "object") {
             $rootScope.$state.transitionTo('dashboard.default', {});
         } else {
@@ -148,8 +154,17 @@ angular.module('hsbApp.UserControllers', [])
         }
 
         $scope.deleteDeck = function(deck) {
-            console.log('delete', deck._id);
-            $decks.deleteById(deck._id);
+            var c = confirm('Are you sure?');
+            if(c) {
+                $timeout(function() {                  
+                  $decks.deleteById(deck._id);
+                  $growl.msg('Success!', 'Deck removed.');
+                  if(decks.indexOf(deck) !== -1) {
+                    var idx = decks.indexOf(deck);
+                    $scope.userDecks.splice(idx, 1);
+                  }
+                });
+            }
         };
 
         $scope.onReady();

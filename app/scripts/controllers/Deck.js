@@ -4,6 +4,19 @@ angular.module('hsbApp.DeckControllers', [])
 
         // GET top decks from resolved promise
         $scope.topDecks = decks;
+        
+        angular.forEach($scope.topDecks, function(deck, idx) {
+
+            // remove incomplete decks
+            if(deck.length < 30) {
+                
+                delete $scope.topDecks[idx];
+            
+            }
+
+        });
+
+        $scope.topDecks = $scope.topDecks.filter( function( el ){ return (typeof el !== "undefined"); } );
 
         $scope.onReady();
 
@@ -93,6 +106,7 @@ angular.module('hsbApp.DeckControllers', [])
 
         if(!cards) {
             var cards = deck.cards;
+            $scope.deckCounter = rawDeck.cards.length;
         }
 
         // stats schema
@@ -382,7 +396,7 @@ angular.module('hsbApp.DeckControllers', [])
 
     }])
 
-    .controller('DeckBuilderCtrl',['$scope','$stateParams','user','$appStorage','$decks','$rootScope', function ($scope, $stateParams, user, $appStorage, $decks, $rootScope){
+    .controller('DeckBuilderCtrl',['$scope','$stateParams','user','$appStorage','$decks','$rootScope','$timeout','$window','$growl', function ($scope, $stateParams, user, $appStorage, $decks, $rootScope, $timeout, $window, $growl){
         
         $scope.deckUser = user;
         $scope.deckClass = $stateParams.deckClass;
@@ -427,13 +441,13 @@ angular.module('hsbApp.DeckControllers', [])
 
                 $scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
             }
-            $scope.deckCounter++;                               
+            $scope.deckCounter++;                             
         });
 
-        $scope.$watch('createdDeck', function(newVal, oldVal) {
+        $scope.$watch('deckCards', function(newVal, oldVal) {
             if(newVal) {
-                console.log(newVal);
-                $appStorage.put('Deck-' + $stateParams.deckClass, newVal);
+                $scope.createdDeck.cards = newVal;
+                $appStorage.put('Deck-' + $stateParams.deckClass, $scope.createdDeck);
             }
         }, true);
 
@@ -441,15 +455,17 @@ angular.module('hsbApp.DeckControllers', [])
             $scope.createdDeck.username = $scope.deckUser.profile.username;
             $scope.createdDeck.author = $scope.deckUser.profile.display_name;
             $scope.createdDeck.name = this.deckName;
-            $scope.createdDeck.description = this.deckDescription;
+            $scope.createdDeck.description = this.deckDescription || null;
+            $scope.createdDeck.length = $scope.deckCounter;
             
             var saveDeckPromise = $decks.saveDeck($scope.createdDeck);
             saveDeckPromise.then(function(data) {
                 if(data) {
                     if(data.status == 'success') {
                         $('#deckModal').modal('hide');
+                        $growl.msg('Success', data.message);
                     } else {
-                        alert('There was a problem. Try saving again.');
+                        $growl.msg('Error', 'There was a problem. Try saving again');
                     }               
                 }
             });
@@ -458,8 +474,16 @@ angular.module('hsbApp.DeckControllers', [])
         $scope.clearDeck = function() {
             var c = confirm('Are you sure?');
             if(c) {
-                $scope.deckCards = [];
-                $appStorage.erase('Deck-' + $stateParams.deckClass);
+                $timeout(function() {
+                    $scope.deckCounter = 0;
+                    $scope.deckCards = [];
+                    $scope.createdDeck = {
+                        "class": $scope.deckClass,
+                        "cards": $scope.deckCards
+                    };
+                    $appStorage.erase('Deck-' + $stateParams.deckClass);
+                    $window.location.href = '/deckbuilder/' + $stateParams.deckClass;
+                });
             }
         };
 
@@ -467,7 +491,7 @@ angular.module('hsbApp.DeckControllers', [])
 
     }])
 
-    .controller('DeckBuilderEditCtrl',['$scope','$stateParams','user','$appStorage','$decks','deck','$rootScope', function ($scope, $stateParams, user, $appStorage, $decks, deck, $rootScope){
+    .controller('DeckBuilderEditCtrl',['$scope','$stateParams','user','$appStorage','$decks','deck','$rootScope','$timeout','$window','$growl', function ($scope, $stateParams, user, $appStorage, $decks, deck, $rootScope, $timeout, $window, $growl){
         if(typeof user !== "object") {
             $rootScope.$state.transitionTo('dashboard.default', {});
         } else {
@@ -527,9 +551,10 @@ angular.module('hsbApp.DeckControllers', [])
                     $scope.deckCounter++;
                 });
 
-                $scope.$watch('createdDeck', function(newVal, oldVal) {
+                $scope.$watch('deckCards', function(newVal, oldVal) {
                     if(newVal) {
-                        $appStorage.put('Deck-' + $stateParams.deckClass, newVal);
+                        $scope.createdDeck.cards = newVal;
+                        $appStorage.put('Deck-' + $stateParams.deckClass, $scope.createdDeck);
                     }
                 }, true);
 
@@ -537,16 +562,18 @@ angular.module('hsbApp.DeckControllers', [])
                     $scope.createdDeck.username = $scope.deckUser.profile.username;
                     $scope.createdDeck.author = $scope.deckUser.profile.display_name;
                     $scope.createdDeck.name = this.deckName;
-                    $scope.createdDeck.description = this.deckDescription;
+                    $scope.createdDeck.description = this.deckDescription || null;
+                    $scope.createdDeck.length = $scope.deckCounter;
                     
                     var updateDeckPromise = $decks.updateDeck($scope.createdDeck);
                     updateDeckPromise.then(function(data) {
                         if(data) {
                             if(data.status == 'success') {
                                 $('#deckModal').modal('hide');
+                                $growl.msg('Success', data.message);
                             } else {
-                                alert('There was a problem. Try saving again.');
-                            }               
+                                $growl.msg('Error', 'There was a problem. Try saving again');
+                            }                
                         }
                     });
                 };
@@ -554,8 +581,16 @@ angular.module('hsbApp.DeckControllers', [])
                 $scope.clearDeck = function() {
                     var c = confirm('Are you sure?');
                     if(c) {
-                        $scope.deckCards = [];
-                        $appStorage.erase('Deck-' + $stateParams.deckClass);
+                        $timeout(function() {
+                            $scope.deckCounter = 0;
+                            $scope.deckCards = [];
+                            $scope.createdDeck = {
+                                "class": $scope.deckClass,
+                                "cards": $scope.deckCards
+                            };
+                            $appStorage.erase('Deck-' + $stateParams.deckClass);
+                            $window.location.href = '/deckbuilder/' + $stateParams.deckClass;
+                        });
                     }
                 };
 
@@ -577,7 +612,7 @@ angular.module('hsbApp.DeckControllers', [])
         $scope.cards.heroPower = heroPowerCards;
         $scope.cards.minion = minionCards;
         $scope.cards.weapon = weaponCards;
-
+        
         $scope.$watch('cards', function(newVal, oldVal) {
             if(newVal) {
                 $scope.cards = newVal;      
@@ -597,11 +632,13 @@ angular.module('hsbApp.DeckControllers', [])
             }
         };
 
-        $scope.createdDeck = $scope.$parent.$$childHead.createdDeck;
-
-        $scope.$watch('createdDeck', function(newVal, oldVal) {
+        $scope.$parent.$$childHead.$watch('deckCards', function(newVal, oldVal) {
             if(newVal) {
-                angular.forEach(newVal.cards, function(card, idx) {
+                angular.forEach(newVal, function(card, idx) {
+
+                    if(card.remaining == 0) {
+                        card.disabled = true;
+                    }
 
                     if(card.limit && card.limit > 0) {
                         switch(parseInt(card.type))
@@ -718,7 +755,15 @@ angular.module('hsbApp.DeckControllers', [])
                     }
                 });
             }
-        });
+        }, true);
+
+        $scope.$parent.$$childHead.$watch('deckCounter', function(newVal, oldVal) {
+            if(newVal) {
+                if(newVal >= 30) {
+                    $scope.disableAllCards = true;
+                }
+            }
+        }, true);
 
         $scope.onReady();
 

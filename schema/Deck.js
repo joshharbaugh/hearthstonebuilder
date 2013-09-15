@@ -15,7 +15,9 @@ exports = module.exports = function(app, mongoose) {
         quality: Number,
         image: String,
         icon: String,
-        limit: Number
+        limit: Number,
+        qty: Number,
+        remaining: Number
     });
 
     app.db.model('Card', CardSchema);
@@ -29,6 +31,7 @@ exports = module.exports = function(app, mongoose) {
         created: Date,
         last_modified: Date,
         rating: Number,
+        length: Number,
         cards: [CardSchema]
     });
 

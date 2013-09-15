@@ -18,6 +18,7 @@ var hsbApp = window.hsbApp = angular.module('hsbApp',
     'hsbApp.MessageServices',
     'hsbApp.CardServices',
     'hsbApp.DeckServices',
+    'hsbApp.NotificationServices',
     'hsbApp.Routes',
     'hsbApp.FileDirectives'
   ]

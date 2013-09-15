@@ -40,6 +40,7 @@ exports.getDecksByUsername = function(req, res){
 
 exports.saveDeckToUsername = function(req, res){
 	var requestPayload = req.body;
+	console.log(requestPayload);
 	res.app.db.models.Deck.findOne({ name: req.body.name }, function (err, doc) {
 		if (err) {
 			res.json(200, { 'status': 'error', 'data': err });
@@ -59,7 +60,7 @@ exports.saveDeckToUsername = function(req, res){
 
 exports.updateDeck = function(req, res){
 	var o = req.body;
-	res.app.db.models.Deck.update({ _id: req.params.id }, { author: o.author, cards: o.cards, class: o.class, last_modified: new Date(), description: o.description, name: o.name }, { upsert: true }, function (err, numberAffected, raw) {
+	res.app.db.models.Deck.update({ _id: req.params.id }, { author: o.author, cards: o.cards, class: o.class, last_modified: new Date(), description: o.description, name: o.name, length: o.length }, { upsert: true }, function (err, numberAffected, raw) {
 		if (err) {
 			res.json(200, { 'status': 'error', 'data': err });
 		} else {
