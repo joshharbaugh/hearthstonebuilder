@@ -188,6 +188,7 @@ app.post('/api/user', function(req, res){
 	  }
 	});
 });
+app.get('/api/user/:username', users.getByUsername);
 app.get('/api/user/:id', users.getById);
 app.put('/api/user/:id', ensureAuthenticated, users.updateUser);
 

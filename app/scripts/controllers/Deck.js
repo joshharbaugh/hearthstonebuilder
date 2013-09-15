@@ -44,17 +44,24 @@ angular.module('hsbApp.DeckControllers', [])
 
     }])
 
-    .controller('DeckSummaryCtrl',['$scope','$stateParams','deck','user','$decks', function ($scope, $stateParams, deck, user, $decks){
+    .controller('DeckSummaryCtrl',['$scope','$stateParams','deck','user','$decks','$users', function ($scope, $stateParams, deck, user, $decks, $users){
 
         $scope.userVotedForDeck = false;
         $scope.voting = true;
 
+        $scope.deck = deck;
+        var deckAuthorPromise = $users.getByUsername(deck.username);
+        deckAuthorPromise.then(function(response) {
+            if(response) {
+                $scope.deckAuthor = response;
+            }
+        });
+
         if(typeof user !== "object") {
 
-            $scope.voting = false;
+            $scope.voting = false;            
 
         } else {
-            $scope.deck = deck;
 
             if(user.votes.indexOf($scope.deck._id) === 0) {
 
@@ -105,8 +112,8 @@ angular.module('hsbApp.DeckControllers', [])
     .controller('DeckStatsCtrl',['$scope','deck','cards','rawDeck', function ($scope, deck, cards, rawDeck){
 
         if(!cards) {
-            var cards = deck.cards;
-            $scope.deckCounter = rawDeck.cards.length;
+            var DeckCards = deck.cards;
+            $scope.unfilteredCards = [];
         }
 
         // stats schema
@@ -141,7 +148,13 @@ angular.module('hsbApp.DeckControllers', [])
         };
         
         // loopthrough and sort 
-        angular.forEach(cards, function(obj, idx) {
+        angular.forEach(DeckCards, function(obj, idx) {
+            if(obj.qty) {
+                $scope.unfilteredCards.push(obj);
+                $scope.unfilteredCards.push(obj);
+            } else {
+                $scope.unfilteredCards.push(obj);
+            }
             // by type
             if(parseInt(obj.type) == 5) {
                 $scope.stats.type.ability.push(obj);
@@ -211,6 +224,8 @@ angular.module('hsbApp.DeckControllers', [])
                 $scope.stats.cost.tenplus.push(obj);
             }
         });
+
+        $scope.deckCounter = $scope.unfilteredCards.length;
 
         var stats_rarity = new Morris.Donut({
             element: 'stats-rarity',
@@ -306,19 +321,19 @@ angular.module('hsbApp.DeckControllers', [])
         $scope.startingHandSecond = [];
 
         for(var i=0; i<3; i++) {
-            $scope.startingHandFirst[i] = Math.floor((Math.random()*30));
+            $scope.startingHandFirst.push(Math.floor((Math.random() * $scope.unfilteredCards.length)));
         }
-
+        
         for(var i=0; i<4; i++) {
-            $scope.startingHandSecond[i] = Math.floor((Math.random()*30));
+            $scope.startingHandSecond.push(Math.floor((Math.random() * $scope.unfilteredCards.length)));
         }
         
         angular.forEach($scope.startingHandFirst, function(cardNumber, idx) {
-            $scope.startingHandFirst[idx] = rawDeck.cards[cardNumber];
+            $scope.startingHandFirst[idx] = $scope.unfilteredCards[cardNumber];
         });
 
         angular.forEach($scope.startingHandSecond, function(cardNumber, idx) {
-            $scope.startingHandSecond[idx] = rawDeck.cards[cardNumber];
+            $scope.startingHandSecond[idx] = $scope.unfilteredCards[cardNumber];
         });
 
         // Hypergeometric distribution functions

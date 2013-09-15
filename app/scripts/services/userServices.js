@@ -14,6 +14,18 @@ angular.module('hsbApp.UserServices', [])
 					});
 				
 				return deferred.promise;
+			},
+			getByUsername: function(username) {
+				var deferred = $q.defer();				
+				$http({ method:'GET',url:'/api/user/' + username })
+					.success(function(data,status,headers,request) {
+						deferred.resolve(data);
+					})
+					.error(function(data,status) {
+						deferred.reject(status);
+					});
+				
+				return deferred.promise;
 			}
 		};
 
