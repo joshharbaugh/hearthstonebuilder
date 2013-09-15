@@ -89,7 +89,7 @@ app.use(express.logger('dev'));
 app.use(express.cookieParser());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.session({ secret: 'dfj3fk2i3lkjfsld92492kc0!fkjdf0249fk29#4dkf92j' }));
+app.use(express.cookieSession({secret: 'dfj3fk2i3lkjfsld92492kc0!fkjdf0249fk29#4dkf92j', cookie: { maxAge: 1000*60*60 } }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
@@ -103,7 +103,6 @@ if ('development' == app.get('env')) {
 	});
 	app.use(express.errorHandler());
 } else {
-	app.use(express.cookieSession({secret: 'dfj3fk2i3lkjfsld92492kc0!fkjdf0249fk29#4dkf92j', cookie: { maxAge: 1000*60*60 } }))
 	app.use(express.static(path.join(__dirname, 'dist')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
