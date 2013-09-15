@@ -201,6 +201,10 @@ angular.module('hsbApp.Routes', [])
 					function($stateParams, $decks) {
 						return $decks.getById($stateParams.deckId);
 					}],
+					rawDeck: ['$stateParams', '$decks',
+					function($stateParams, $decks) {
+						return $decks.getById($stateParams.deckId);
+					}],
 					cards: ['$stateParams', '$decks',
 					function($stateParams, $decks) {
 						var deckPromise = $decks.getById($stateParams.deckId);

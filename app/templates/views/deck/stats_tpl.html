@@ -18,3 +18,113 @@
 		</div>
 	</div>
 </div>
+
+<div class="panel">
+	<h2 class="panel-title">Random Starting Hand</h2>
+	<div class="panel-content">
+		<div class="stats-container">
+			<h2 class="caption">1st</h2>
+			<div class="container-fluid">
+				<div data-ng-repeat="card in startingHandFirst" class="span4">
+					<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}"><img width="193" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt="{{ card.name }}" /></a>
+				</div>
+			</div>
+		</div>
+		<div class="stats-container">
+			<h2 class="caption">2nd</h2>
+			<div class="container-fluid">
+				<div data-ng-repeat="card in startingHandSecond" class="span3">
+					<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}"><img width="193" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt="{{ card.name }}" /></a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="panel">
+	<h2 class="panel-title">Probabilities
+		<ul class="nav-pills pull-right nav-messages">
+			<li class="active"><a data-target="#first" data-toggle="tab">1st</a></li>
+			<li><a data-target="#second" data-toggle="tab">2nd</a></li>
+		</ul>
+	</h2>
+	<div class="panel-content">
+		<div class="description">
+			<p style="margin:10px 14px;font-style:italic;" class="muted">These are the probabilities that you will have drawn the given card at least once by a certain turn.</p>
+		</div>
+		<div class="pill-content">
+			<div class="stats-container pill-pane active" id="first">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Starting Hand</th>
+							<th>Turn 1</th>
+							<th>Turn 2</th>
+							<th>Turn 3</th>
+							<th>Turn 4</th>
+							<th>Turn 5</th>
+							<th>Turn 6</th>
+							<th>Turn 7</th>
+							<th>Turn 8</th>
+							<th>Turn 9</th>
+							<th>Turn 10</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in deck.cards">
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}">{{ card.name }}</a></strong> x{{ card.qty || 1 }}</td>
+							<td>{{ card.probabilities.first[0] }}</td>
+							<td>{{ card.probabilities.first[1] }}</td>
+							<td>{{ card.probabilities.first[2] }}</td>
+							<td>{{ card.probabilities.first[3] }}</td>
+							<td>{{ card.probabilities.first[4] }}</td>
+							<td>{{ card.probabilities.first[5] }}</td>
+							<td>{{ card.probabilities.first[6] }}</td>
+							<td>{{ card.probabilities.first[7] }}</td>
+							<td>{{ card.probabilities.first[8] }}</td>
+							<td>{{ card.probabilities.first[9] }}</td>
+							<td>{{ card.probabilities.first[10] }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="stats-container pill-pane" id="second">
+				<table class="table table-hover table-striped">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Starting Hand</th>
+							<th>Turn 1</th>
+							<th>Turn 2</th>
+							<th>Turn 3</th>
+							<th>Turn 4</th>
+							<th>Turn 5</th>
+							<th>Turn 6</th>
+							<th>Turn 7</th>
+							<th>Turn 8</th>
+							<th>Turn 9</th>
+							<th>Turn 10</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="card in deck.cards">
+							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}">{{ card.name }}</a></strong> x{{ card.qty || 1 }}</td>
+							<td>{{ card.probabilities.second[0] }}</td>
+							<td>{{ card.probabilities.second[1] }}</td>
+							<td>{{ card.probabilities.second[2] }}</td>
+							<td>{{ card.probabilities.second[3] }}</td>
+							<td>{{ card.probabilities.second[4] }}</td>
+							<td>{{ card.probabilities.second[5] }}</td>
+							<td>{{ card.probabilities.second[6] }}</td>
+							<td>{{ card.probabilities.second[7] }}</td>
+							<td>{{ card.probabilities.second[8] }}</td>
+							<td>{{ card.probabilities.second[9] }}</td>
+							<td>{{ card.probabilities.second[10] }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
