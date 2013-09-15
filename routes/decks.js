@@ -69,3 +69,20 @@ exports.updateDeck = function(req, res){
 		}		
 	});
 };
+
+exports.updateDeckRating = function(req, res){
+	var o = req.body;
+	res.app.db.models.Deck.update({ _id: req.params.id }, { rating: o.rating }, { upsert: true }, function (err, numberAffected, raw) {
+		if (err) {
+			res.json(200, { 'status': 'error', 'data': err });
+		} else {
+			res.app.db.models.User.update({ _id: o.user_id }, { $addToSet: { votes: o.deck_id } }, { upsert: true }, function (err, numberAffected, raw) {
+				if (err) {
+					res.json(200, { 'status': 'error', 'data': err });
+				} else {
+					res.json(200, { 'status': 'success', 'message': 'Rating updated successfully!', 'raw': raw });
+				}
+			});
+		}
+	});
+};

@@ -20,7 +20,18 @@
 			</tr>
 			<tr>
 				<td><strong>Rating</strong></td>
-				<td><strong>{{ deck.rating }}</strong></td>
+				<td>
+					<strong>{{ deck.rating }}</strong>
+					<span data-ng-show="user.profile" data-ng-hide="userVotedForDeck || !voting">
+						<a data-ng-click="upVote(deck.rating)" class="btn btn-mini btn-flat btn-flat-green" data-ng-class="{'disabled': userVotedForDeck}"><i class="icon-arrow-up icon-white"></i></a> <a data-ng-click="downVote(deck.rating)" class="btn btn-mini btn-flat btn-flat-red" data-ng-class="{'disabled': userVotedForDeck}"><i class="icon-arrow-down icon-white"></i></a>
+					</span> 
+					<span data-ng-show="userVotedForDeck" class="label label-info">
+						<i class="icon-ok icon-white"></i> Voted
+					</span>
+					<span data-ng-show="!voting">
+						<a href="/login"><em>Login to vote</em></a>
+					</span>
+				</td>
 			</tr>
 			<tr>
 				<td><strong>Link to Deck</strong></td>

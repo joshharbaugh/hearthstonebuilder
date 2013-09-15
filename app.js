@@ -193,7 +193,7 @@ app.get('/api/user', ensureAuthenticated, function(req, res){
 	res.json(200, req.user);
 });
 app.post('/api/user', function(req, res){
-	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": req.body.avatar }, "saved_decks": [] });
+	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": "https://s3.amazonaws.com/hearthstonebuilder/avatars/default_gravatar.jpg" }, "saved_decks": [] });
 	new_user.save(function(err) {
 	  if(err) {
 	    res.json(200, { 'status': 'error', 'message': err });
@@ -211,6 +211,7 @@ app.get('/api/decks', decks.list);
 app.get('/api/decks/:username', decks.getDecksByUsername);
 app.post('/api/decks/:username', decks.saveDeckToUsername);
 app.put('/api/decks/:id', decks.updateDeck);
+app.put('/api/decks/:id/rating', decks.updateDeckRating);
 
 app.get('/api/messages/:username', messages.getByUsername);
 app.get('/api/messages/:username/sent', messages.getSentByUsername);

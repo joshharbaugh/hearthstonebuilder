@@ -198,6 +198,199 @@ h1,h2,h3,h4,h5,h6 {
 }
 .class-warrior { color: #C69B6D !important; }
 
+/* Dashboard class selections */
+.deckbuilder-class-selection {
+    display: inline-block;
+    position: relative;
+    height: 157px;
+    width: 189px !important;
+
+    span {
+        display: block;
+        height: 157px;
+        width: 189px !important;
+    }
+
+    .deckbuilder-class-selection-portrait {
+        display: block;
+        background: url(../images/class-portraits.jpg);
+        height: 93px !important;
+        margin: 20px auto 0 !important;
+        width: 132px !important;
+        border: 3px solid #32383d;
+        -webkit-border-radius: 0 0 10px 10px;
+        -moz-border-radius: 0 0 10px 10px;
+        border-radius: 0 0 10px 10px;
+    }
+
+    .deckbuilder-class-selection-frame {
+        /*background: url(../images/sprite.png) no-repeat 0 -16px;*/
+        left: 0;
+        position: absolute;
+        top: 0;
+
+        .deckbuilder-class-selection-name {
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1.2;
+            height: auto !important;
+            padding: 5px 0;
+            text-align: center;
+            width: 138px !important;
+            background: #32383d;
+            margin: 0 auto;
+            -webkit-border-radius: 0 10px 0 0;
+            -moz-border-radius: 0 10px 0 0;
+            border-radius: 0 10px 0 0;
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat 0 0;
+                height: 35px !important;
+                left: 16px;
+                position: absolute;
+                top: -5px;
+                width: 35px !important;
+            }
+        }
+    }
+
+    &.druid {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -1023px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -385px;
+            }
+
+        }
+    }
+
+    &.hunter {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -279px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -105px;
+            }
+
+        }
+    }
+
+    &.mage {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -744px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -280px;
+            }
+
+        }
+    }
+
+    &.paladin {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -186px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -70px;
+            }
+
+        }
+    }
+
+    &.priest {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -465px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -175px;
+            }
+
+        }
+    }
+
+    &.rogue {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -372px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -140px;
+            }
+
+        }
+    }
+
+    &.shaman {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -651px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -245px;
+            }
+
+        }
+    }
+
+    &.warlock {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -837px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -315px;
+            }
+
+        }
+    }
+
+    &.warrior {
+
+        .deckbuilder-class-selection-portrait {
+            background-position: 0 -93px;
+        }
+
+        .deckbuilder-class-selection-name {
+
+            .deckbuilder-class-selection-icon {
+                background: url(../images/sprite.png) no-repeat -189px -35px;
+            }
+
+        }
+    }
+}
+
 /* Sidebar */
 #sidebar-wrapper {
     background: #2b3035;

@@ -58,6 +58,17 @@ angular.module('hsbApp.DeckServices', [])
 					});
 				return deferred.promise;
 			},
+			updateDeckRating: function(payload) {
+				var deferred = $q.defer();				
+				$http({ method:'PUT', url:'/api/decks/' + payload.deck_id + '/rating', data: payload })
+					.success(function(data,status,headers,request) {
+						deferred.resolve(data);
+					})
+					.error(function(data,status) {
+						deferred.reject(status);
+					});
+				return deferred.promise;
+			},
 			deleteById: function(id) {
 				var deferred = $q.defer();				
 				$http({ method:'DELETE',url:'/api/deck/' + id })

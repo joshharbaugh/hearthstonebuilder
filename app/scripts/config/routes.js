@@ -210,6 +210,10 @@ angular.module('hsbApp.Routes', [])
 								return cards;
 							}
 						});
+					}],
+					user: ['$users',
+					function( $users ){
+						return $users.getCurrent();
 					}]
 				},
 				views: {
@@ -218,7 +222,8 @@ angular.module('hsbApp.Routes', [])
 						controller: 'DeckDetailCtrl'
 					},
 					'summary@decks.detail': {
-						templateUrl: CONFIG.prepareViewTemplateUrl('deck/summary')
+						templateUrl: CONFIG.prepareViewTemplateUrl('deck/summary'),
+						controller: 'DeckSummaryCtrl'
 					},
 					'stats@decks.detail': {
 						templateUrl: CONFIG.prepareViewTemplateUrl('deck/stats'),

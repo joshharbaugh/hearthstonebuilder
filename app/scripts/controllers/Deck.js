@@ -31,6 +31,64 @@ angular.module('hsbApp.DeckControllers', [])
 
 	}])
 
+	.controller('DeckSummaryCtrl',['$scope','$stateParams','deck','user','$decks', function ($scope, $stateParams, deck, user, $decks){
+
+		$scope.userVotedForDeck = false;
+		$scope.voting = true;
+
+		if(typeof user !== "object") {
+
+			$scope.voting = false;
+
+		} else {
+			$scope.deck = deck;
+
+			if(user.votes.indexOf($scope.deck._id) === 0) {
+
+				$scope.userVotedForDeck = true;
+
+			} else {
+
+				$scope.upVote = function(rating) {
+					$scope.deck.rating++;
+					var payload = {
+						'rating': $scope.deck.rating,
+						'user_id': user._id,
+						'deck_id': $scope.deck._id
+					};
+					var updateRatingPromise = $decks.updateDeckRating(payload);
+					updateRatingPromise.then(function(data) {
+						if(data) {
+							if(data.status == 'success') {
+								$scope.userVotedForDeck = true;
+							} else {}
+						}
+					});
+				};
+
+				$scope.downVote = function(rating) {
+					$scope.deck.rating--;
+					var payload = {
+						'rating': $scope.deck.rating,
+						'user_id': user._id,
+						'deck_id': $scope.deck._id
+					};
+					var updateRatingPromise = $decks.updateDeckRating(payload);
+					updateRatingPromise.then(function(data) {
+						if(data) {
+							if(data.status == 'success') {
+								$scope.userVotedForDeck = true;
+							} else {}
+						}
+					});
+				};
+
+			}
+
+		}
+
+	}])
+
 	.controller('DeckStatsCtrl',['$scope','deck','cards', function ($scope, deck, cards){
 
 		if(!cards) {
