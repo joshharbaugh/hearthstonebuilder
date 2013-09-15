@@ -102,7 +102,7 @@ angular.module('hsbApp.UserControllers', [])
 
     .controller('UserRegisterCtrl',['$scope','$http','$state','$rootScope', function ($scope, $http, $state, $rootScope){
 
-        $scope.viewTitle = 'HearthStone Builder';
+        $scope.viewTitle = 'Register';
         $scope.register = function() {
 
             try {

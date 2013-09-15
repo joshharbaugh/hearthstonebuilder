@@ -412,7 +412,7 @@ angular.module('hsbApp.Routes', [])
 					}]
 				},
 				controller: ['$scope','user', function($scope, user) {
-					$scope.viewTitle = 'HearthStone Builder';
+					$scope.viewTitle = 'Login';
 					$scope.user = user;
 					$scope.onReady();
 				}]			
