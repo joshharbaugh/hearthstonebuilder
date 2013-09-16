@@ -19,6 +19,8 @@ var express  = require('express'),
     fs       = require('fs'),
     request  = require('request'),
     AWS      = require('aws-sdk'),
+    ironio   = require('node-ironio')('mKlVDXJnFUVIFDHEXkrxO6g8aDU'),
+    project  = ironio.projects('52376a31fa13cc000900000a'),
     SALT_WORK_FACTOR = 10;
 
 var app = express();
@@ -148,7 +150,27 @@ app.post('/api/logout', function(req, res){
 });
 
 // RESTful API
-app.get('/api/cards', cards.list);
+app.get('/api/cards', function(req, res) {
+	// IronCache
+	var c = project.caches('mycache');
+
+	// Get an item from the cache
+	c.get('cards', function(err, val) {
+		if(val) {
+			res.json(200, JSON.parse(val));
+		} else {
+			res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
+				if (err) res.send(500, err);
+				else {
+					c.put('cards', JSON.stringify(response), function(err) {
+						if(err) res.send(500, err);
+						else res.json(200, response);
+					});
+				}
+			});
+		}
+	});
+});
 app.get('/api/cards/images', cards.images);
 app.get('/api/cards/images/download', function(req, res) {
 	res.app.db.models.Card.find({}, { _id: false, image: true }).exec(function(err, response) {
@@ -194,7 +216,28 @@ app.put('/api/user/:id', ensureAuthenticated, users.updateUser);
 
 app.get('/api/deck/:id', decks.getDeckById);
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
-app.get('/api/decks', decks.list);
+//app.get('/api/decks', decks.list);
+app.get('/api/decks', function(req, res) {
+	// IronCache
+	var c = project.caches('mycache');
+
+	// Get an item from the cache
+	c.get('decks', function(err, val) {
+		if(val) {
+			res.json(200, JSON.parse(val));
+		} else {
+			res.app.db.models.Deck.find({}).sort({ rating: 'desc' }).exec(function(err, response) {
+				if (err) res.send(500, err);
+				else {
+					c.put('decks', JSON.stringify(response), function(err) {
+						if(err) res.send(500, err);
+						else res.json(200, response);
+					});
+				}
+			});
+		}
+	});
+});
 app.get('/api/decks/:username', decks.getDecksByUsername);
 app.post('/api/decks/:username', ensureAuthenticated, decks.saveDeckToUsername);
 app.put('/api/decks/:id', ensureAuthenticated, decks.updateDeck);

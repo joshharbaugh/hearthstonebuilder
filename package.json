@@ -17,7 +17,8 @@
     "passport-local": "*",
     "bcrypt": "*",
     "request": "*",
-    "aws-sdk": "*"
+    "aws-sdk": "*",
+    "node-ironio": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
