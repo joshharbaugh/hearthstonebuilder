@@ -18,7 +18,8 @@
     "bcrypt": "*",
     "request": "*",
     "aws-sdk": "*",
-    "node-ironio": "*"
+    "node-ironio": "*",
+    "raven": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
