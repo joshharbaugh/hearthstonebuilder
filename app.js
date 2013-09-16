@@ -227,7 +227,37 @@ app.get('/api/user/:username', users.getByUsername);
 app.get('/api/user/:id', users.getById);
 app.put('/api/user/:id', ensureAuthenticated, users.updateUser);
 
-app.get('/api/deck/:id', decks.getDeckById);
+app.get('/api/deck/:id', function(req, res) {
+	// Get a deck from the cache
+	c.get('deck_' + req.params.id, function(err, val) {
+		if(val) {
+			console.log('pulling from cache');
+			res.json(200, JSON.parse(val));
+
+			res.app.db.models.Deck.findOne({ _id: req.params.id }, function(err, deck) {
+				if (err) console.log(err);
+				else {
+					c.put('deck_' + req.params.id, JSON.stringify(deck), function(err) {
+						if(err) console.log(err);
+					});
+				}
+			});
+		} else {
+			console.log('setting cache');
+			res.app.db.models.Deck.findOne({ _id: req.params.id }, function(err, deck) {
+				if (err) console.log(err);
+				else {
+					c.put('deck_' + req.params.id, JSON.stringify(deck), function(err) {
+						if (err) res.send(500, err);
+						else {
+							res.json(200, deck);
+						}
+					});
+				}
+			});
+		}
+	});
+});
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 //app.get('/api/decks', decks.list);
 app.get('/api/decks', function(req, res) {
