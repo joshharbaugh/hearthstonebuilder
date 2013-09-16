@@ -25,6 +25,13 @@ var express  = require('express'),
 
 var app = express();
 
+// IronCache
+if ('development' == app.get('env')) {
+	var c = project.caches('hsb-dev');
+} else {
+	var c = project.caches('hsb-prod');
+}
+
 app.set('mongodb-uri', process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'localhost/test');
 
 app.db = mongoose.createConnection(app.get('mongodb-uri'));
@@ -151,9 +158,6 @@ app.post('/api/logout', function(req, res){
 
 // RESTful API
 app.get('/api/cards', function(req, res) {
-	// IronCache
-	var c = project.caches('mycache');
-
 	// Get an item from the cache
 	c.get('cards', function(err, val) {
 		if(val) {
@@ -227,9 +231,6 @@ app.get('/api/deck/:id', decks.getDeckById);
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 //app.get('/api/decks', decks.list);
 app.get('/api/decks', function(req, res) {
-	// IronCache
-	var c = project.caches('mycache');
-
 	// Get an item from the cache
 	c.get('decks', function(err, val) {
 		if(val) {
