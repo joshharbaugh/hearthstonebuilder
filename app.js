@@ -160,11 +160,10 @@ app.get('/api/cards', function(req, res) {
 			res.json(200, JSON.parse(val));
 
 			res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) res.send(500, err);
+				if (err) console.log(err);
 				else {
 					c.put('cards', JSON.stringify(response), function(err) {
-						if(err) res.send(500, err);
-						else res.json(200, response);
+						if(err) console.log(err);
 					});
 				}
 			});
@@ -237,11 +236,10 @@ app.get('/api/decks', function(req, res) {
 			res.json(200, JSON.parse(val));
 
 			res.app.db.models.Deck.find({}).sort({ rating: 'desc' }).exec(function(err, response) {
-				if (err) res.send(500, err);
+				if(err) console.log(err);
 				else {
 					c.put('decks', JSON.stringify(response), function(err) {
-						if(err) res.send(500, err);
-						else res.json(200, response);
+						if(err) console.log(err);
 					});
 				}
 			});
