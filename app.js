@@ -102,8 +102,8 @@ app.use(express.methodOverride());
 app.use(express.cookieSession({secret: 'dfj3fk2i3lkjfsld92492kc0!fkjdf0249fk29#4dkf92j', cookie: { maxAge: 1000*60*60 } }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(raven.middleware.express('https://7907b957d0e44be88b4464c41fd47826:8d791509cb3f453bbba8826bd1b1fb04@app.getsentry.com/13116'));
 app.use(app.router);
+app.use(raven.middleware.express('https://7907b957d0e44be88b4464c41fd47826:8d791509cb3f453bbba8826bd1b1fb04@app.getsentry.com/13116'));
 
 // development only
 if ('development' == app.get('env')) {
@@ -138,6 +138,12 @@ if ('development' == app.get('env')) {
 	res.json(200, hearthstonecards);
 });*/
 
+/* TEST FORCE ERROR
+app.get('/error', function(req, res, next) {
+	var err = 'final error message';
+	next(err);
+});*/
+
 // Passport Auth
 app.post('/login', function(req, res, next) {
 	passport.authenticate('local', function(err, user, info) {
@@ -159,14 +165,14 @@ app.post('/api/logout', function(req, res){
 });
 
 // RESTful API
-app.get('/api/cards', function(req, res) {
+app.get('/api/cards', function(req, res, next) {
 	// Get an item from the cache
 	c.get('cards', function(err, val) {
 		if(val) {
 			res.json(200, JSON.parse(val));
 
 			res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) console.log(err);
+				if (err) next(err);
 				else {
 					c.put('cards', JSON.stringify(response), function(err) {
 						if(err) console.log(err);
@@ -175,10 +181,10 @@ app.get('/api/cards', function(req, res) {
 			});
 		} else {
 			res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) res.send(500, err);
+				if (err) next(err);
 				else {
 					c.put('cards', JSON.stringify(response), function(err) {
-						if(err) res.send(500, err);
+						if(err) next(err);
 						else res.json(200, response);
 					});
 				}
@@ -187,13 +193,13 @@ app.get('/api/cards', function(req, res) {
 	});
 });
 app.get('/api/cards/images', cards.images);
-app.get('/api/cards/images/download', function(req, res) {
+app.get('/api/cards/images/download', function(req, res, next) {
 	res.app.db.models.Card.find({}, { _id: false, image: true }).exec(function(err, response) {
-		if (err) res.send(500, err);
+		if (err) next(err);
 		else {
 			var download = function(uri, filename){
 				request({ 'uri': uri, 'encoding': 'binary' }, function(err, res, body) {
-					if(err) throw err;
+					if(err) next(err);
 					console.log('content-type:', res.headers['content-type']);
 					console.log('content-length:', res.headers['content-length']);
 					console.log('file:', filename);
@@ -206,9 +212,129 @@ app.get('/api/cards/images/download', function(req, res) {
 		}
 	});
 });
-app.get('/api/cards/class/:classId', cards.getCardsByClass);
-app.get('/api/cards/type/:typeId', cards.getCardsByType);
-app.get('/api/cards/type/:typeId/class/:classId', cards.getCardsByTypeAndClass);
+app.get('/api/cards/class/:classId', function(req, res, next) {
+	// Get an item from the cache
+	c.get('cards_class_' + req.params.classId, function(err, val) {
+		if(val) {
+			res.json(200, JSON.parse(val));
+
+			res.app.db.models.Card.find({}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					for(var i=0; i<response.length; i++) {
+						if(response[i].quality == 5) {
+							response[i].limit = 1;
+						} else {
+							response[i].limit = 2;
+						}
+					}
+					c.put('cards_class_' + req.params.classId, JSON.stringify(response), function(err) {
+						if(err) next(err);
+					});
+				}
+			});
+		} else {
+			res.app.db.models.Card.find({}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					for(var i=0; i<response.length; i++) {
+						if(response[i].quality == 5) {
+							response[i].limit = 1;
+						} else {
+							response[i].limit = 2;
+						}
+					}
+					c.put('cards_class_' + req.params.classId, JSON.stringify(response), function(err) {
+						if(err) next(err);
+						else res.json(200, response);
+					});
+				}
+			});
+		}
+	});
+});
+app.get('/api/cards/type/:typeId', function(req, res, next) {
+	// Get an item from the cache
+	c.get('cards_type_' + req.params.typeId, function(err, val) {
+		if(val) {
+			res.json(200, JSON.parse(val));
+
+			res.app.db.models.Card.find({type:req.params.typeId}).sort({ name: 'asc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					for(var i=0; i<response.length; i++) {
+						if(response[i].quality == 5) {
+							response[i].limit = 1;
+						} else {
+							response[i].limit = 2;
+						}
+					}
+					c.put('cards_type_' + req.params.typeId, JSON.stringify(response), function(err) {
+						if(err) next(err);
+					});
+				}
+			});
+		} else {
+			res.app.db.models.Card.find({type:req.params.typeId}).sort({ name: 'asc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					for(var i=0; i<response.length; i++) {
+						if(response[i].quality == 5) {
+							response[i].limit = 1;
+						} else {
+							response[i].limit = 2;
+						}
+					}
+					c.put('cards_type_' + req.params.typeId, JSON.stringify(response), function(err) {
+						if(err) next(err);
+						else res.json(200, response);
+					});
+				}
+			});
+		}
+	});
+});
+app.get('/api/cards/type/:typeId/class/:classId', function(req, res, next) {
+	// Get an item from the cache
+	c.get('cards_type_' + req.params.typeId + '_class_' + req.params.classId, function(err, val) {
+		if(val) {
+			res.json(200, JSON.parse(val));
+
+			res.app.db.models.Card.find({type:req.params.typeId}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					for(var i=0; i<response.length; i++) {
+						if(response[i].quality == 5) {
+							response[i].limit = 1;
+						} else {
+							response[i].limit = 2;
+						}
+					}
+					c.put('cards_type_' + req.params.typeId + '_class_' + req.params.classId, JSON.stringify(response), function(err) {
+						if(err) next(err);
+					});
+				}
+			});
+		} else {
+			res.app.db.models.Card.find({type:req.params.typeId}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					for(var i=0; i<response.length; i++) {
+						if(response[i].quality == 5) {
+							response[i].limit = 1;
+						} else {
+							response[i].limit = 2;
+						}
+					}
+					c.put('cards_type_' + req.params.typeId + '_class_' + req.params.classId, JSON.stringify(response), function(err) {
+						if(err) next(err);
+						else res.json(200, response);
+					});
+				}
+			});
+		}
+	});
+});
 app.get('/api/card/:id', cards.getCardsById);
 
 app.get('/api/users', users.list);
@@ -229,28 +355,26 @@ app.get('/api/user/:username', users.getByUsername);
 app.get('/api/user/:id', users.getById);
 app.put('/api/user/:id', ensureAuthenticated, users.updateUser);
 
-app.get('/api/deck/:id', function(req, res) {
+app.get('/api/deck/:id', function(req, res, next) {
 	// Get a deck from the cache
 	c.get('deck_' + req.params.id, function(err, val) {
 		if(val) {
-			console.log('pulling from cache');
 			res.json(200, JSON.parse(val));
 
 			res.app.db.models.Deck.findOne({ _id: req.params.id }, function(err, deck) {
-				if (err) console.log(err);
+				if (err) next(err);
 				else {
 					c.put('deck_' + req.params.id, JSON.stringify(deck), function(err) {
-						if(err) console.log(err);
+						if(err) next(err);
 					});
 				}
 			});
 		} else {
-			console.log('setting cache');
 			res.app.db.models.Deck.findOne({ _id: req.params.id }, function(err, deck) {
-				if (err) console.log(err);
+				if (err) next(err);
 				else {
 					c.put('deck_' + req.params.id, JSON.stringify(deck), function(err) {
-						if (err) res.send(500, err);
+						if (err) next(err);
 						else {
 							res.json(200, deck);
 						}
@@ -262,26 +386,26 @@ app.get('/api/deck/:id', function(req, res) {
 });
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 //app.get('/api/decks', decks.list);
-app.get('/api/decks', function(req, res) {
+app.get('/api/decks', function(req, res, next) {
 	// Get an item from the cache
 	c.get('decks', function(err, val) {
 		if(val) {
 			res.json(200, JSON.parse(val));
 
 			res.app.db.models.Deck.find({}).sort({ rating: 'desc' }).exec(function(err, response) {
-				if(err) console.log(err);
+				if(err) next(err);
 				else {
 					c.put('decks', JSON.stringify(response), function(err) {
-						if(err) console.log(err);
+						if(err) next(err);
 					});
 				}
 			});
 		} else {
 			res.app.db.models.Deck.find({}).sort({ rating: 'desc' }).exec(function(err, response) {
-				if (err) res.send(500, err);
+				if (err) next(err);
 				else {
 					c.put('decks', JSON.stringify(response), function(err) {
-						if(err) res.send(500, err);
+						if(err) next(err);
 						else res.json(200, response);
 					});
 				}
@@ -289,7 +413,33 @@ app.get('/api/decks', function(req, res) {
 		}
 	});
 });
-app.get('/api/decks/:username', decks.getDecksByUsername);
+app.get('/api/decks/:username', function(req, res, next) {
+	// Get an item from the cache
+	c.get('decks_' + req.params.username, function(err, val) {
+		if(val) {
+			res.json(200, JSON.parse(val));
+
+			res.app.db.models.Deck.find({ username: req.params.username }).sort({ rating: 'desc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					c.put('decks_' + req.params.username, JSON.stringify(response), function(err) {
+						if(err) next(err);
+					});
+				}
+			});
+		} else {
+			res.app.db.models.Deck.find({ username: req.params.username }).sort({ rating: 'desc' }).exec(function(err, response) {
+				if (err) next(err);
+				else {
+					c.put('decks_' + req.params.username, JSON.stringify(response), function(err) {
+						if(err) next(err);
+						else res.json(200, response);
+					});
+				}
+			});
+		}
+	});
+});
 app.post('/api/decks/:username', ensureAuthenticated, decks.saveDeckToUsername);
 app.put('/api/decks/:id', ensureAuthenticated, decks.updateDeck);
 app.put('/api/decks/:id/rating', ensureAuthenticated, decks.updateDeckRating);
@@ -298,7 +448,7 @@ app.get('/api/messages/:username', ensureAuthenticated, messages.getByUsername);
 app.get('/api/messages/:username/sent', ensureAuthenticated, messages.getSentByUsername);
 
 // upload to S3
-app.post('/api/upload', ensureAuthenticated, function(req, res){
+app.post('/api/upload', ensureAuthenticated, function(req, res, next){
 	AWS.config.loadFromPath('./aws.json');
 	
 	var s3 = new AWS.S3({computeChecksums: true});
@@ -309,7 +459,8 @@ app.post('/api/upload', ensureAuthenticated, function(req, res){
 		ContentType: req.body.ContentType 
 	};
 	s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-		res.json(200, { 'status': 'success', 'upload_url': signedUrl });
+		if(err) next(err);
+		else res.json(200, { 'status': 'success', 'upload_url': signedUrl });
 	});	
 });
 
