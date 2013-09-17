@@ -21,6 +21,7 @@ var express  = require('express'),
     AWS      = require('aws-sdk'),
     ironio   = require('node-ironio')('mKlVDXJnFUVIFDHEXkrxO6g8aDU'),
     project  = ironio.projects('52376a31fa13cc000900000a'),
+    raven    = require('raven'),
     SALT_WORK_FACTOR = 10;
 
 var app = express();
@@ -101,8 +102,8 @@ app.use(express.methodOverride());
 app.use(express.cookieSession({secret: 'dfj3fk2i3lkjfsld92492kc0!fkjdf0249fk29#4dkf92j', cookie: { maxAge: 1000*60*60 } }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(raven.middleware.express('https://7907b957d0e44be88b4464c41fd47826:8d791509cb3f453bbba8826bd1b1fb04@app.getsentry.com/13116'));
 app.use(app.router);
-app.error(raven.middleware.express('https://7907b957d0e44be88b4464c41fd47826:8d791509cb3f453bbba8826bd1b1fb04@app.getsentry.com/13116'));
 
 // development only
 if ('development' == app.get('env')) {
