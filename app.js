@@ -22,9 +22,16 @@ var express  = require('express'),
     ironio   = require('node-ironio')('mKlVDXJnFUVIFDHEXkrxO6g8aDU'),
     project  = ironio.projects('52376a31fa13cc000900000a'),
     raven    = require('raven'),
+    memjs    = require('memjs'),
     SALT_WORK_FACTOR = 10;
 
 var app = express();
+
+var client = memjs.Client.create();
+client.get('hello', function(err) {
+	if(err) console.log(err);
+	else console.log('memcache')
+});
 
 // IronCache
 if ('development' == app.get('env')) {

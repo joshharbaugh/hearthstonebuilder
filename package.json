@@ -19,7 +19,8 @@
     "request": "*",
     "aws-sdk": "*",
     "node-ironio": "*",
-    "raven": "*"
+    "raven": "*",
+    "memjs": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
