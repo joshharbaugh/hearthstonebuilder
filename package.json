@@ -20,7 +20,8 @@
     "aws-sdk": "*",
     "node-ironio": "*",
     "raven": "*",
-    "memjs": "*"
+    "memjs": "*",
+    "bounscale": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

@@ -2,3 +2,6 @@ node_modules
 .tmp
 .sass-cache
 scraper
+aws.json
+iron.json
+npm-debug.log
