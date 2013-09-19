@@ -2,6 +2,41 @@ angular.module('hsbApp.UserControllers', [])
 
     .controller('UserProfileCtrl',['$scope','$http','$growl', function ($scope, $http, $growl){
 
+        $scope.passwordVerified = false;
+
+        $scope.$watch('user', function(newVal, oldVal) {
+
+          if(newVal) {
+
+            if(typeof newVal.newpassword !== 'undefined' && newVal.newpassword == newVal.newpasswordconfirm) {
+
+              $scope.passwordVerified = true;
+              
+            }
+
+          }
+
+        }, true);
+
+        $scope.changePassword = function(user) {
+
+          if(user.newpassword !== user.newpasswordconfirm) {
+            
+            $growl.msg('Oops!', 'The password values do not match.');
+            return;
+          
+          } else {
+
+            $http({method: 'PUT', url: '/api/user/' + $scope.user._id + '/password', data: { 'password': user.newpassword }}).success(function(response) {
+                              
+              $growl.msg('Success!', 'Your password has been updated');
+            
+            });
+
+          }
+
+        };
+
         $scope.saveProfile = function() {
 
             if(!$scope.files[0]) {

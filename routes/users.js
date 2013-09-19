@@ -45,3 +45,31 @@ exports.updateUser = function(req, res){
 		}
 	});
 };
+
+exports.updateUserPassword = function(req, res){
+	res.setTimeout(30 * 1000);
+	res.app.db.models.User.findOne({ _id: req.params.id }).exec(function(err, response) {
+		if (err) res.send(500, err);
+		else {
+			response.password = req.body.password;
+			console.log(response);
+			response.save(function(err) {
+				if(err) {
+					res.json(200, { 'status': 'error', 'message': err });
+				} else {
+					res.json(200, { 'status': 'success', 'message': 'Password updated successfully!' });
+				}
+			});
+			//res.json(200, response);
+		}
+	});
+	/*res.app.db.models.User.update({ _id: req.params.id }, { 'password': password }, { upsert: true }, function (err, numberAffected, raw) {
+		if (err) {
+			res.json(200, { 'status': 'error', 'data': err });
+		} else {
+			console.log('The number of updated documents was %d', numberAffected);
+			console.log('The raw response from Mongo was ', raw);
+			res.json(200, { 'status': 'success', 'message': raw });
+		}
+	});*/
+};

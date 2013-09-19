@@ -538,7 +538,6 @@ h1,h2,h3,h4,h5,h6 {
             float: right;
 
             &.open {
-                background: #fafafa;
 
                 a, a:hover {
                     text-decoration: none;
@@ -551,6 +550,11 @@ h1,h2,h3,h4,h5,h6 {
                 height: 64px;
                 display: block;
                 outline: none;
+
+                &.user-dropdown {
+                    width: 160px;
+                    float: right;
+                }
 
                 &:hover {
                     text-decoration: none;
@@ -566,6 +570,8 @@ h1,h2,h3,h4,h5,h6 {
             }
 
             .dropdown-menu {
+                right: 0;
+                left: auto;
                 border: none;
                 background: #fafafa;
                 margin-top: 0;

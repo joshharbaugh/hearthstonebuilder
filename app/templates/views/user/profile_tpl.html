@@ -2,7 +2,7 @@
 	<h2 class="panel-title">Profile</h2>
 	<div class="panel-content">
 		<form name="profile" data-ng-submit="saveProfile()">
-			<table class="table table-hover table-striped">
+			<table class="table table-striped">
 				<tbody>
 					<tr>
 						<td>Display Name</td>
@@ -23,6 +23,36 @@
 						<td></td>
 						<td>
 							<button type="submit" class="btn btn-flat btn-flat-red">Save</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+</div>
+
+<div class="span6 panel">
+	<h2 class="panel-title">Change password</h2>
+	<div class="panel-content">
+		<form name="profile" data-ng-submit="changePassword(user)">
+			<table class="table table-striped">
+				<tbody>
+					<tr>
+						<td>Password</td>
+						<td><input type="password" data-ng-model="user.newpassword" class="no-margin" required></td>
+					</tr>
+					<tr>
+						<td>Confirm Password</td>
+						<td><input type="password" data-ng-model="user.newpasswordconfirm" class="no-margin" required></td>
+					</tr>
+					<tr data-ng-show="user.newpassword != user.newpasswordconfirm">
+						<td></td>
+						<td><span class="label label-important">Values do not match</span></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<button type="submit" class="btn btn-flat btn-flat-red" data-ng-class="{'disabled': !passwordVerified}">Save</button>
 						</td>
 					</tr>
 				</tbody>
