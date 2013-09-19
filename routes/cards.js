@@ -3,6 +3,7 @@
  */
 
 exports.list = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -12,6 +13,7 @@ exports.list = function(req, res){
 };
 
 exports.images = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Card.find({}, { _id: false, image: true }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -21,6 +23,7 @@ exports.images = function(req, res){
 };
 
 exports.getCardsById = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Card.find({ _id: req.params.id }).sort({ name: 'asc' }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -37,6 +40,7 @@ exports.getCardsById = function(req, res){
 };
 
 exports.getCardsByClass = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Card.find({}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -53,6 +57,7 @@ exports.getCardsByClass = function(req, res){
 };
 
 exports.getCardsByType = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Card.find({type:req.params.typeId}).sort({ name: 'asc' }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -69,6 +74,7 @@ exports.getCardsByType = function(req, res){
 };
 
 exports.getCardsByTypeAndClass = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Card.find({type:req.params.typeId}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {

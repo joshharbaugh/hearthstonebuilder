@@ -3,6 +3,7 @@
  */
 
 exports.list = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Deck.find({}).sort({ rating: 'desc' }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -12,6 +13,7 @@ exports.list = function(req, res){
 };
 
 exports.getDeckById = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Deck.findOne({ _id: req.params.id }, function(err, deck) {
 		if (err) res.send(500, err);
 		else {
@@ -21,6 +23,7 @@ exports.getDeckById = function(req, res){
 };
 
 exports.deleteDeckById = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Deck.remove({ _id: req.params.id }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -30,6 +33,7 @@ exports.deleteDeckById = function(req, res){
 };
 
 exports.getDecksByUsername = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Deck.find({ username: req.params.username }).sort({ rating: 'desc' }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -39,8 +43,8 @@ exports.getDecksByUsername = function(req, res){
 };
 
 exports.saveDeckToUsername = function(req, res){
+	res.setTimeout(30 * 1000);
 	var requestPayload = req.body;
-	console.log(requestPayload);
 	res.app.db.models.Deck.findOne({ name: req.body.name }, function (err, doc) {
 		if (err) {
 			res.json(200, { 'status': 'error', 'data': err });
@@ -59,6 +63,7 @@ exports.saveDeckToUsername = function(req, res){
 };
 
 exports.updateDeck = function(req, res){
+	res.setTimeout(30 * 1000);
 	var o = req.body;
 	res.app.db.models.Deck.update({ _id: req.params.id }, { author: o.author, cards: o.cards, class: o.class, last_modified: new Date(), description: o.description, name: o.name, length: o.length }, { upsert: true }, function (err, numberAffected, raw) {
 		if (err) {
@@ -72,6 +77,7 @@ exports.updateDeck = function(req, res){
 };
 
 exports.updateDeckRating = function(req, res){
+	res.setTimeout(30 * 1000);
 	var o = req.body;
 	res.app.db.models.Deck.update({ _id: req.params.id }, { rating: o.rating }, { upsert: true }, function (err, numberAffected, raw) {
 		if (err) {

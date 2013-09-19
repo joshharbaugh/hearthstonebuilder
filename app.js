@@ -28,10 +28,11 @@ var express  = require('express'),
 var app = express();
 
 var client = memjs.Client.create();
+/*
 client.get('hello', function(err) {
 	if(err) console.log(err);
 	else console.log('memcache')
-});
+});*/
 
 // IronCache
 if ('development' == app.get('env')) {
@@ -168,12 +169,14 @@ app.post('/login', function(req, res, next) {
 });
 
 app.post('/api/logout', function(req, res){
+	res.setTimeout(30 * 1000);
 	req.logout();
 	res.redirect('/');
 });
 
 // RESTful API
 app.get('/api/cards', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('cards', function(err, val) {
 		if(val) {
@@ -202,6 +205,7 @@ app.get('/api/cards', function(req, res, next) {
 });
 app.get('/api/cards/images', cards.images);
 app.get('/api/cards/images/download', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	res.app.db.models.Card.find({}, { _id: false, image: true }).exec(function(err, response) {
 		if (err) next(err);
 		else {
@@ -221,6 +225,7 @@ app.get('/api/cards/images/download', function(req, res, next) {
 	});
 });
 app.get('/api/cards/class/:classId', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('cards_class_' + req.params.classId, function(err, val) {
 		if(val) {
@@ -262,6 +267,7 @@ app.get('/api/cards/class/:classId', function(req, res, next) {
 	});
 });
 app.get('/api/cards/type/:typeId', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('cards_type_' + req.params.typeId, function(err, val) {
 		if(val) {
@@ -303,6 +309,7 @@ app.get('/api/cards/type/:typeId', function(req, res, next) {
 	});
 });
 app.get('/api/cards/type/:typeId/class/:classId', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('cards_type_' + req.params.typeId + '_class_' + req.params.classId, function(err, val) {
 		if(val) {
@@ -347,9 +354,11 @@ app.get('/api/card/:id', cards.getCardsById);
 
 app.get('/api/users', users.list);
 app.get('/api/user', ensureAuthenticated, function(req, res){
+	res.setTimeout(30 * 1000);
 	res.json(200, req.user);
 });
 app.post('/api/user', function(req, res){
+	res.setTimeout(30 * 1000);
 	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": "https://s3.amazonaws.com/hearthstonebuilder/avatars/default_gravatar.jpg" }, "saved_decks": [] });
 	new_user.save(function(err) {
 	  if(err) {
@@ -364,6 +373,7 @@ app.get('/api/user/:id', users.getById);
 app.put('/api/user/:id', ensureAuthenticated, users.updateUser);
 
 app.get('/api/deck/:id', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	// Get a deck from the cache
 	c.get('deck_' + req.params.id, function(err, val) {
 		if(val) {
@@ -395,6 +405,7 @@ app.get('/api/deck/:id', function(req, res, next) {
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 //app.get('/api/decks', decks.list);
 app.get('/api/decks', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('decks', function(err, val) {
 		if(val) {
@@ -422,6 +433,7 @@ app.get('/api/decks', function(req, res, next) {
 	});
 });
 app.get('/api/decks/:username', function(req, res, next) {
+	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('decks_' + req.params.username, function(err, val) {
 		if(val) {
@@ -457,6 +469,7 @@ app.get('/api/messages/:username/sent', ensureAuthenticated, messages.getSentByU
 
 // upload to S3
 app.post('/api/upload', ensureAuthenticated, function(req, res, next){
+	res.setTimeout(30 * 1000);
 	AWS.config.loadFromPath('./aws.json');
 	
 	var s3 = new AWS.S3({computeChecksums: true});
@@ -475,7 +488,10 @@ app.post('/api/upload', ensureAuthenticated, function(req, res, next){
 // catch-all redirect to homepage
 app.get('/api/*', routes.index);
 
-http.createServer(app).listen(app.get('port'), function(){
+http.createServer(app).on('connection', function(socket) {
+  console.log("A new connection was made by a client.");
+  socket.setTimeout(30 * 1000); 
+}).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 

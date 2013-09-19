@@ -3,6 +3,7 @@
  */
 
 exports.list = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.User.find({}).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -12,6 +13,7 @@ exports.list = function(req, res){
 };
 
 exports.getById = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.User.findOne({ _id: req.params.id }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -21,6 +23,7 @@ exports.getById = function(req, res){
 };
 
 exports.getByUsername = function(req, res){
+	res.setTimeout(30 * 1000);
 	res.app.db.models.User.findOne({ 'profile.username': req.params.username }).exec(function(err, response) {
 		if (err) res.send(500, err);
 		else {
@@ -30,6 +33,7 @@ exports.getByUsername = function(req, res){
 };
 
 exports.updateUser = function(req, res){
+	res.setTimeout(30 * 1000);
 	var avatar = req.body.avatar.split('?');
 	res.app.db.models.User.update({ _id: req.params.id }, { 'profile.avatar': avatar[0] }, { upsert: true }, function (err, numberAffected, raw) {
 		if (err) {
