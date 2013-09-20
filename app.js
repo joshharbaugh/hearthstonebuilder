@@ -129,7 +129,7 @@ if ('development' == app.get('env')) {
 	app.use(express.static(path.join(__dirname, 'dist')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
-		res.render( __dirname + '/app/index.html', { version: version } );
+		res.render( __dirname + '/dist/index.html', { version: version } );
 		//res.sendfile(__dirname + '/dist/index.html', {'version': version});
 	});
 }
