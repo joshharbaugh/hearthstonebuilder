@@ -23,6 +23,8 @@ var express  = require('express'),
     project  = ironio.projects('52376a31fa13cc000900000a'),
     raven    = require('raven'),
     memjs    = require('memjs'),
+    pkg = require('./package.json'),
+    version = pkg.version,
     SALT_WORK_FACTOR = 10;
 
 var app = express();
@@ -99,6 +101,7 @@ passport.use(new LocalStrategy(
 ));
 
 // all environments
+app.set('version', version);
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
@@ -119,14 +122,14 @@ if ('development' == app.get('env')) {
 	app.use(express.static(path.join(__dirname, 'app')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
-		res.sendfile(__dirname + '/app/index.html');
+		res.sendfile(__dirname + '/app/index.html', {'version': version});
 	});
 	app.use(express.errorHandler());
 } else {
 	app.use(express.static(path.join(__dirname, 'dist')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
-	  res.sendfile(__dirname + '/dist/index.html');
+	  res.sendfile(__dirname + '/dist/index.html', {'version': version});
 	});
 }
 
@@ -494,6 +497,8 @@ http.createServer(app).on('connection', function(socket) {
   socket.setTimeout(30 * 1000); 
 }).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+  console.log('Node Version: ' + process.version);
+  console.log('App Version: ' + app.get('version'));
 });
 
 function ensureAuthenticated(req, res, next) {
