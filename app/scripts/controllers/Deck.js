@@ -439,6 +439,7 @@ angular.module('hsbApp.DeckControllers', [])
             });
         }
 
+        // listeners
         $scope.$on('addCard', function(event, args) {       
             if ($scope.deckCards.length == 0) {
                 $scope.deckCards.push(args.data);
@@ -459,12 +460,25 @@ angular.module('hsbApp.DeckControllers', [])
             $scope.deckCounter++;                             
         });
 
+        // watchers
         $scope.$watch('deckCards', function(newVal, oldVal) {
             if(newVal) {
                 $scope.createdDeck.cards = newVal;
                 $appStorage.put('Deck-' + $stateParams.deckClass, $scope.createdDeck);
             }
         }, true);
+
+        // events
+        $scope.removeCard = function(card) {
+                    
+            var deckCards = $scope.deckCards;
+
+            if(deckCards.indexOf(card) !== -1) {
+                var idx = deckCards.indexOf(card);
+                deckCards.splice(idx, 1);
+            }
+
+        };
 
         $scope.saveDeck = function() {
             $scope.createdDeck.username = $scope.deckUser.profile.username;
@@ -546,6 +560,7 @@ angular.module('hsbApp.DeckControllers', [])
                     }
                 });
                 
+                // listeners
                 $scope.$on('addCard', function(event, args) {
                     if ($scope.deckCards.length == 0) {
                         $scope.deckCards.push(args.data);
@@ -566,12 +581,25 @@ angular.module('hsbApp.DeckControllers', [])
                     $scope.deckCounter++;
                 });
 
+                // watchers
                 $scope.$watch('deckCards', function(newVal, oldVal) {
                     if(newVal) {
                         $scope.createdDeck.cards = newVal;
                         $appStorage.put('Deck-' + $stateParams.deckClass, $scope.createdDeck);
                     }
                 }, true);
+
+                // events
+                $scope.removeCard = function(card) {
+                    
+                    var deckCards = $scope.deckCards;
+
+                    if(deckCards.indexOf(card) !== -1) {
+                        var idx = deckCards.indexOf(card);
+                        deckCards.splice(idx, 1);
+                    }
+
+                };
 
                 $scope.saveDeck = function() {
                     $scope.createdDeck.username = $scope.deckUser.profile.username;

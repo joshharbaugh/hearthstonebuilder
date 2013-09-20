@@ -14,6 +14,7 @@
 						<th>Attack</th>
 						<th>Health</th>
 						<th>Type</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -30,13 +31,14 @@
 							<span data-ng-switch-when="4">Minion</span>
 							<span data-ng-switch-when="7">Weapon</span>
 						</td>
+						<td style="vertical-align:middle" ><button data-ng-click="removeCard(card)" type="button" class="btn btn-flat btn-flat-red pull-right"><i class="icon-remove icon-white"></i></button></td>
 					</tr>
 				</tbody>
 			</table>
 
 			<button type="button" data-ng-show="deckCounter > 0" class="btn btn-large btn-flat btn-flat-green pull-left" data-toggle="modal" data-target="#deckModal" style="margin:20px;">Save Deck</button>
 
-			<button type="button" class="btn btn-flat btn-flat-red pull-right" style="margin:20px;" data-ng-click="clearDeck()">Clear Deck</button>
+			<button type="button" data-ng-show="deckCounter > 0" class="btn btn-flat btn-flat-red pull-right" style="margin:20px;" data-ng-click="clearDeck()">Clear Deck</button>
 
 			<div id="deckModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deckModalLabel" aria-hidden="true">
 				<div class="modal-header">
