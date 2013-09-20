@@ -2,10 +2,10 @@ var CONFIG;
 
 (function() {
 
-var appName = 'HearthStone Builder';
+var appName = window.app.name;
 var appPrefix = 'app/';
 var templateUrlPrefix = 'templates/';
-var appVersion = '0.1.0';
+var appVersion = window.app.version;
 
 CONFIG = {
 

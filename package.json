@@ -21,7 +21,8 @@
     "node-ironio": "*",
     "raven": "*",
     "memjs": "*",
-    "bounscale": "*"
+    "bounscale": "*",
+    "ejs": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

@@ -103,8 +103,7 @@ passport.use(new LocalStrategy(
 // all environments
 app.set('version', version);
 app.set('port', process.env.PORT || 3000);
-app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
+app.engine('html', require('ejs').renderFile);
 app.use(require('bounscale'));
 app.use(express.favicon());
 app.use(express.logger('dev'));
@@ -122,14 +121,16 @@ if ('development' == app.get('env')) {
 	app.use(express.static(path.join(__dirname, 'app')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
-		res.sendfile(__dirname + '/app/index.html', {'version': version});
+		res.render( __dirname + '/app/index.html', { version: version } );
+		//res.sendfile(__dirname + '/app/index.html', {'version': version});
 	});
 	app.use(express.errorHandler());
 } else {
 	app.use(express.static(path.join(__dirname, 'dist')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
-	  res.sendfile(__dirname + '/dist/index.html', {'version': version});
+		res.render( __dirname + '/app/index.html', { version: version } );
+		//res.sendfile(__dirname + '/dist/index.html', {'version': version});
 	});
 }
 
