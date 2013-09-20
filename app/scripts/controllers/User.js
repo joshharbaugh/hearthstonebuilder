@@ -170,6 +170,53 @@ angular.module('hsbApp.UserControllers', [])
 
     }])
 
+    .controller('UserLoginCtrl',['$scope','$http','$state','$rootScope','$growl', function ($scope, $http, $state, $rootScope, $growl){
+
+        $rootScope.loginError = false;
+
+        $scope.login = function() {
+
+          try {
+
+            var payload = {
+              'username': this.username,
+              'password': this.password
+            };
+
+            $http({method: 'POST', url: '/login', data: payload}).success(function(data) {
+
+                if(data.status == 'success') {
+
+                  $rootScope.loginError = false;
+
+                  $growl.msg('Welcome back!', data.message);
+
+                  $rootScope.$state.transitionTo('dashboard.default', {});
+
+                } else {
+
+                  $rootScope.loginError = {
+                    'message': data.message
+                  };
+
+                }
+
+            }).error(function(data) {
+
+                $rootScope.loginError = {
+                  'message': data
+                };
+            
+            });
+
+          } catch(e) {}
+
+        };
+
+        $scope.onReady();
+
+    }])
+
     .controller('UserMessagesCtrl',['$scope','$users','messages','sent', function ($scope, $users, messages, sent){
         $scope.messages = messages;
         $scope.sent     = sent;

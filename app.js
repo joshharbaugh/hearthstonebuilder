@@ -165,11 +165,11 @@ app.post('/login', function(req, res, next) {
 		if (err) { return next(err) }
 		if (!user) {
 			req.session.messages =  [info.message];
-			return res.redirect('/login')
+			return res.json(200, { 'status': 'error', 'message': info.message });
 		}
 		req.logIn(user, function(err) {
 			if (err) { return next(err); }
-			return res.redirect('/');
+			return res.json(200, { 'status': 'success', 'message': user.profile.display_name });
 		});
 	})(req, res, next);
 });

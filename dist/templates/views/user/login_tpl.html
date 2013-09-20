@@ -5,7 +5,7 @@
 	<div class="span6 panel">
 		<h2 class="panel-title">Login</h2>
 		<div class="panel-content">
-			<form class="form-horizontal" action="/login" method="post" style="margin-top:20px">
+			<form class="form-horizontal" method="post" style="margin-top:20px" data-ng-submit="login()" data-ng-controller="UserLoginCtrl">
 				<div class="control-group">
 					<label class="control-label" for="username">Username:</label>
 					<div class="controls">
@@ -25,5 +25,6 @@
 				</div>
 			</form>
 		</div>
-	</div>
+		<div data-ng-show="loginError" class="alert alert-danger no-margin loginError">{{ loginError.message }}</div>
+	</div>	
 </div>
