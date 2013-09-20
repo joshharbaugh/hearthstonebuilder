@@ -105,11 +105,11 @@ app.set('version', version);
 app.set('port', process.env.PORT || 3000);
 app.engine('html', require('ejs').renderFile);
 app.use(require('bounscale'));
-app.use(express.favicon());
 app.use(express.logger('dev'));
+app.use(express.compress());
 app.use(express.cookieParser());
-app.use(express.bodyParser());
 app.use(express.methodOverride());
+app.use(express.bodyParser());
 app.use(express.cookieSession({secret: 'dfj3fk2i3lkjfsld92492kc0!fkjdf0249fk29#4dkf92j', cookie: { maxAge: 1000*60*60 } }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -118,6 +118,7 @@ app.use(raven.middleware.express('https://7907b957d0e44be88b4464c41fd47826:8d791
 
 // development only
 if ('development' == app.get('env')) {
+	app.use(express.favicon(path.join(__dirname, '/app/favicon.ico')));
 	app.use(express.static(path.join(__dirname, 'app')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
@@ -126,6 +127,7 @@ if ('development' == app.get('env')) {
 	});
 	app.use(express.errorHandler());
 } else {
+	app.use(express.favicon(path.join(__dirname, '/dist/favicon.ico')));
 	app.use(express.static(path.join(__dirname, 'dist')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
 	app.use(function(req, res) {
