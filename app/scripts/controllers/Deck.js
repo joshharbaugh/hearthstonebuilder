@@ -471,11 +471,13 @@ angular.module('hsbApp.DeckControllers', [])
         // events
         $scope.removeCard = function(card) {
                     
-            var deckCards = $scope.deckCards;
+            var cards = $scope.deckCards;
 
-            if(deckCards.indexOf(card) !== -1) {
-                var idx = deckCards.indexOf(card);
-                deckCards.splice(idx, 1);
+            if(cards.indexOf(card) !== -1) {
+                var idx = cards.indexOf(card);
+                cards.splice(idx, 1);
+                $scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
+                $scope.deckCounter = $scope.deckCounter - card.qty;
             }
 
         };
@@ -592,11 +594,13 @@ angular.module('hsbApp.DeckControllers', [])
                 // events
                 $scope.removeCard = function(card) {
                     
-                    var deckCards = $scope.deckCards;
+                    var cards = $scope.deckCards;
 
-                    if(deckCards.indexOf(card) !== -1) {
-                        var idx = deckCards.indexOf(card);
-                        deckCards.splice(idx, 1);
+                    if(cards.indexOf(card) !== -1) {
+                        var idx = cards.indexOf(card);
+                        cards.splice(idx, 1);
+                        $scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
+                        $scope.deckCounter = $scope.deckCounter - card.qty;
                     }
 
                 };
@@ -679,7 +683,15 @@ angular.module('hsbApp.DeckControllers', [])
             if(newVal) {
                 angular.forEach(newVal, function(card, idx) {
 
-                    if(card.remaining == 0) {
+                    console.log(card);
+
+                    // legendary
+                    if(card.quality == 5 && card.remaining = 0 || card.quality == 5 && card.qty == 1) {
+                        card.disabled = true;
+                    }
+
+                    // everything else
+                    if(card.remaining == 0 || card.qty == 2) {
                         card.disabled = true;
                     }
 
@@ -804,6 +816,8 @@ angular.module('hsbApp.DeckControllers', [])
             if(newVal) {
                 if(newVal >= 30) {
                     $scope.disableAllCards = true;
+                } else {
+                    $scope.disableAllCards = false;
                 }
             }
         }, true);

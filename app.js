@@ -104,7 +104,7 @@ passport.use(new LocalStrategy(
 app.set('version', version);
 app.set('port', process.env.PORT || 3000);
 app.engine('html', require('ejs').renderFile);
-app.use(require('bounscale'));
+//app.use(require('bounscale'));
 app.use(express.logger('dev'));
 app.use(express.compress());
 app.use(express.cookieParser());
