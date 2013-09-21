@@ -686,7 +686,7 @@ angular.module('hsbApp.DeckControllers', [])
                     console.log(card);
 
                     // legendary
-                    if(card.quality == 5 && card.remaining = 0 || card.quality == 5 && card.qty == 1) {
+                    if(card.quality == 5) {
                         card.disabled = true;
                     }
 

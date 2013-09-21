@@ -104,7 +104,7 @@ passport.use(new LocalStrategy(
 app.set('version', version);
 app.set('port', process.env.PORT || 3000);
 app.engine('html', require('ejs').renderFile);
-//app.use(require('bounscale'));
+app.use(require('bounscale'));
 app.use(express.logger('dev'));
 app.use(express.compress());
 app.use(express.cookieParser());
@@ -496,7 +496,7 @@ app.post('/api/upload', ensureAuthenticated, function(req, res, next){
 app.get('/api/*', routes.index);
 
 http.createServer(app).on('connection', function(socket) {
-  console.log("A new connection was made by a client.");
+  //console.log("A new connection was made by a client.");
   socket.setTimeout(30 * 1000); 
 }).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
