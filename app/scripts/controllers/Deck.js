@@ -442,8 +442,10 @@ angular.module('hsbApp.DeckControllers', [])
         // listeners
         $scope.$on('addCard', function(event, args) {       
             if ($scope.deckCards.length == 0) {
+                args.data.qty = 1;
                 $scope.deckCards.push(args.data);
             } else {
+                args.data.qty = 1;
                 $scope.deckCards.push(args.data);
                 var cards = $scope.deckCards;
                 cards.sort( function(a,b) { return a.id - b.id; } );
@@ -473,63 +475,97 @@ angular.module('hsbApp.DeckControllers', [])
                     
             var cards = $scope.deckCards;
 
-            if(cards.indexOf(card) !== -1) {
+            if(cards.indexOf(card) !== -1) {                
                 var idx = cards.indexOf(card);
-                cards.splice(idx, 1);
+                if(card.qty == 2) {
+                    card.qty--;
+                    processCard(1);
+                } else {
+                    cards.splice(idx, 1);
+                    processCard(2);                    
+                }
                 $scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
                 $scope.deckCounter = $scope.deckCounter - card.qty;
 
-                switch(parseInt(card.type))
-                {
-                    case 5:
-                        angular.forEach($scope.$$nextSibling.cards.ability, function(_card, i) {
-                            if(_card.id == card.id) {
-                                card.disabled = false;
-                                _card.disabled = false;
-                            }
-                        });
-                        break;
-                    case 3:
-                        angular.forEach($scope.$$nextSibling.cards.hero, function(_card, i) {
-                            if(_card.id == card.id) {
-                                card.disabled = false;
-                                _card.disabled = false;
-                            }
-                        });
-                        break;
-                    case 10:
-                        angular.forEach($scope.$$nextSibling.cards.heroPower, function(_card, i) {
-                            if(_card.id == card.id) {
-                                card.disabled = false;
-                                _card.disabled = false;
-                            }
-                        });
-                        break;
-                    case 4:
-                        angular.forEach($scope.$$nextSibling.cards.minion, function(_card, i) {
-                            if(_card.id == card.id) {
-                                card.disabled = false;
-                                _card.disabled = false;
-                            }
-                        });
-                        break;
-                    case 7:
-                        angular.forEach($scope.$$nextSibling.cards.weapon, function(_card, i) {
-                            if(_card.id == card.id) {
-                                card.disabled = false;
-                                _card.disabled = false;
-                            }
-                        });
-                        break;
-                    default:
-                        return;
-                }
-                angular.forEach($scope.$$nextSibling.cards.all, function(_card, i) {
-                    if(_card.id == card.id) {
-                        card.disabled = false;
-                                _card.disabled = false;
+                function processCard(offset) {
+
+                    switch(parseInt(card.type))
+                    {
+                        case 5:
+                            angular.forEach($scope.$$nextSibling.cards.ability, function(_card, i) {
+                                if(_card.id == card.id) {
+                                    card.disabled = false;
+                                    card.limit = offset;
+                                    card.remaining = offset;
+                                    _card.disabled = false;
+                                    _card.limit = offset;
+                                    _card.remaining = offset;
+                                }
+                            });
+                            break;
+                        case 3:
+                            angular.forEach($scope.$$nextSibling.cards.hero, function(_card, i) {
+                                if(_card.id == card.id) {
+                                    card.disabled = false;
+                                    card.limit = offset;
+                                    card.remaining = offset;
+                                    _card.disabled = false;
+                                    _card.limit = offset;
+                                    _card.remaining = offset;
+                                }
+                            });
+                            break;
+                        case 10:
+                            angular.forEach($scope.$$nextSibling.cards.heroPower, function(_card, i) {
+                                if(_card.id == card.id) {
+                                    card.disabled = false;
+                                    card.limit = offset;
+                                    card.remaining = offset;
+                                    _card.disabled = false;
+                                    _card.limit = offset;
+                                    _card.remaining = offset;
+                                }
+                            });
+                            break;
+                        case 4:
+                            angular.forEach($scope.$$nextSibling.cards.minion, function(_card, i) {
+                                if(_card.id == card.id) {                                
+                                    card.disabled = false;
+                                    card.limit = offset;
+                                    card.remaining = offset;
+                                    _card.disabled = false;
+                                    _card.limit = offset;
+                                    _card.remaining = offset;
+                                }
+                            });
+                            break;
+                        case 7:
+                            angular.forEach($scope.$$nextSibling.cards.weapon, function(_card, i) {
+                                if(_card.id == card.id) {
+                                    card.disabled = false;
+                                    card.limit = offset;
+                                    card.remaining = offset;
+                                    _card.disabled = false;
+                                    _card.limit = offset;
+                                    _card.remaining = offset;
+                                }
+                            });
+                            break;
+                        default:
+                            return;
                     }
-                });
+                    angular.forEach($scope.$$nextSibling.cards.all, function(_card, i) {
+                        if(_card.id == card.id) {
+                            card.disabled = false;
+                            card.limit = offset;
+                            card.remaining = offset;
+                            _card.disabled = false;
+                            _card.limit = offset;
+                            _card.remaining = offset;
+                        }
+                    });
+
+                }
             }
 
         };
@@ -617,8 +653,10 @@ angular.module('hsbApp.DeckControllers', [])
                 // listeners
                 $scope.$on('addCard', function(event, args) {
                     if ($scope.deckCards.length == 0) {
+                        args.data.qty = 1;
                         $scope.deckCards.push(args.data);
                     } else {
+                        args.data.qty = 1;
                         $scope.deckCards.push(args.data);
                         var cards = $scope.deckCards;
                         cards.sort( function(a,b) { return a.id - b.id; } );
@@ -644,67 +682,101 @@ angular.module('hsbApp.DeckControllers', [])
                 }, true);
 
                 // events
-                $scope.removeCard = function(card) {                
+                $scope.removeCard = function(card) {            
                     
                     var cards = $scope.deckCards;
 
                     if(cards.indexOf(card) !== -1) {
                         var idx = cards.indexOf(card);
-                        cards.splice(idx, 1);
+                        if(card.qty == 2) {
+                            card.qty--;
+                            processCard(1);
+                        } else {
+                            cards.splice(idx, 1);
+                            processCard(2);                    
+                        }
                         $scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
                         $scope.deckCounter = $scope.deckCounter - card.qty;
 
-                        switch(parseInt(card.type))
-                        {
-                            case 5:
-                                angular.forEach($scope.$$nextSibling.cards.ability, function(_card, i) {
-                                    if(_card.id == card.id) {
-                                        card.disabled = false;
-                                        _card.disabled = false;
-                                    }
-                                });
-                                break;
-                            case 3:
-                                angular.forEach($scope.$$nextSibling.cards.hero, function(_card, i) {
-                                    if(_card.id == card.id) {
-                                        card.disabled = false;
-                                        _card.disabled = false;
-                                    }
-                                });
-                                break;
-                            case 10:
-                                angular.forEach($scope.$$nextSibling.cards.heroPower, function(_card, i) {
-                                    if(_card.id == card.id) {
-                                        card.disabled = false;
-                                        _card.disabled = false;
-                                    }
-                                });
-                                break;
-                            case 4:
-                                angular.forEach($scope.$$nextSibling.cards.minion, function(_card, i) {
-                                    if(_card.id == card.id) {
-                                        card.disabled = false;
-                                        _card.disabled = false;
-                                    }
-                                });
-                                break;
-                            case 7:
-                                angular.forEach($scope.$$nextSibling.cards.weapon, function(_card, i) {
-                                    if(_card.id == card.id) {
-                                        card.disabled = false;
-                                        _card.disabled = false;
-                                    }
-                                });
-                                break;
-                            default:
-                                return;
-                        }
-                        angular.forEach($scope.$$nextSibling.cards.all, function(_card, i) {
-                            if(_card.id == card.id) {
-                                card.disabled = false;
-                                        _card.disabled = false;
+                        function processCard(offset) {
+
+                            switch(parseInt(card.type))
+                            {
+                                case 5:
+                                    angular.forEach($scope.$$nextSibling.cards.ability, function(_card, i) {
+                                        if(_card.id == card.id) {
+                                            card.disabled = false;
+                                            card.limit = offset;
+                                            card.remaining = offset;
+                                            _card.disabled = false;
+                                            _card.limit = offset;
+                                            _card.remaining = offset;
+                                        }
+                                    });
+                                    break;
+                                case 3:
+                                    angular.forEach($scope.$$nextSibling.cards.hero, function(_card, i) {
+                                        if(_card.id == card.id) {
+                                            card.disabled = false;
+                                            card.limit = offset;
+                                            card.remaining = offset;
+                                            _card.disabled = false;
+                                            _card.limit = offset;
+                                            _card.remaining = offset;
+                                        }
+                                    });
+                                    break;
+                                case 10:
+                                    angular.forEach($scope.$$nextSibling.cards.heroPower, function(_card, i) {
+                                        if(_card.id == card.id) {
+                                            card.disabled = false;
+                                            card.limit = offset;
+                                            card.remaining = offset;
+                                            _card.disabled = false;
+                                            _card.limit = offset;
+                                            _card.remaining = offset;
+                                        }
+                                    });
+                                    break;
+                                case 4:
+                                    angular.forEach($scope.$$nextSibling.cards.minion, function(_card, i) {
+                                        if(_card.id == card.id) {                                
+                                            card.disabled = false;
+                                            card.limit = offset;
+                                            card.remaining = offset;
+                                            _card.disabled = false;
+                                            _card.limit = offset;
+                                            _card.remaining = offset;
+                                        }
+                                    });
+                                    break;
+                                case 7:
+                                    angular.forEach($scope.$$nextSibling.cards.weapon, function(_card, i) {
+                                        if(_card.id == card.id) {
+                                            card.disabled = false;
+                                            card.limit = offset;
+                                            card.remaining = offset;
+                                            _card.disabled = false;
+                                            _card.limit = offset;
+                                            _card.remaining = offset;
+                                        }
+                                    });
+                                    break;
+                                default:
+                                    return;
                             }
-                        });
+                            angular.forEach($scope.$$nextSibling.cards.all, function(_card, i) {
+                                if(_card.id == card.id) {
+                                    card.disabled = false;
+                                    card.limit = offset;
+                                    card.remaining = offset;
+                                    _card.disabled = false;
+                                    _card.limit = offset;
+                                    _card.remaining = offset;
+                                }
+                            });
+
+                        }
                     }
 
                 };
