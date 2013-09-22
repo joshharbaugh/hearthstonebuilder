@@ -478,6 +478,58 @@ angular.module('hsbApp.DeckControllers', [])
                 cards.splice(idx, 1);
                 $scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
                 $scope.deckCounter = $scope.deckCounter - card.qty;
+
+                switch(parseInt(card.type))
+                {
+                    case 5:
+                        angular.forEach($scope.$$nextSibling.cards.ability, function(_card, i) {
+                            if(_card.id == card.id) {
+                                card.disabled = false;
+                                _card.disabled = false;
+                            }
+                        });
+                        break;
+                    case 3:
+                        angular.forEach($scope.$$nextSibling.cards.hero, function(_card, i) {
+                            if(_card.id == card.id) {
+                                card.disabled = false;
+                                _card.disabled = false;
+                            }
+                        });
+                        break;
+                    case 10:
+                        angular.forEach($scope.$$nextSibling.cards.heroPower, function(_card, i) {
+                            if(_card.id == card.id) {
+                                card.disabled = false;
+                                _card.disabled = false;
+                            }
+                        });
+                        break;
+                    case 4:
+                        angular.forEach($scope.$$nextSibling.cards.minion, function(_card, i) {
+                            if(_card.id == card.id) {
+                                card.disabled = false;
+                                _card.disabled = false;
+                            }
+                        });
+                        break;
+                    case 7:
+                        angular.forEach($scope.$$nextSibling.cards.weapon, function(_card, i) {
+                            if(_card.id == card.id) {
+                                card.disabled = false;
+                                _card.disabled = false;
+                            }
+                        });
+                        break;
+                    default:
+                        return;
+                }
+                angular.forEach($scope.$$nextSibling.cards.all, function(_card, i) {
+                    if(_card.id == card.id) {
+                        card.disabled = false;
+                                _card.disabled = false;
+                    }
+                });
             }
 
         };
@@ -592,7 +644,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }, true);
 
                 // events
-                $scope.removeCard = function(card) {
+                $scope.removeCard = function(card) {                
                     
                     var cards = $scope.deckCards;
 
@@ -601,6 +653,58 @@ angular.module('hsbApp.DeckControllers', [])
                         cards.splice(idx, 1);
                         $scope.deckCards = cards.filter( function( el ){ return (typeof el !== "undefined"); } );
                         $scope.deckCounter = $scope.deckCounter - card.qty;
+
+                        switch(parseInt(card.type))
+                        {
+                            case 5:
+                                angular.forEach($scope.$$nextSibling.cards.ability, function(_card, i) {
+                                    if(_card.id == card.id) {
+                                        card.disabled = false;
+                                        _card.disabled = false;
+                                    }
+                                });
+                                break;
+                            case 3:
+                                angular.forEach($scope.$$nextSibling.cards.hero, function(_card, i) {
+                                    if(_card.id == card.id) {
+                                        card.disabled = false;
+                                        _card.disabled = false;
+                                    }
+                                });
+                                break;
+                            case 10:
+                                angular.forEach($scope.$$nextSibling.cards.heroPower, function(_card, i) {
+                                    if(_card.id == card.id) {
+                                        card.disabled = false;
+                                        _card.disabled = false;
+                                    }
+                                });
+                                break;
+                            case 4:
+                                angular.forEach($scope.$$nextSibling.cards.minion, function(_card, i) {
+                                    if(_card.id == card.id) {
+                                        card.disabled = false;
+                                        _card.disabled = false;
+                                    }
+                                });
+                                break;
+                            case 7:
+                                angular.forEach($scope.$$nextSibling.cards.weapon, function(_card, i) {
+                                    if(_card.id == card.id) {
+                                        card.disabled = false;
+                                        _card.disabled = false;
+                                    }
+                                });
+                                break;
+                            default:
+                                return;
+                        }
+                        angular.forEach($scope.$$nextSibling.cards.all, function(_card, i) {
+                            if(_card.id == card.id) {
+                                card.disabled = false;
+                                        _card.disabled = false;
+                            }
+                        });
                     }
 
                 };
@@ -683,7 +787,7 @@ angular.module('hsbApp.DeckControllers', [])
             if(newVal) {
                 angular.forEach(newVal, function(card, idx) {
 
-                    console.log(card);
+                    //console.log(card);
 
                     // legendary
                     if(card.quality == 5) {

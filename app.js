@@ -379,7 +379,8 @@ app.get('/api/user/:id', users.getById);
 app.put('/api/user/:id', ensureAuthenticated, users.updateUser);
 app.put('/api/user/:id/password', ensureAuthenticated, users.updateUserPassword);
 
-app.get('/api/deck/:id', function(req, res, next) {
+app.get('/api/deck/:id', decks.getDeckById);
+/*app.get('/api/deck/:id', function(req, res, next) {
 	res.setTimeout(30 * 1000);
 	// Get a deck from the cache
 	c.get('deck_' + req.params.id, function(err, val) {
@@ -408,10 +409,10 @@ app.get('/api/deck/:id', function(req, res, next) {
 			});
 		}
 	});
-});
+});*/
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
-//app.get('/api/decks', decks.list);
-app.get('/api/decks', function(req, res, next) {
+app.get('/api/decks', decks.list);
+/*app.get('/api/decks', function(req, res, next) {
 	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('decks', function(err, val) {
@@ -438,8 +439,9 @@ app.get('/api/decks', function(req, res, next) {
 			});
 		}
 	});
-});
-app.get('/api/decks/:username', function(req, res, next) {
+});*/
+app.get('/api/decks/:username', decks.getDecksByUsername);
+/*app.get('/api/decks/:username', function(req, res, next) {
 	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('decks_' + req.params.username, function(err, val) {
@@ -466,7 +468,7 @@ app.get('/api/decks/:username', function(req, res, next) {
 			});
 		}
 	});
-});
+});*/
 app.post('/api/decks/:username', ensureAuthenticated, decks.saveDeckToUsername);
 app.put('/api/decks/:id', ensureAuthenticated, decks.updateDeck);
 app.put('/api/decks/:id/rating', ensureAuthenticated, decks.updateDeckRating);
