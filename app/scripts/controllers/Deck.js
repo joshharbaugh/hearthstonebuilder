@@ -63,7 +63,7 @@ angular.module('hsbApp.DeckControllers', [])
 
         } else {
 
-            if(user.votes.indexOf($scope.deck._id) === 0) {
+            if(user.votes.indexOf($scope.deck._id) !== -1) {
 
                 $scope.userVotedForDeck = true;
 
