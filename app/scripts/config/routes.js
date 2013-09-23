@@ -23,10 +23,6 @@ angular.module('hsbApp.Routes', [])
 				url: "/dashboard",
 				templateUrl: CONFIG.prepareViewTemplateUrl('home/dashboard'),
 				resolve: {
-					cards: ['$cards',
-					function( $cards ){
-						return $cards.get();
-					}],
 					user: ['$users',
 					function( $users ){
 						return $users.getCurrent();

@@ -1,14 +1,6 @@
 angular.module('hsbApp.DashboardControllers', [])
 
-	.controller('DashboardModuleCtrl',['$scope','cards', function ($scope, cards) {
-
-		$scope.cards = cards;
-
-		$scope.$watch('cards', function(newVal, oldVal) {
-			if(newVal) {
-				$scope.cards = newVal;
-			}
-		});
+	.controller('DashboardModuleCtrl',['$scope', function ($scope) {
 
 		$scope.$on('$viewContentLoaded', function() {
 			// when the view is loaded

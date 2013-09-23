@@ -6,9 +6,7 @@ exports.list = function(req, res){
 	res.setTimeout(30 * 1000);
 	res.app.db.models.User.find({}).exec(function(err, response) {
 		if (err) res.send(500, err);
-		else {
-			res.json(200, response);
-		}
+		else res.json(200, response);
 	});
 };
 
@@ -16,9 +14,7 @@ exports.getById = function(req, res){
 	res.setTimeout(30 * 1000);
 	res.app.db.models.User.findOne({ _id: req.params.id }).exec(function(err, response) {
 		if (err) res.send(500, err);
-		else {
-			res.json(200, response);
-		}
+		else res.json(200, response);
 	});
 };
 
@@ -26,9 +22,7 @@ exports.getByUsername = function(req, res){
 	res.setTimeout(30 * 1000);
 	res.app.db.models.User.findOne({ 'profile.username': req.params.username }).exec(function(err, response) {
 		if (err) res.send(500, err);
-		else {
-			res.json(200, response);
-		}
+		else res.json(200, response);
 	});
 };
 
@@ -52,7 +46,6 @@ exports.updateUserPassword = function(req, res){
 		if (err) res.send(500, err);
 		else {
 			response.password = req.body.password;
-			console.log(response);
 			response.save(function(err) {
 				if(err) {
 					res.json(200, { 'status': 'error', 'message': err });

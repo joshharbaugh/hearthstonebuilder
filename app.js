@@ -184,30 +184,40 @@ app.post('/api/logout', function(req, res){
 app.get('/api/cards', function(req, res, next) {
 	res.setTimeout(30 * 1000);
 	// Get an item from the cache
-	c.get('cards', function(err, val) {
-		if(val) {
-			res.json(200, JSON.parse(val));
+	try {
+		c.get('cards', function(err, val) {
+			if(err) res.json(200, { 'errno': err.errno, 'code': err.code, 'syscall': err.syscall });
+			else {
+				if(val) {
+					res.json(200, JSON.parse(val));
 
-			res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					c.put('cards', JSON.stringify(response), function(err) {
-						if(err) console.log(err);
+					res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
+						if (err) next(err);
+						else {
+							c.put('cards', JSON.stringify(response), function(err) {
+								if(err) console.log(err);
+							});
+						}
+					});
+				} else {
+					res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
+						if (err) next(err);
+						else {
+							c.put('cards', JSON.stringify(response), function(err) {
+								if(err) next(err);
+								else res.json(200, response);
+							});
+						}
 					});
 				}
-			});
-		} else {
-			res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					c.put('cards', JSON.stringify(response), function(err) {
-						if(err) next(err);
-						else res.json(200, response);
-					});
-				}
-			});
-		}
-	});
+			}
+		});
+	} catch(e) {
+		res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
+			if (err) next(err);
+			else res.json(200, response);
+		});
+	}
 });
 app.get('/api/cards/images', cards.images);
 app.get('/api/cards/images/download', function(req, res, next) {
@@ -234,6 +244,7 @@ app.get('/api/cards/class/:classId', function(req, res, next) {
 	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('cards_class_' + req.params.classId, function(err, val) {
+		if(err) res.json(200, { 'status': 'error' });
 		if(val) {
 			res.json(200, JSON.parse(val));
 
@@ -276,6 +287,7 @@ app.get('/api/cards/type/:typeId', function(req, res, next) {
 	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('cards_type_' + req.params.typeId, function(err, val) {
+		if(err) res.json(200, { 'status': 'error' });
 		if(val) {
 			res.json(200, JSON.parse(val));
 
@@ -318,6 +330,7 @@ app.get('/api/cards/type/:typeId/class/:classId', function(req, res, next) {
 	res.setTimeout(30 * 1000);
 	// Get an item from the cache
 	c.get('cards_type_' + req.params.typeId + '_class_' + req.params.classId, function(err, val) {
+		if(err) res.json(200, { 'status': 'error' });
 		if(val) {
 			res.json(200, JSON.parse(val));
 
@@ -365,7 +378,7 @@ app.get('/api/user', ensureAuthenticated, function(req, res){
 });
 app.post('/api/user', function(req, res){
 	res.setTimeout(30 * 1000);
-	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": "https://s3.amazonaws.com/hearthstonebuilder/avatars/default_gravatar.jpg" }, "saved_decks": [] });
+	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": "https://s3.amazonaws.com/hearthstonebuilder/avatars/default_gravatar.jpg" } });
 	new_user.save(function(err) {
 	  if(err) {
 	    res.json(200, { 'status': 'error', 'message': err });
