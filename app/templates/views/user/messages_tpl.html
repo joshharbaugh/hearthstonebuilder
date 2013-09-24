@@ -1,56 +1,108 @@
-<div class="span12 panel">
-	<h2 class="panel-title">Messages
-		<ul class="nav-pills pull-right nav-messages">
-			<li class="active"><a data-target="#inbox" data-toggle="tab">Inbox</a></li>
-			<li><a data-target="#sent" data-toggle="tab">Sent</a></li>
-		</ul>
-	</h2>
-	<div class="panel-content pill-content">
-		<div class="pill-pane active" id="inbox">
-			<table class="table table-hover" id="messages">
-				<thead>
-					<tr>
-						<th style="width:50px"></th>
-						<th>From</th>
-						<th>Subject</th>
-						<th>Received</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr data-ng-show="messages.length == 0">
-						<td colspan="4">No messages</td>
-					</tr>
-					<tr data-ng-show="messages.length > 0" data-ng-repeat="message in messages" data-ng-class="{'new': message.status == 'new', 'read': message.status == 'read'}">
-						<td><span data-ng-show="message.status=='new'" class="label label-important">{{ message.status }}</span></td>
-						<td>{{ message.from }}</td>
-						<td>{{ message.subject }}</td>
-						<td>{{ message.created | date }}</td>
-					</tr>
-				</tbody>
-			</table>
+<div class="row-fluid">
+	<div class="span12">
+		<button class="btn btn-large btn-flat btn-flat-green" data-toggle="modal" data-target="#newMessageModal">New Message</button>
+	</div>
+
+	<div id="newMessageModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="newMessageModalLabel" aria-hidden="true" data-ng-model="newMessage">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="newMessageModal">New message</h3>
 		</div>
-		<div class="pill-pane" id="sent">
-			<table class="table table-hover" id="sent_messages">
-				<thead>
-					<tr>
-						<th style="width:50px"></th>
-						<th>To</th>
-						<th>Subject</th>
-						<th>Sent</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr data-ng-show="sent.length == 0">
-						<td colspan="4">No sent messages</td>
-					</tr>
-					<tr data-ng-show="sent.length > 0" data-ng-repeat="message in sent" data-ng-class="{'new': message.status == 'new', 'read': message.status == 'read'}">
-						<td><span data-ng-show="message.status=='new'" class="label label-important">{{ message.status }}</span></td>
-						<td>{{ message.username }}</td>
-						<td>{{ message.subject }}</td>
-						<td>{{ message.created | date }}</td>
-					</tr>
-				</tbody>
-			</table>
+		<div class="modal-body">
+			<form>
+				<label for="">Subject</label>
+				<input type="text" data-ng-model="newMessage.subject" placeholder="Subject">
+
+				<label for="">To</label>
+				<input type="text" data-ng-model="newMessage.to" placeholder="To">
+
+				<label for="">Message</label>
+				<textarea name="message" data-ng-model="newMessage.message" id="message" cols="30" rows="10"></textarea>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-flat btn-flat-green pull-left" data-ng-click="sendMessage(newMessage)">Send</button>			
+			<button class="btn btn-flat">Discard</button>
+		</div>
+	</div>
+</div>
+
+<div class="row-fluid">
+	<div class="span12 panel">
+		<h2 class="panel-title">Messages
+			<ul class="nav-pills pull-right nav-messages">
+				<li class="active"><a data-target="#inbox" data-toggle="tab">Inbox</a></li>
+				<li><a data-target="#sent" data-toggle="tab">Sent</a></li>
+			</ul>
+		</h2>
+		<div class="panel-content pill-content">
+			<div class="pill-pane active" id="inbox">
+				<table class="table table-hover" id="messages">
+					<thead>
+						<tr>
+							<th style="width:50px"></th>
+							<th>From</th>
+							<th>Subject</th>
+							<th>Received</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-show="messages.length == 0">
+							<td colspan="4">No messages</td>
+						</tr>
+						<tr data-ng-show="messages.length > 0" data-ng-repeat="message in messages" data-ng-class="{'new': message.status == 'new', 'read': message.status == 'read'}" data-ng-click="openMessage(message)" data-toggle="modal" data-target="#messageModal">
+							<td><span data-ng-show="message.status=='new'" class="label label-important">{{ message.status }}</span></td>
+							<td>{{ message.from }}</td>
+							<td>{{ message.subject }}</td>
+							<td>{{ message.created | date }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="pill-pane" id="sent">
+				<table class="table table-hover" id="sent_messages">
+					<thead>
+						<tr>
+							<th style="width:50px"></th>
+							<th>To</th>
+							<th>Subject</th>
+							<th>Sent</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-show="sent.length == 0">
+							<td colspan="4">No sent messages</td>
+						</tr>
+						<tr data-ng-show="sent.length > 0" data-ng-repeat="message in sent" data-ng-class="{'new': message.status == 'new', 'read': message.status == 'read'}">
+							<td><span data-ng-show="message.status=='new'" class="label label-important">{{ message.status }}</span></td>
+							<td>{{ message.username }}</td>
+							<td>{{ message.subject }}</td>
+							<td>{{ message.created | date }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div id="messageModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			<h3 id="messageModalLabel">{{ active_message.created | date }}</h3>
+		</div>
+		<div class="modal-body">
+			<div class="message-head">
+				<p class="message-subject">Subject: {{ active_message.subject }}</p>
+				<p class="message-sender">From: {{ active_message.from }}</p>	
+			</div>
+			<div class="message-body">
+				<p>{{ active_message.message }}</p>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<!--<button class="btn btn-flat btn-flat-green pull-left">Reply</button>-->
+			<button class="btn btn-flat pull-left" data-ng-click="markAsUnread(active_message)">Mark as Unread</button>
+			<button class="btn btn-flat btn-flat-red" data-ng-click="deleteMessage(active_message)" data-dismiss="modal" aria-hidden="true">Delete</button>
 		</div>
 	</div>
 </div>

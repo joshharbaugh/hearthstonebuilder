@@ -17,3 +17,14 @@ exports.getSentByUsername = function(req, res){
 		}
 	});
 };
+
+exports.updateStatus = function(req, res){
+	res.setTimeout(30 * 1000);
+	var message = req.body;
+	res.app.db.models.Message.update({ _id: req.params.id }, { 'status': req.body.status }, function (err, numberAffected, raw) {
+		if(err) res.send(500, err);
+		else {
+			res.json(200, {});
+		}
+	});
+};

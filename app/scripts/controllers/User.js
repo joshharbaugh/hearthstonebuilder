@@ -217,11 +217,47 @@ angular.module('hsbApp.UserControllers', [])
 
     }])
 
-    .controller('UserMessagesCtrl',['$scope','$users','messages','sent', function ($scope, $users, messages, sent){
-        $scope.messages = messages;
-        $scope.sent     = sent;
+    .controller('UserMessagesCtrl',['$scope','$users','messages','sent','$messages','$rootScope','$growl', function ($scope, $users, messages, sent, $messages, $rootScope, $growl){
+        if(typeof $scope.user !== "object") {
+          $rootScope.$state.transitionTo('dashboard.default', {});
+        } else {
+          $scope.messages = messages;
+          $scope.sent     = sent;
 
-        $scope.onReady();
+          $scope.openMessage = function(message) {
+            $scope.active_message = message;
+            message.status = 'read';
+            $messages.updateStatus(message);      
+          };
+
+          $scope.markAsUnread = function(message) {
+            message.status = 'new';
+            $messages.updateStatus(message);
+          };
+
+          $scope.deleteMessage = function(message) {
+            var deletePromise = $messages.deleteMessage(message);
+            deletePromise.then(function(response) {
+              if($scope.messages.indexOf(message) !== -1) {
+                var idx = $scope.messages.indexOf(message);
+                $scope.messages.splice(idx, 1);
+              }
+            });
+          };
+
+          $scope.sendMessage = function(message) {            
+            message.from = $scope.user.profile.username;
+            console.log(message);
+            var sendPromise = $messages.createMessage(message);
+            sendPromise.then(function(response) {
+              if(response.status == "success") {
+                $("#newMessageModal").modal('hide');
+              }
+            });
+          };
+
+          $scope.onReady();
+        }
     }])
 
     .controller('UserDecksCtrl',['$scope','user','decks','$stateParams','$rootScope','$decks','$growl','$timeout', function ($scope, user, decks, $stateParams, $rootScope, $decks, $growl, $timeout){

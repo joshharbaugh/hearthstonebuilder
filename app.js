@@ -425,69 +425,35 @@ app.get('/api/deck/:id', decks.getDeckById);
 });*/
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 app.get('/api/decks', decks.list);
-/*app.get('/api/decks', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	// Get an item from the cache
-	c.get('decks', function(err, val) {
-		if(val) {
-			res.json(200, JSON.parse(val));
-
-			res.app.db.models.Deck.find({}).sort({ rating: 'desc' }).exec(function(err, response) {
-				if(err) next(err);
-				else {
-					c.put('decks', JSON.stringify(response), function(err) {
-						if(err) next(err);
-					});
-				}
-			});
-		} else {
-			res.app.db.models.Deck.find({}).sort({ rating: 'desc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					c.put('decks', JSON.stringify(response), function(err) {
-						if(err) next(err);
-						else res.json(200, response);
-					});
-				}
-			});
-		}
-	});
-});*/
 app.get('/api/decks/:username', decks.getDecksByUsername);
-/*app.get('/api/decks/:username', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	// Get an item from the cache
-	c.get('decks_' + req.params.username, function(err, val) {
-		if(val) {
-			res.json(200, JSON.parse(val));
-
-			res.app.db.models.Deck.find({ username: req.params.username }).sort({ rating: 'desc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					c.put('decks_' + req.params.username, JSON.stringify(response), function(err) {
-						if(err) next(err);
-					});
-				}
-			});
-		} else {
-			res.app.db.models.Deck.find({ username: req.params.username }).sort({ rating: 'desc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					c.put('decks_' + req.params.username, JSON.stringify(response), function(err) {
-						if(err) next(err);
-						else res.json(200, response);
-					});
-				}
-			});
-		}
-	});
-});*/
 app.post('/api/decks/:username', ensureAuthenticated, decks.saveDeckToUsername);
 app.put('/api/decks/:id', ensureAuthenticated, decks.updateDeck);
 app.put('/api/decks/:id/rating', ensureAuthenticated, decks.updateDeckRating);
 
 app.get('/api/messages/:username', ensureAuthenticated, messages.getByUsername);
 app.get('/api/messages/:username/sent', ensureAuthenticated, messages.getSentByUsername);
+
+app.post('/api/message', ensureAuthenticated, function(req, res){
+	var message = req.body.message;
+	var new_message = new app.db.models.Message({ "username": message.to, "message": message.message, "created": new Date(), "from": message.from, "subject": message.subject, "status": "new" });
+	new_message.save(function(err) {
+	  if(err) {
+	    res.json(200, { 'status': 'error', 'message': err });
+	  } else {
+	    res.json(200, { 'status': 'success', 'message': 'Message sent!' });
+	  }
+	});
+});
+app.delete('/api/message/:id', ensureAuthenticated, function(req, res){
+	res.setTimeout(30 * 1000);
+	res.app.db.models.Message.remove({ _id: req.params.id }).exec(function(err, response) {
+		if (err) res.send(500, err);
+		else {
+			res.json(200, { 'status': 'success', 'message': 'Message deleted' });
+		}
+	});
+});
+app.put('/api/message/:id/status', ensureAuthenticated, messages.updateStatus);
 
 // upload to S3
 app.post('/api/upload', ensureAuthenticated, function(req, res, next){
