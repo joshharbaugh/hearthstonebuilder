@@ -49,6 +49,7 @@ app.db = mongoose.createConnection(app.get('mongodb-uri'));
 
 app.db.once('open', function() {
 	console.log('Mongoose open for business');
+	console.log(app.get('mongodb-uri'));
 });
 
 require('./models')(app, mongoose, bcrypt, SALT_WORK_FACTOR);
