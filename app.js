@@ -118,6 +118,7 @@ app.use(raven.middleware.express('https://7907b957d0e44be88b4464c41fd47826:8d791
 
 // development only
 if ('development' == app.get('env')) {
+	console.log('===Development===');
 	app.use(express.favicon(path.join(__dirname, '/app/favicon.ico')));
 	app.use(express.static(path.join(__dirname, 'app')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
@@ -127,6 +128,7 @@ if ('development' == app.get('env')) {
 	});
 	app.use(express.errorHandler());
 } else {
+	console.log('===Production===');
 	app.use(express.favicon(path.join(__dirname, '/dist/favicon.ico')));
 	app.use(express.static(path.join(__dirname, 'dist')));
 	app.use(express.static(path.join(__dirname, '.tmp')));
