@@ -115,7 +115,7 @@ app.use(express.cookieSession({secret: 'dfj3fk2i3lkjfsld92492kc0!fkjdf0249fk29#4
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
-app.error(raven.middleware.express('https://62b9f8a1d863427f9425e95e31051712:3e8ebb29977f4325b8b9fe34a328b137@app.getsentry.com/13667'));
+app.use(raven.middleware.express('https://62b9f8a1d863427f9425e95e31051712:3e8ebb29977f4325b8b9fe34a328b137@app.getsentry.com/13667'));
 
 // development only
 if ('development' == app.get('env')) {
