@@ -8,7 +8,7 @@
 			<table class="table table-hover table-striped">
 				<thead>
 					<tr>
-						<th></th>
+						<th class="hidden-phone"></th>
 						<th>Name</th>
 						<th>Cost</th>
 						<th>Attack</th>
@@ -19,7 +19,7 @@
 				</thead>
 				<tbody>
 					<tr data-ng-repeat="card in deckCards">
-						<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
+						<td class="hidden-phone" style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 						<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.qty">x{{ card.qty }}</span></strong> <p class="muted">{{ card.description }}</p></td>
 						<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
 						<td style="vertical-align:middle" data-ng-bind="card.attack"></td>

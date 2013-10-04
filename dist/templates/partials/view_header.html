@@ -1,5 +1,5 @@
 <header>
-	<h1 class="span7 page-title"><span style="color:#32383d">HearthStone Builder:</span> <span style="color:#767197">{{ viewTitle }}</span> <span class="muted" style="font-size: 14px" data-ng-show="$stateParams.username">{{ $stateParams.username }}</span></h1>
+	<h1 class="span7 page-title hidden-phone"><span style="color:#32383d">HearthStone Builder:</span> <span style="color:#767197">{{ viewTitle }}</span> <span class="muted" style="font-size: 14px" data-ng-show="$stateParams.username">{{ $stateParams.username }}</span></h1>
 	<nav data-ng-show="!user.profile" class="span5" style="padding-top:13px">
 		<a href="/login" class="btn btn-flat span6">Login</a>
 		<a href="/register" class="btn btn-flat btn-flat-red span6">Create an account</a>
@@ -10,6 +10,7 @@
 			<span>{{ user.profile.username }}</span>
 			<i class="icon-chevron-down"></i>
 		</a>
+		<a href="/logout" class="visible-phone hidden-desktop hidden-tablet btn btn-flat mobile-logout span6">Logout</a>
 		<ul class="dropdown-menu" role="menu">
 			<li><a ui-sref="users.decks({username:user.profile.username})" data-ng-href="/users/{{ user.profile.username }}/decks">Decks</a></li>
 			<li class="divider"></li>

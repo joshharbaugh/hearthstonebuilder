@@ -1,0 +1,81 @@
+@import "bootstrap-sass/lib/responsive";
+
+@media (max-width: 767px) {
+	body { padding: 0; }
+	#sidebar-wrapper {
+		&.collapsed {
+			width: 100%;
+			height: auto;
+			position: relative;
+			float: left;
+		}
+
+		.sidebar-icon {
+			width: 100%;
+
+			li {
+				width: 64px;
+				float: left;
+			}
+		}
+
+		.sidebar-group {
+			top: 41px;
+			left: 0;
+
+			li {
+				width: 100%;
+			}
+		}
+	}
+
+	#content-wrapper {
+		&.collapsed {
+			margin-left: 0;
+		}
+
+		header {
+			nav.span5 {
+				a {
+					width: 48%;
+					float: left;
+
+					&:first-child {
+						margin-right: 4%;
+					}
+				}
+			}
+			nav.span4 {
+				a.user-dropdown {
+					width: 48%;
+					float: left;
+				}
+			}
+			nav.user-profile a.mobile-logout {
+				width: 40%;
+				float: left;
+				height: auto;
+				line-height: 30px;
+				position: relative;
+				top: 13px;
+				left: 43px;
+			}
+			nav.user-profile .dropdown-menu {
+				right: auto;
+				left: 0;
+			}
+		}
+
+		.panel-content {
+			form {
+				padding: 0 20px 20px 20px;
+			}
+
+			.stats-container {
+				div.span4, div.span3 {
+					text-align: center;
+				}
+			}
+		}
+	}
+}
