@@ -25,22 +25,28 @@ var express  = require('express'),
     memjs    = require('memjs'),
     pkg = require('./package.json'),
     version = pkg.version,
+    winston = require('winston'),
+    Papertrail = require('winston-papertrail').Papertrail,
     SALT_WORK_FACTOR = 10;
+
+var logger = new winston.Logger({
+    transports: [
+        new winston.transports.Papertrail({
+            host: 'logs.papertrailapp.com',
+            port: 14583
+        })
+    ]
+});
 
 var app = express();
 
 var client = memjs.Client.create();
-/*
-client.get('hello', function(err) {
-	if(err) console.log(err);
-	else console.log('memcache')
-});*/
 
 // IronCache
 if ('development' == app.get('env')) {
-	var c = project.caches('hsb-dev');
+    var c = project.caches('hsb-dev');
 } else {
-	var c = project.caches('hsb-prod');
+    var c = project.caches('hsb-prod');
 }
 
 app.set('mongodb-uri', process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'localhost/test');
@@ -48,57 +54,39 @@ app.set('mongodb-uri', process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'l
 app.db = mongoose.createConnection(app.get('mongodb-uri'));
 
 app.db.once('open', function() {
-	console.log('Mongoose open for business');
-	console.log(app.get('mongodb-uri'));
+    logger.info('Mongoose open for business');
+    logger.info(app.get('mongodb-uri'));
 });
 
 require('./models')(app, mongoose, bcrypt, SALT_WORK_FACTOR);
 
-/*var test_user = new app.db.models.User({ "password": "password",
-    "profile": {
-        "username": "jharbaugh",
-        "id": 1,
-        "display_name": "Josh Harbaugh"
-    },
-    "saved_decks": [ {
-        "deck_id": 1,
-        "resource_uri": "/api/deck/1"
-    } ] });
-test_user.save(function(err) {
-  if(err) {
-    console.log(err);
-  } else {
-    console.log('user: ' + test_user.profile.username + " saved.");
-  }
-});*/
-
 passport.serializeUser(function(user, done) {
-	done(null, user.id);
+    done(null, user.id);
 });
 
-passport.deserializeUser(function(id, done) {	
-	app.db.models.User.findOne({ _id: id }).exec(function (err, user) {
-		if(err) console.log(err);
-		done(err, user);
-	});
+passport.deserializeUser(function(id, done) {   
+    app.db.models.User.findOne({ _id: id }).exec(function (err, user) {
+        if(err) logger.info(err);
+        done(err, user);
+    });
 });
 
 // Passport Strategy
 passport.use(new LocalStrategy(
-	function(username, password, done) {
-		app.db.models.User.findOne({}).where('profile.username').equals(username).exec(function(err, user) {
-			if (err) { return done(err); }
-			if (!user) { return done(null, false, { message: 'Incorrect username.' }); }
-			user.comparePassword(password, function(err, isMatch) {
-				if (err) return done(err);
-				if(isMatch) {
-					return done(null, user);
-				} else {
-					return done(null, false, { message: 'Invalid password' });
-				}
-			});
-		});
-	}
+    function(username, password, done) {
+        app.db.models.User.findOne({}).where('profile.username').equals(username).exec(function(err, user) {
+            if (err) { return done(err); }
+            if (!user) { return done(null, false, { message: 'Incorrect username.' }); }
+            user.comparePassword(password, function(err, isMatch) {
+                if (err) return done(err);
+                if(isMatch) {
+                    return done(null, user);
+                } else {
+                    return done(null, false, { message: 'Invalid password' });
+                }
+            });
+        });
+    }
 ));
 
 // all environments
@@ -119,276 +107,257 @@ app.use(raven.middleware.express('https://62b9f8a1d863427f9425e95e31051712:3e8eb
 
 // development only
 if ('development' == app.get('env')) {
-	console.log('===Development===');
-	app.use(express.favicon(path.join(__dirname, '/app/favicon.ico')));
-	app.use(express.static(path.join(__dirname, 'app')));
-	app.use(express.static(path.join(__dirname, '.tmp')));
-	app.use(function(req, res) {
-		res.render( __dirname + '/app/index.html', { version: version } );
-		//res.sendfile(__dirname + '/app/index.html', {'version': version});
-	});
-	app.use(express.errorHandler());
+    logger.info('===Development===');
+    app.use(express.favicon(path.join(__dirname, '/app/favicon.ico')));
+    app.use(express.static(path.join(__dirname, 'app')));
+    app.use(express.static(path.join(__dirname, '.tmp')));
+    app.use(function(req, res) {
+        res.render( __dirname + '/app/index.html', { version: version } );
+    });
+    app.use(express.errorHandler());
 } else {
-	console.log('===Production===');
-	app.use(express.favicon(path.join(__dirname, '/dist/favicon.ico')));
-	app.use(express.static(path.join(__dirname, 'dist')));
-	app.use(express.static(path.join(__dirname, '.tmp')));
-	app.use(function(req, res) {
-		res.render( __dirname + '/dist/index.html', { version: version } );
-		//res.sendfile(__dirname + '/dist/index.html', {'version': version});
-	});
+    logger.info('===Production===');
+    app.use(express.favicon(path.join(__dirname, '/dist/favicon.ico')));
+    app.use(express.static(path.join(__dirname, 'dist')));
+    app.use(express.static(path.join(__dirname, '.tmp')));
+    app.use(function(req, res) {
+        res.render( __dirname + '/dist/index.html', { version: version } );
+    });
 }
-
-// Admin
-/*app.get('/admin', function(req, res){
-	var hearthstonecards = [{"id":922,"image":"CS1_042","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":1,"attack":1,"health":2,"collectible":1,"name":"Goldshire Footman","description":"Taunt"},{"id":602,"image":"CS1_069","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":5,"attack":3,"health":6,"collectible":1,"name":"Fen Creeper","description":"Taunt"},{"id":841,"image":"CS1_112","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":1,"cost":5,"collectible":1,"name":"Holy Nova","description":"Deal 2 damage to all enemies.  Restore #2 Health to all  friendly characters."},{"id":8,"image":"CS1_113","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":1,"cost":8,"collectible":1,"name":"Mind Control","description":"Take control of an enemy minion."},{"id":376,"image":"CS1_129","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":1,"cost":1,"collectible":1,"name":"Inner Fire","description":"Change a minion's Attack to be equal to its Health."},{"id":279,"image":"CS1_130","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":0,"cost":1,"collectible":1,"name":"Holy Smite","description":"Deal 2 damage."},{"id":479,"image":"CS1h_001","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"classs":5,"quality":0,"cost":2,"name":"Lesser Heal","description":"Hero Power   Restore 2 Health."},{"id":1099,"image":"CS2_003","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":1,"cost":1,"collectible":1,"name":"Mind Vision","description":"Put a copy of a random card in your opponent's hand into your hand."},{"id":613,"image":"CS2_004","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":0,"cost":1,"collectible":1,"name":"Power Word: Shield","description":"Give a minion +3 Health."},{"id":1050,"image":"CS2_005","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":0,"cost":1,"collectible":1,"name":"Claw","description":"Give your hero +2 Attack this turn and 2 Armor."},{"id":773,"image":"CS2_007","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":0,"cost":3,"collectible":1,"name":"Healing Touch","description":"Restore #8 Health."},{"id":467,"image":"CS2_008","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"collectible":1,"cost":0,"name":"Moonfire","description":"Deal 1 damage."},{"id":213,"image":"CS2_009","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":0,"cost":2,"collectible":1,"name":"Mark of the Wild","description":"Give a minion Taunt and +2\/+2. (+2 Attack\/+2 Health)"},{"id":742,"image":"CS2_011","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":3,"collectible":1,"name":"Savage Roar","description":"Give your characters +2 Attack this turn."},{"id":64,"image":"CS2_012","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":4,"collectible":1,"name":"Swipe","description":"Deal 4 damage to an enemy and 1 damage to all other enemies."},{"id":1124,"image":"CS2_013","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":0,"cost":2,"collectible":1,"name":"Wild Growth","description":"Gain an empty Mana Crystal."},{"id":1725,"image":"CS2_013t","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":0,"classs":11,"quality":2,"name":"Excess Mana","description":"Draw a card. (You can only have 10 Mana in your tray.)"},{"id":1123,"image":"CS2_017","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"classs":11,"quality":0,"cost":2,"name":"Shapeshift","description":"Hero Power  +1 Attack this turn.  +1 Armor."},{"id":77,"image":"CS2_022","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":0,"cost":4,"collectible":1,"name":"Polymorph","description":"Transform a minion into a 1\/1 Sheep."},{"id":555,"image":"CS2_023","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":0,"cost":3,"collectible":1,"name":"Arcane Intellect","description":"Draw 2 cards."},{"id":662,"image":"CS2_024","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"cost":3,"collectible":1,"name":"Frostbolt","description":"Deal 3 damage to a character and Freeze it."},{"id":447,"image":"CS2_025","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":0,"cost":2,"collectible":1,"name":"Arcane Explosion","description":"Deal 1 damage to all enemy minions."},{"id":587,"image":"CS2_026","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"cost":2,"collectible":1,"name":"Frost Nova","description":"Freeze all enemy minions."},{"id":1084,"image":"CS2_027","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"cost":1,"collectible":1,"name":"Mirror Image","description":"Summon two 0\/1 minions with Taunt."},{"id":457,"image":"CS2_028","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":3,"cost":5,"collectible":1,"name":"Blizzard","description":"Deal 2 damage to all enemy minions and Freeze them."},{"id":315,"image":"CS2_029","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":0,"cost":4,"collectible":1,"name":"Fireball","description":"Deal 6 damage."},{"id":172,"image":"CS2_031","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"collectible":1,"cost":1,"name":"Ice Lance","description":"Freeze a character. If it was already Frozen, deal 4 damage instead."},{"id":1004,"image":"CS2_032","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"cost":7,"collectible":1,"name":"Flamestrike","description":"Deal 4 damage to all enemy minions."},{"id":395,"image":"CS2_033","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":8,"quality":1,"cost":4,"attack":3,"health":6,"collectible":1,"name":"Water Elemental","description":"Freeze any character that Water Elemental damages."},{"id":807,"image":"CS2_034","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"quality":0,"cost":2,"faction":3,"classs":8,"name":"Fireblast","description":"Hero Power   Deal 1 damage."},{"id":971,"image":"CS2_037","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":0,"cost":1,"collectible":1,"name":"Frost Shock","description":"Deal 1 damage to an enemy character and Freeze it."},{"id":404,"image":"CS2_038","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":3,"cost":2,"collectible":1,"name":"Ancestral Spirit","description":"Choose a minion. When that minion is destroyed, return it to the battlefield."},{"id":51,"image":"CS2_039","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":0,"cost":2,"collectible":1,"name":"Windfury","description":"Give a minion Windfury."},{"id":149,"image":"CS2_041","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":0,"cost":0,"collectible":1,"name":"Ancestral Healing","description":"Restore a minion to full Health and give it Taunt."},{"id":189,"image":"CS2_042","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":1,"cost":6,"attack":6,"health":5,"collectible":1,"name":"Fire Elemental","description":"Battlecry: Deal 3 damage."},{"id":239,"image":"CS2_045","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":0,"cost":1,"collectible":1,"name":"Rockbiter Weapon","description":"Give a friendly character +3 Attack this turn."},{"id":1171,"image":"CS2_046","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":1,"cost":5,"collectible":1,"name":"Bloodlust","description":"Give your minions +3 Attack this turn."},{"id":687,"image":"CS2_049","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"classs":7,"quality":0,"cost":2,"name":"Totemic Call","description":"Hero Power   Summon a random Totem."},{"id":537,"image":"CS2_050","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":0,"attack":1,"health":1,"race":21,"cost":1,"name":"Searing Totem"},{"id":850,"image":"CS2_051","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":0,"health":2,"race":21,"cost":1,"attack":0,"name":"Stoneclaw Totem","description":"Taunt"},{"id":458,"image":"CS2_052","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":0,"health":2,"race":21,"cost":1,"attack":0,"name":"Wrath of Air Totem","description":"Spell Power +1"},{"id":818,"image":"CS2_053","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":4,"cost":3,"collectible":1,"name":"Far Sight","description":"Draw a card. That card costs (3) less."},{"id":300,"image":"CS2_056","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"classs":9,"quality":0,"cost":2,"name":"Life Tap","description":"Hero Power   Draw a card and take 2 damage."},{"id":914,"image":"CS2_057","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":0,"cost":3,"collectible":1,"name":"Shadow Bolt","description":"Deal 4 damage to a minion."},{"id":469,"image":"CS2_059","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"health":1,"attack":1,"faction":3,"classs":9,"race":15,"collectible":1,"name":"Blood Imp","description":"Stealth. Your other minions have +1 Health."},{"id":919,"image":"CS2_061","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":0,"cost":3,"collectible":1,"name":"Drain Life","description":"Deal 2 damage. Restore #2 Health to your hero."},{"id":950,"image":"CS2_062","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":0,"cost":4,"collectible":1,"name":"Hellfire","description":"Deal 3 damage to ALL characters."},{"id":982,"image":"CS2_063","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":1,"cost":1,"collectible":1,"name":"Corruption","description":"Choose an enemy minion.   At the start of your turn, destroy it."},{"id":1019,"image":"CS2_064","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"race":15,"quality":1,"cost":6,"attack":6,"health":6,"collectible":1,"name":"Dread Infernal","description":"Battlecry: Deal 1 damage to ALL other characters."},{"id":48,"image":"CS2_065","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"race":15,"quality":0,"cost":1,"health":3,"attack":1,"collectible":1,"name":"Voidwalker","description":"Taunt"},{"id":180,"image":"CS2_072","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":0,"cost":0,"collectible":1,"name":"Backstab","description":"Deal 2 damage to an enemy minion."},{"id":268,"image":"CS2_073","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":1,"cost":1,"collectible":1,"name":"Cold Blood","description":"Give a minion +2 Attack. Combo: +4 Attack instead."},{"id":459,"image":"CS2_074","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":0,"cost":1,"collectible":1,"name":"Deadly Poison","description":"Give your weapon +2 Attack."},{"id":710,"image":"CS2_075","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":0,"cost":1,"collectible":1,"name":"Sinister Strike","description":"Deal 3 damage to the enemy hero."},{"id":345,"image":"CS2_076","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":0,"cost":5,"collectible":1,"name":"Assassinate","description":"Destroy an enemy minion."},{"id":630,"image":"CS2_077","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":1,"cost":7,"collectible":1,"name":"Sprint","description":"Draw 4 cards."},{"id":421,"image":"CS2_080","set":2,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":4,"quality":1,"cost":5,"attack":3,"durability":4,"collectible":1,"name":"Assassin's Blade"},{"id":485,"image":"CS2_082","set":2,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":4,"quality":0,"attack":1,"durability":2,"cost":1,"name":"Wicked Knife"},{"id":730,"image":"CS2_083b","set":2,"quality":0,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"cost":2,"classs":4,"faction":3,"name":"Dagger Mastery","description":"Hero Power   Equip a 1\/2 Dagger; or Give your weapon +1 Attack this turn."},{"id":141,"image":"CS2_084","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":3,"quality":1,"cost":0,"collectible":1,"name":"Hunter's Mark","description":"Change a minion's Health to 1 this turn."},{"id":70,"image":"CS2_087","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":0,"cost":1,"collectible":1,"name":"Blessing of Might","description":"Give a minion +3 Attack."},{"id":1068,"image":"CS2_088","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":2,"quality":1,"cost":7,"health":6,"attack":5,"collectible":1,"name":"Guardian of Kings","description":"Battlecry: Restore 6 Health to your hero."},{"id":291,"image":"CS2_089","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":0,"cost":2,"collectible":1,"name":"Holy Light","description":"Restore #6 Health."},{"id":383,"image":"CS2_091","set":2,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":2,"quality":0,"cost":1,"attack":1,"durability":4,"collectible":1,"name":"Light's Justice"},{"id":943,"image":"CS2_092","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":1,"cost":4,"collectible":1,"name":"Blessing of Kings","description":"Give a minion +4\/+4. (+4 Attack\/+4 Health)"},{"id":476,"image":"CS2_093","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":1,"cost":4,"collectible":1,"name":"Consecration","description":"Deal 2 damage to all enemies."},{"id":250,"image":"CS2_094","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":0,"cost":4,"collectible":1,"name":"Hammer of Wrath","description":"Deal 3 damage.  Draw a card."},{"id":847,"image":"CS2_097","set":2,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":2,"quality":1,"cost":4,"attack":4,"durability":2,"collectible":1,"name":"Truesilver Champion","description":"Whenever your hero attacks, restore 2 Health to it."},{"id":472,"image":"CS2_101","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"classs":2,"quality":0,"cost":2,"name":"Reinforce","description":"Hero Power   Summon a 1\/1 Silver Hand Recruit."},{"id":1652,"image":"CS2_101t","set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":1,"classs":2,"name":"Silver Hand Recruit"},{"id":725,"image":"CS2_102","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"classs":1,"quality":0,"cost":2,"name":"Armor Up!","description":"Hero Power   Gain 2 Armor."},{"id":344,"image":"CS2_103","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":0,"cost":0,"collectible":1,"name":"Charge","description":"Give a friendly minion Charge."},{"id":1108,"image":"CS2_104","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":1,"cost":2,"collectible":1,"name":"Rampage","description":"Give a damaged minion +3\/+3."},{"id":1007,"image":"CS2_105","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":0,"cost":2,"collectible":1,"name":"Heroic Strike","description":"Give your hero +4 Attack this turn."},{"id":401,"image":"CS2_106","set":2,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":1,"quality":0,"cost":2,"attack":3,"durability":2,"collectible":1,"name":"Fiery War Axe"},{"id":785,"image":"CS2_108","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":0,"cost":1,"collectible":1,"name":"Execute","description":"Destroy a damaged enemy minion."},{"id":304,"image":"CS2_112","set":2,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":1,"quality":1,"cost":5,"attack":5,"durability":2,"collectible":1,"name":"Arcanite Reaper"},{"id":940,"image":"CS2_114","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":1,"cost":2,"collectible":1,"name":"Cleave","description":"Deal 2 damage to two random enemy minions."},{"id":1651,"image":"CS2_117","collectible":1,"set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":3,"health":3,"name":"Earthen Ring Farseer","description":"Battlecry: Restore 3 Health."},{"id":1653,"image":"CS2_118","collectible":1,"set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":5,"health":1,"name":"Magma Rager"},{"id":1370,"image":"CS2_119","collectible":1,"set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":2,"health":7,"race":20,"name":"Oasis Snapjaw"},{"id":1369,"image":"CS2_120","collectible":1,"set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":2,"health":3,"race":20,"name":"River Crocolisk"},{"id":41,"image":"CS2_121","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":2,"attack":2,"health":2,"collectible":1,"name":"Frostwolf Grunt","description":"Taunt"},{"id":1401,"image":"CS2_122","collectible":1,"set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":2,"health":2,"name":"Raid Leader","description":"Your other minions have +1 Attack."},{"id":289,"image":"CS2_124","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":0,"cost":3,"attack":3,"health":1,"collectible":1,"name":"Wolfrider","description":"Charge"},{"id":1182,"image":"CS2_125","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":3,"attack":3,"health":3,"collectible":1,"race":20,"name":"Ironfur Grizzly","description":"Taunt"},{"id":67,"image":"CS2_127","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":3,"attack":1,"health":4,"collectible":1,"race":20,"name":"Silverback Patriarch","description":"Taunt"},{"id":622,"image":"CS2_131","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":4,"attack":2,"health":5,"collectible":1,"name":"Stormwind Knight","description":"Charge"},{"id":339,"image":"CS2_141","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":3,"attack":2,"health":2,"collectible":1,"name":"Ironforge Rifleman","description":"Battlecry: Deal 1 damage."},{"id":672,"image":"CS2_142","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":2,"attack":2,"health":2,"collectible":1,"name":"Kobold Geomancer","description":"Spell Power +1"},{"id":724,"image":"CS2_146","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":1,"attack":2,"health":1,"collectible":1,"race":23,"name":"Southsea Deckhand","description":"Has Charge while you have a weapon equipped."},{"id":308,"image":"CS2_147","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"health":4,"attack":2,"faction":2,"collectible":1,"name":"Gnomish Inventor","description":"Battlecry: Draw a card."},{"id":413,"image":"CS2_150","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":5,"attack":4,"health":2,"collectible":1,"name":"Stormpike Commando","description":"Battlecry: Deal 2 damage."},{"id":69,"image":"CS2_151","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":5,"attack":4,"health":4,"collectible":1,"name":"Silver Hand Knight","description":"Battlecry: Summon a 2\/2 Squire."},{"id":482,"image":"CS2_152","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"attack":2,"health":2,"cost":1,"name":"Squire"},{"id":525,"image":"CS2_155","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":6,"attack":4,"health":7,"collectible":1,"name":"Archmage","description":"Spell Power +1"},{"id":134,"image":"CS2_161","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":7,"attack":7,"health":5,"faction":2,"collectible":1,"name":"Ravenholdt Assassin","description":"Stealth"},{"id":157,"image":"CS2_162","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":6,"attack":6,"health":5,"collectible":1,"name":"Lord of the Arena","description":"Taunt"},{"id":191,"image":"CS2_168","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":0,"cost":1,"attack":2,"health":1,"collectible":1,"race":14,"name":"Murloc Raider"},{"id":641,"image":"CS2_169","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":1,"attack":1,"health":1,"collectible":1,"race":20,"name":"Young Dragonhawk","description":"Windfury"},{"id":648,"image":"CS2_171","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":20,"quality":0,"cost":1,"attack":1,"health":1,"collectible":1,"name":"Stonetusk Boar","description":"Charge"},{"id":216,"image":"CS2_172","set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"health":2,"attack":3,"faction":1,"collectible":1,"race":20,"name":"Bloodfen Raptor"},{"id":739,"image":"CS2_173","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":1,"cost":2,"attack":2,"health":1,"collectible":1,"name":"Bluegill Warrior","description":"Charge"},{"id":635,"image":"CS2_179","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":0,"cost":4,"attack":3,"health":5,"collectible":1,"name":"Sen'jin Shieldmasta","description":"Taunt"},{"id":1109,"image":"CS2_181","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":3,"cost":3,"attack":3,"health":7,"collectible":1,"name":"Injured Blademaster","description":"Battlecry: Deal 4 damage to HIMSELF."},{"id":90,"image":"CS2_182","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":4,"attack":4,"health":5,"collectible":1,"name":"Chillwind Yeti"},{"id":712,"image":"CS2_186","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":7,"attack":7,"health":7,"collectible":1,"name":"War Golem"},{"id":1140,"image":"CS2_187","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":5,"attack":5,"health":4,"collectible":1,"name":"Booty Bay Bodyguard","description":"Taunt"},{"id":242,"image":"CS2_188","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":1,"attack":2,"health":1,"collectible":1,"name":"Abusive Sergeant","description":"Battlecry: Give a friendly minion +2 Attack this turn."},{"id":389,"image":"CS2_189","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":1,"attack":1,"health":1,"collectible":1,"name":"Elven Archer","description":"Battlecry: Deal 1 damage."},{"id":257,"image":"CS2_196","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":3,"attack":2,"health":3,"collectible":1,"name":"Razorfen Hunter","description":"Battlecry: Summon a 1\/1 Boar."},{"id":995,"image":"CS2_197","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":4,"attack":4,"health":4,"collectible":1,"name":"Ogre Magi","description":"Spell Power +1"},{"id":1686,"image":"CS2_200","collectible":1,"set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"attack":6,"health":7,"name":"Boulderfist Ogre"},{"id":1687,"image":"CS2_201","collectible":1,"set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":7,"attack":9,"health":5,"race":20,"name":"Core Hound"},{"id":290,"image":"CS2_203","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":2,"attack":2,"health":1,"collectible":1,"race":20,"name":"Ironbeak Owl","description":"Battlecry: Silence a minion."},{"id":445,"image":"CS2_213","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":0,"cost":6,"attack":5,"health":2,"collectible":1,"name":"Reckless Rocketeer","description":"Charge"},{"id":61,"image":"CS2_221","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":5,"attack":4,"health":6,"collectible":1,"name":"Spiteful Smith","description":"Enrage: Your weapon has +2 Attack."},{"id":753,"image":"CS2_222","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":7,"attack":6,"health":6,"collectible":1,"name":"Stormwind Champion","description":"Your other minions have +1\/+1."},{"id":496,"image":"CS2_226","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":5,"attack":4,"health":4,"collectible":1,"name":"Frostwolf Warlord","description":"Has +1\/+1 for each other friendly minion on the battlefield."},{"id":1122,"image":"CS2_227","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":5,"attack":7,"health":6,"collectible":1,"name":"Venture Co. Mercenary","description":"Your minions cost (3) more."},{"id":179,"image":"CS2_231","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":0,"health":1,"attack":1,"faction":3,"collectible":1,"name":"Wisp"},{"id":205,"image":"CS2_232","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":8,"health":8,"attack":8,"faction":3,"classs":11,"collectible":1,"name":"Ironbark Protector","description":"Taunt"},{"id":1064,"image":"CS2_233","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":4,"collectible":1,"name":"Blade Flurry","description":"Destroy your weapon and deal its damage to all enemies."},{"id":1367,"image":"CS2_234","collectible":1,"set":2,"quality":0,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"classs":5,"name":"Shadow Word: Pain","description":"Destroy a minion with 3 or less Attack."},{"id":1650,"image":"CS2_235","collectible":1,"set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":1,"health":3,"classs":5,"name":"Northshire Cleric","description":"Whenever a minion is healed, draw a card."},{"id":1361,"image":"CS2_236","collectible":1,"set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"classs":5,"name":"Divine Spirit","description":"Double a minion's Health."},{"id":1241,"image":"CS2_237","collectible":1,"set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":2,"health":2,"classs":3,"race":20,"name":"Starving Buzzard","description":"Whenever you summon a Beast, draw a card."},{"id":298,"image":"CS2_boar","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"attack":1,"health":1,"cost":1,"race":20,"name":"Boar"},{"id":968,"image":"CS2_mirror","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"health":1,"classs":8,"cost":0,"attack":0,"name":"Mirror Image","description":"Taunt"},{"id":796,"image":"CS2_tk1","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"attack":1,"health":1,"race":20,"cost":0,"name":"Sheep"},{"id":340,"image":"DREAM_01","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":3,"health":5,"quality":2,"name":"Laughing Sister","description":"Can't be targeted by Spells or Hero Powers."},{"id":301,"image":"DREAM_02","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"quality":2,"name":"Ysera Awakens","description":"Deal 5 damage to all characters except Ysera."},{"id":489,"image":"DREAM_03","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":7,"health":6,"quality":2,"name":"Emerald Drake"},{"id":808,"image":"DREAM_04","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":0,"quality":2,"name":"Dream","description":"Return a minion to its owner's hand."},{"id":217,"image":"DREAM_05","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":0,"quality":2,"name":"Nightmare","description":"Give a minion +5\/+5.  At the start of your next turn, destroy it."},{"id":582,"image":"DS1_055","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":5,"attack":4,"health":5,"collectible":1,"name":"Darkscale Healer","description":"Battlecry: Restore 2 Health to all friendly characters."},{"id":1003,"image":"DS1_070","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":0,"cost":4,"attack":4,"health":3,"classs":3,"collectible":1,"name":"Houndmaster","description":"Battlecry: Give a friendly Beast +2\/+2 and Taunt."},{"id":606,"image":"DS1_175","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":3,"quality":0,"cost":1,"attack":1,"health":1,"race":20,"collectible":1,"name":"Timber Wolf","description":"Your other Beasts have +1 Attack."},{"id":699,"image":"DS1_178","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"attack":2,"health":5,"faction":3,"classs":3,"race":20,"collectible":1,"name":"Tundra Rhino","description":"Your Beasts have Charge."},{"id":292,"image":"DS1_183","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":3,"quality":0,"cost":4,"collectible":1,"name":"Multi-Shot","description":"Deal 3 damage to two random enemy minions."},{"id":1047,"image":"DS1_184","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":3,"quality":0,"cost":1,"collectible":1,"name":"Tracking","description":"Look at the top three cards of your deck. Draw one and discard the others."},{"id":877,"image":"DS1_185","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":3,"quality":0,"cost":1,"collectible":1,"name":"Arcane Shot","description":"Deal 2 damage."},{"id":311,"image":"DS1_188","set":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":3,"quality":4,"cost":7,"attack":5,"durability":2,"collectible":1,"name":"Gladiator's Longbow","description":"Your hero is Immune while attacking."},{"id":545,"image":"DS1_233","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":0,"cost":2,"collectible":1,"name":"Mind Blast","description":"Deal 5 damage to the enemy hero."},{"id":229,"image":"DS1h_292","set":2,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"classs":3,"quality":0,"cost":2,"name":"Steady Shot","description":"Hero Power   Deal 2 damage to the enemy hero."},{"id":1655,"image":"EX1_001","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":2,"name":"Lightwarden","description":"Whenever a character is healed, gain +1 Attack."},{"id":1656,"image":"EX1_002","collectible":1,"set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"attack":4,"health":5,"elite":1,"name":"The Black Knight","description":"Battlecry: Destroy a minion with Taunt."},{"id":1634,"image":"EX1_004","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":2,"health":1,"name":"Young Priestess","description":"At the end of your turn, give another random friendly minion +1 Health."},{"id":1657,"image":"EX1_005","collectible":1,"set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":4,"health":2,"name":"Big Game Hunter","description":"Battlecry: Destroy a minion with an Attack of 7 or more."},{"id":1658,"image":"EX1_006","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":0,"health":3,"name":"Alarm-o-Bot","description":"At the start of your turn, swap this minion with a random one in your hand."},{"id":1659,"image":"EX1_007","collectible":1,"set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":1,"health":3,"name":"Acolyte of Pain","description":"Whenever this minion takes damage, draw a card."},{"id":757,"image":"EX1_008","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"health":1,"attack":1,"faction":2,"collectible":1,"name":"Argent Squire","description":"Divine Shield"},{"id":1688,"image":"EX1_009","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":1,"race":20,"name":"Angry Chicken","description":"Enrage: +5 Attack."},{"id":994,"image":"EX1_010","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":1,"attack":2,"health":1,"collectible":1,"name":"Worgen Infiltrator","description":"Stealth"},{"id":132,"image":"EX1_011","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":0,"cost":1,"attack":2,"health":1,"collectible":1,"name":"Voodoo Doctor","description":"Battlecry: Restore 2 Health."},{"id":749,"image":"EX1_012","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":5,"cost":2,"attack":1,"health":1,"elite":1,"collectible":1,"name":"Bloodmage Thalnos","description":"Spell Power +1. Deathrattle: Draw a card."},{"id":1693,"image":"EX1_014","collectible":1,"set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":5,"health":5,"elite":1,"race":20,"name":"King Mukla","description":"Battlecry: Give your opponent 2 Bananas."},{"id":1694,"image":"EX1_014t","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"quality":2,"name":"Bananas","description":"Give a minion +1\/+1."},{"id":284,"image":"EX1_015","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":0,"cost":2,"attack":1,"health":2,"collectible":1,"name":"Novice Engineer","description":"Battlecry: Draw a card."},{"id":1721,"image":"EX1_016","collectible":1,"set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"attack":5,"health":5,"elite":1,"name":"Sylvanas Windrunner","description":"Deathrattle: Take control of a random enemy minion."},{"id":921,"image":"EX1_017","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":3,"attack":4,"health":2,"collectible":1,"race":20,"name":"Jungle Panther","description":"Stealth"},{"id":608,"image":"EX1_019","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":3,"attack":3,"health":3,"collectible":1,"name":"Shattered Sun Cleric","description":"Battlecry: Give a friendly minion +1\/+1."},{"id":642,"image":"EX1_020","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":3,"attack":3,"health":1,"collectible":1,"name":"Scarlet Crusader","description":"Divine Shield"},{"id":765,"image":"EX1_021","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":3,"attack":2,"health":3,"collectible":1,"name":"Thrallmar Farseer","description":"Windfury"},{"id":34,"image":"EX1_023","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":4,"attack":3,"health":3,"collectible":1,"name":"Silvermoon Guardian","description":"Divine Shield"},{"id":523,"image":"EX1_025","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":4,"attack":2,"health":4,"collectible":1,"name":"Dragonling Mechanic","description":"Battlecry: Summon a 2\/1 Mechanical Dragonling."},{"id":59,"image":"EX1_025t","icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"attack":2,"health":1,"set":2,"cost":1,"name":"Mechanical Dragonling"},{"id":68,"image":"EX1_028","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"cost":5,"attack":5,"health":5,"collectible":1,"race":20,"quality":1,"name":"Stranglethorn Tiger","description":"Stealth"},{"id":658,"image":"EX1_029","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":1,"attack":2,"health":1,"collectible":1,"name":"Leper Gnome","description":"Deathrattle: Deal 2 damage to the enemy hero."},{"id":759,"image":"EX1_032","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":6,"attack":4,"health":5,"collectible":1,"name":"Sunwalker","description":"Taunt. Divine Shield"},{"id":567,"image":"EX1_033","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":6,"attack":4,"health":5,"collectible":1,"name":"Windfury Harpy","description":"Windfury"},{"id":1037,"image":"EX1_043","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":4,"attack":1,"health":1,"race":24,"collectible":1,"name":"Twilight Drake","description":"Battlecry: Gain +1\/+1 for each card in your hand."},{"id":791,"image":"EX1_044","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":3,"attack":2,"health":2,"collectible":1,"name":"Questing Adventurer","description":"Whenever you play a card, gain +1\/+1."},{"id":605,"image":"EX1_045","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":2,"attack":4,"health":5,"collectible":1,"name":"Ancient Watcher","description":"Can't Attack."},{"id":348,"image":"EX1_046","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":4,"attack":4,"health":4,"collectible":1,"name":"Dark Iron Dwarf","description":"Battlecry: Give a minion +2 Attack."},{"id":754,"image":"EX1_048","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":1,"quality":1,"cost":4,"attack":4,"health":3,"collectible":1,"name":"Spellbreaker","description":"Battlecry: Silence a minion."},{"id":415,"image":"EX1_049","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":2,"attack":3,"health":2,"collectible":1,"name":"Youthful Brewmaster","description":"Battlecry: Return a friendly minion from the battlefield to your hand."},{"id":1016,"image":"EX1_050","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":3,"attack":2,"health":2,"race":14,"collectible":1,"name":"Coldlight Oracle","description":"Battlecry: Each player draws 2 cards."},{"id":12,"image":"EX1_055","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":2,"attack":1,"health":3,"collectible":1,"name":"Mana Addict","description":"Whenever you cast a spell, gain +2 Attack this turn."},{"id":186,"image":"EX1_057","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":4,"attack":5,"health":4,"collectible":1,"name":"Ancient Brewmaster","description":"Battlecry: Return a friendly minion from the battlefield to your hand."},{"id":891,"image":"EX1_058","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":2,"attack":2,"health":3,"collectible":1,"name":"Sunfury Protector","description":"Battlecry: Your other minions gain Taunt."},{"id":801,"image":"EX1_059","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":2,"attack":2,"health":2,"collectible":1,"name":"Crazed Alchemist","description":"Battlecry: Swap the Attack and Health of a minion."},{"id":736,"image":"EX1_062","set":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":5,"cost":4,"attack":2,"health":4,"elite":1,"collectible":1,"name":"Old Murk-Eye","description":"Charge. Has +1 Attack for each other Murloc on the battlefield."},{"id":906,"image":"EX1_066","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":2,"attack":3,"health":2,"collectible":1,"name":"Acidic Swamp Ooze","description":"Battlecry: Destroy your opponent's weapon."},{"id":281,"image":"EX1_067","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":6,"attack":4,"health":3,"collectible":1,"name":"Argent Commander","description":"Charge. Divine Shield"},{"id":37,"image":"EX1_076","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":2,"attack":2,"health":2,"collectible":1,"name":"Pint-Sized Summoner","description":"The first minion you play each turn costs (2) less."},{"id":158,"image":"EX1_080","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":1,"attack":1,"health":2,"collectible":1,"name":"Secretkeeper","description":"Whenever a Secret is played, gain +1\/+1."},{"id":762,"image":"EX1_082","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":2,"attack":3,"health":2,"collectible":1,"name":"Mad Bomber","description":"Battlecry: Deal 3 damage randomly split between all other characters."},{"id":570,"image":"EX1_083","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":5,"cost":3,"attack":2,"health":2,"elite":1,"collectible":1,"name":"Tinkmaster Overspark","description":"Battlecry: Transform a minion into a 5\/5 Devilsaur or a 1\/1 Squirrel at random."},{"id":1009,"image":"EX1_084","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":0,"cost":3,"attack":2,"health":3,"classs":1,"collectible":1,"name":"Warsong Commander","description":"Your other minions have Charge."},{"id":734,"image":"EX1_085","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":3,"attack":3,"health":3,"collectible":1,"name":"Mind Control Tech","description":"Battlecry: If your opponent has 4 or more minions, take control of one at random."},{"id":466,"image":"EX1_089","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":3,"attack":4,"health":2,"collectible":1,"name":"Arcane Golem","description":"Charge. Battlecry: Give your opponent a Mana Crystal."},{"id":272,"image":"EX1_091","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":4,"cost":6,"attack":3,"health":4,"classs":5,"collectible":1,"name":"Cabal Shadow Priest","description":"Battlecry: Take control of an enemy minion that has 2 or less Attack."},{"id":763,"image":"EX1_093","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":3,"cost":4,"attack":3,"health":3,"collectible":1,"name":"Defender of Argus","description":"Battlecry: Give adjacent minions +1\/+1 and Taunt."},{"id":932,"image":"EX1_095","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":5,"attack":4,"health":4,"collectible":1,"name":"Gadgetzan Auctioneer","description":"Whenever you cast a spell, draw a card."},{"id":251,"image":"EX1_096","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":2,"attack":2,"health":1,"collectible":1,"name":"Loot Hoarder","description":"Deathrattle: Draw a card."},{"id":440,"image":"EX1_097","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":5,"attack":4,"health":4,"collectible":1,"name":"Abomination","description":"Taunt. Deathrattle: Deal 2 damage to ALL characters."},{"id":1135,"image":"EX1_100","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":5,"cost":2,"attack":1,"health":4,"elite":1,"collectible":1,"name":"Lorewalker Cho","description":"Whenever a player casts a spell, put a copy into the other player\u2019s hand."},{"id":979,"image":"EX1_102","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":3,"attack":1,"health":4,"collectible":1,"name":"Demolisher","description":"At the start of your turn, deal 2 damage to a random enemy."},{"id":453,"image":"EX1_103","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":3,"cost":3,"attack":2,"health":3,"collectible":1,"name":"Coldlight Seer","description":"Battlecry: Give ALL other Murlocs +2 Health."},{"id":993,"image":"EX1_105","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":4,"cost":12,"attack":8,"health":8,"collectible":1,"name":"Mountain Giant","description":"Costs (1) less for each other card in your hand."},{"id":420,"image":"EX1_110","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":5,"cost":6,"attack":4,"health":5,"elite":1,"collectible":1,"name":"Cairne Bloodhoof","description":"Deathrattle: Summon a 4\/5 Baine Bloodhoof."},{"id":318,"image":"EX1_110t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"quality":5,"cost":4,"attack":4,"health":5,"elite":1,"name":"Baine Bloodhoof"},{"id":858,"image":"EX1_112","set":4,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"health":6,"attack":6,"faction":2,"elite":1,"collectible":1,"name":"Gelbin Mekkatorque","description":"Battlecry: Summon an AWESOME invention."},{"id":559,"image":"EX1_116","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":5,"cost":4,"attack":6,"health":2,"elite":1,"collectible":1,"name":"Leeroy Jenkins","description":"Charge. Battlecry: Summon two 1\/1 Whelps for your opponent."},{"id":904,"image":"EX1_124","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"classs":4,"faction":3,"collectible":1,"name":"Eviscerate","description":"Deal 2 damage. Combo: Deal 4 damage instead."},{"id":282,"image":"EX1_126","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":4,"collectible":1,"name":"Betrayal","description":"An enemy minion deals its damage to the minions next to it."},{"id":990,"image":"EX1_128","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":1,"cost":0,"collectible":1,"name":"Conceal","description":"Give your minions Stealth until your next turn."},{"id":667,"image":"EX1_129","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":1,"cost":3,"collectible":1,"name":"Fan of Knives","description":"Deal 1 damage to all enemy minions. Draw a card."},{"id":584,"image":"EX1_130","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"faction":3,"classs":2,"collectible":1,"name":"Noble Sacrifice","description":"Secret: When an enemy attacks, summon a 2\/1 Defender as the new target."},{"id":102,"image":"EX1_130a","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"quality":1,"cost":1,"classs":2,"attack":2,"health":1,"faction":3,"name":"Defender"},{"id":201,"image":"EX1_131","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":4,"quality":1,"cost":2,"attack":2,"health":3,"collectible":1,"name":"Defias Ringleader","description":"Combo: Summon a 2\/1 Defias Bandit."},{"id":488,"image":"EX1_131t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":2,"health":1,"faction":3,"classs":4,"cost":1,"quality":2,"name":"Defias Bandit"},{"id":462,"image":"EX1_132","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"faction":3,"classs":2,"collectible":1,"name":"Eye for an Eye","description":"Secret: When your hero takes damage, deal that much damage to the enemy hero."},{"id":391,"image":"EX1_133","set":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":4,"quality":3,"cost":3,"attack":2,"durability":2,"collectible":1,"name":"Perdition's Blade","description":"Battlecry: Deal 1 damage. Combo: Deal 2 instead."},{"id":1117,"image":"EX1_134","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":4,"quality":3,"cost":3,"attack":3,"health":3,"collectible":1,"name":"SI:7 Agent","description":"Combo: Deal 2 damage."},{"id":140,"image":"EX1_136","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":1,"cost":1,"collectible":1,"name":"Redemption","description":"Secret: When one of your minions dies, return it to life with 1 Health."},{"id":708,"image":"EX1_137","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":3,"cost":2,"collectible":1,"name":"Headcrack","description":"Deal 2 damage to the enemy hero. Combo: Return this to your hand next turn."},{"id":365,"image":"EX1_144","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"quality":1,"cost":0,"faction":3,"classs":4,"collectible":1,"name":"Shadowstep","description":"Return a friendly minion to your hand. It costs (2) less."},{"id":1158,"image":"EX1_145","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":4,"cost":0,"collectible":1,"name":"Preparation","description":"The next spell you cast this turn costs (2) less."},{"id":836,"image":"EX1_154","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":2,"collectible":1,"name":"Wrath","description":"Choose One - Deal 3 damage; or Deal 1 damage and draw a card."},{"id":253,"image":"EX1_154a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Wrath","description":"Deal 3 damage."},{"id":137,"image":"EX1_154b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Wrath","description":"Deal 1 damage. Draw a card."},{"id":151,"image":"EX1_155","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":3,"collectible":1,"name":"Mark of Nature","description":"Choose One - Give a minion +4 Attack; or +4 Health and Taunt."},{"id":468,"image":"EX1_155a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Mark of Nature","description":"+4 Attack."},{"id":690,"image":"EX1_155b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Mark of Nature","description":"+4 Health and Taunt."},{"id":381,"image":"EX1_158","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":4,"collectible":1,"name":"Soul of the Forest","description":"Give your minions \"Deathrattle: Summon a 2\/2 Treant.\""},{"id":600,"image":"EX1_158t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":11,"attack":2,"health":2,"cost":1,"quality":2,"name":"Treant"},{"id":503,"image":"EX1_160","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":2,"collectible":1,"name":"Power of the Wild","description":"Choose One - Give your minions +1\/+1; or Summon a 3\/2 Panther."},{"id":60,"image":"EX1_160a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Summon a Panther","description":"Summon a 3\/2 Panther."},{"id":835,"image":"EX1_160b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Leader of the Pack","description":"Give all of your minions +1\/+1."},{"id":812,"image":"EX1_160t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"classs":11,"cost":2,"attack":3,"health":2,"race":20,"quality":1,"name":"Panther"},{"id":233,"image":"EX1_161","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":1,"collectible":1,"name":"Naturalize","description":"Destroy a minion. Your opponent draws 2 cards."},{"id":985,"image":"EX1_162","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":2,"attack":2,"health":2,"collectible":1,"race":20,"name":"Dire Wolf Alpha","description":"Adjacent minions have +1 Attack."},{"id":95,"image":"EX1_164","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":3,"cost":5,"collectible":1,"name":"Nourish","description":"Choose One - Gain 2 Mana Crystals; or Draw 3 cards."},{"id":451,"image":"EX1_164a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Nourish","description":"Gain 2 Mana Crystals."},{"id":325,"image":"EX1_164b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Nourish","description":"Draw 3 cards."},{"id":692,"image":"EX1_165","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":11,"quality":1,"cost":5,"attack":4,"health":4,"collectible":1,"name":"Druid of the Claw","description":"Choose One - Charge; or +2 Health and Taunt."},{"id":63,"image":"EX1_165a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":0,"name":"Cat Form","description":"Charge"},{"id":99,"image":"EX1_165b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":0,"name":"Bear Form","description":"+2 Health and Taunt."},{"id":1681,"image":"EX1_165t1","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"attack":4,"health":4,"classs":11,"name":"Druid of the Claw","description":"Charge"},{"id":1682,"image":"EX1_165t2","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"attack":4,"health":6,"classs":11,"name":"Druid of the Claw","description":"Taunt"},{"id":601,"image":"EX1_166","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":11,"quality":3,"cost":4,"attack":2,"health":4,"collectible":1,"name":"Keeper of the Grove","description":"Choose One - Deal 2 damage; or Silence a minion."},{"id":987,"image":"EX1_166a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Moonfire","description":"Deal 2 damage."},{"id":321,"image":"EX1_166b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Dispel","description":"Silence a minion."},{"id":254,"image":"EX1_169","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":0,"cost":0,"collectible":1,"name":"Innervate","description":"Gain 2 Mana Crystals this turn only."},{"id":1098,"image":"EX1_170","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":3,"health":3,"collectible":1,"race":20,"attack":2,"name":"Emperor Cobra","description":"Destroy any minion damaged by this minion."},{"id":823,"image":"EX1_173","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":1,"cost":6,"collectible":1,"name":"Starfire","description":"Deal 5 damage.  Draw a card."},{"id":1035,"image":"EX1_178","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":11,"quality":4,"cost":7,"attack":5,"health":5,"collectible":1,"name":"Ancient of War","description":"Choose One - Ancient of War gets +5 Health and Taunt; or +5 Attack."},{"id":578,"image":"EX1_178a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Rooted","description":"+5 Health and Taunt."},{"id":182,"image":"EX1_178b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Uproot","description":"+5 Attack."},{"id":505,"image":"EX1_238","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":1,"cost":1,"collectible":1,"name":"Lightning Bolt","description":"Deal 3 damage. Overload: (1)"},{"id":864,"image":"EX1_241","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":3,"cost":3,"collectible":1,"name":"Lava Burst","description":"Deal 5 damage. Overload: (2)"},{"id":618,"image":"EX1_243","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":1,"cost":1,"attack":3,"health":1,"collectible":1,"name":"Dust Devil","description":"Windfury. Overload: (2)"},{"id":830,"image":"EX1_244","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":1,"cost":0,"collectible":1,"name":"Totemic Might","description":"Give your Totems +2 Health."},{"id":767,"image":"EX1_245","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":1,"cost":1,"collectible":1,"name":"Earth Shock","description":"Silence a minion, then deal 1 damage to it."},{"id":766,"image":"EX1_246","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":0,"cost":3,"collectible":1,"name":"Hex","description":"Transform a minion into a 0\/1 Frog with Taunt."},{"id":960,"image":"EX1_247","set":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":7,"quality":1,"cost":2,"attack":2,"durability":3,"collectible":1,"name":"Stormforged Axe","description":"Overload: (1)"},{"id":238,"image":"EX1_248","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":3,"cost":3,"collectible":1,"name":"Feral Spirit","description":"Summon two 2\/3 Spirit Wolves with Taunt. Overload: (2)"},{"id":336,"image":"EX1_249","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":5,"cost":7,"attack":7,"health":5,"elite":1,"collectible":1,"name":"Baron Geddon","description":"At the end of your turn, deal 2 damage to ALL other characters."},{"id":1141,"image":"EX1_250","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":4,"cost":5,"attack":7,"health":8,"collectible":1,"name":"Earth Elemental","description":"Taunt. Overload: (3)"},{"id":299,"image":"EX1_251","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":1,"cost":1,"collectible":1,"name":"Forked Lightning","description":"Deal 2 damage to 2 random enemy minions. Overload: (2)"},{"id":774,"image":"EX1_258","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":1,"cost":3,"health":4,"collectible":1,"attack":2,"name":"Unbound Elemental","description":"Whenever you play a card with Overload, gain +1\/+1."},{"id":629,"image":"EX1_259","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":7,"quality":3,"cost":3,"collectible":1,"name":"Lightning Storm","description":"Deal 2-3 damage to all enemy minions. Overload: (2)"},{"id":1737,"image":"EX1_274","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":3,"health":3,"classs":8,"elite":0,"name":"Ethereal Arcanist","description":"If you control a Secret at the end of your turn, gain +2\/+2."},{"id":430,"image":"EX1_275","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"cost":3,"collectible":1,"name":"Cone of Cold","description":"Freeze a minion and the minions next to it, and deal 1 damage to them."},{"id":564,"image":"EX1_277","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":0,"cost":1,"collectible":1,"name":"Arcane Missiles","description":"Shoot 3 missiles at random enemies for 1 damage each."},{"id":573,"image":"EX1_278","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":4,"quality":1,"cost":1,"collectible":1,"name":"Shiv","description":"Deal 1 damage. Draw a card."},{"id":1087,"image":"EX1_279","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":8,"classs":8,"faction":3,"collectible":1,"description":"Deal 10 damage.","name":"Pyroblast"},{"id":512,"image":"EX1_283","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":6,"health":5,"attack":5,"collectible":1,"name":"Frost Elemental","description":"Battlecry: Freeze a character."},{"id":825,"image":"EX1_284","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":3,"cost":5,"health":4,"attack":4,"race":24,"collectible":1,"name":"Azure Drake","description":"Spell Power +1. Battlecry: Draw a card."},{"id":113,"image":"EX1_287","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":3,"cost":3,"collectible":1,"name":"Counterspell","description":"Secret: When your opponent casts a spell, Counter it."},{"id":621,"image":"EX1_289","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"cost":3,"collectible":1,"name":"Ice Barrier","description":"Secret: As soon as your hero is attacked, gain 8 Armor."},{"id":195,"image":"EX1_294","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":1,"cost":3,"collectible":1,"name":"Mirror Entity","description":"Secret: When your opponent plays a minion, summon a copy of it."},{"id":192,"image":"EX1_295","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":8,"quality":4,"cost":3,"collectible":1,"name":"Ice Block","description":"Secret: When your hero takes fatal damage, prevent it and become Immune this turn."},{"id":374,"image":"EX1_298","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":5,"cost":8,"attack":8,"health":8,"elite":1,"collectible":1,"name":"Ragnaros the Firelord","description":"Can't Attack.  At the end of your turn, deal 8 damage to a random enemy."},{"id":517,"image":"EX1_301","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"race":15,"quality":3,"cost":3,"attack":3,"health":5,"collectible":1,"name":"Felguard","description":"Taunt. Battlecry: Destroy one of your Mana Crystals."},{"id":1092,"image":"EX1_302","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":1,"cost":1,"collectible":1,"name":"Mortal Coil","description":"Deal 1 damage to a minion. If that kills it, draw a card."},{"id":147,"image":"EX1_303","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":3,"cost":4,"collectible":1,"name":"Shadowflame","description":"Destroy a friendly minion and deal its Attack damage to all enemy minions."},{"id":1221,"image":"EX1_304","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"classs":9,"attack":3,"health":3,"race":15,"name":"Void Terror","description":"Battlecry: Destroy the minions on either side of this minion and gain their Attack and Health."},{"id":592,"image":"EX1_306","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"race":15,"quality":0,"cost":2,"attack":4,"health":3,"collectible":1,"name":"Succubus","description":"Battlecry: Discard a random card."},{"id":974,"image":"EX1_308","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":1,"cost":0,"collectible":1,"name":"Soulfire","description":"Deal 4 damage. Discard a random card."},{"id":1100,"image":"EX1_309","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":3,"cost":6,"collectible":1,"name":"Siphon Soul","description":"Destroy a minion. Restore #3 Health to your hero."},{"id":631,"image":"EX1_310","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"race":15,"quality":3,"cost":5,"attack":5,"health":7,"collectible":1,"name":"Doomguard","description":"Charge. Battlecry: Discard two random cards."},{"id":859,"image":"EX1_312","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":4,"cost":8,"collectible":1,"name":"Twisting Nether","description":"Destroy all minions."},{"id":783,"image":"EX1_313","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"race":15,"quality":4,"cost":4,"health":5,"attack":7,"collectible":1,"name":"Pit Lord","description":"Battlecry: Deal 7 damage to your hero."},{"id":969,"image":"EX1_315","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"quality":1,"cost":4,"health":4,"collectible":1,"attack":0,"name":"Summoning Portal","description":"Your minions cost (2) less, but not less than (1)."},{"id":846,"image":"EX1_316","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":1,"cost":1,"collectible":1,"name":"Power Overwhelming","description":"Give a friendly minion +4\/+4 until end of turn. Then, it dies. Horribly."},{"id":860,"image":"EX1_317","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":1,"cost":3,"collectible":1,"name":"Sense Demons","description":"Put 2 random Demons from your deck into your hand."},{"id":1723,"image":"EX1_317t","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":1,"classs":9,"race":15,"name":"Worthless Imp","description":"You are out of demons! At least there are always imps..."},{"id":1090,"image":"EX1_319","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":9,"race":15,"quality":1,"cost":1,"attack":3,"health":2,"collectible":1,"name":"Flame Imp","description":"Battlecry: Deal 2 damage to your hero."},{"id":23,"image":"EX1_320","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":9,"quality":4,"cost":5,"collectible":1,"name":"Bane of Doom","description":"Deal 2 damage to a character.  If that kills it, summon a random Demon."},{"id":777,"image":"EX1_323","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"quality":5,"cost":9,"classs":9,"race":15,"attack":3,"health":15,"elite":1,"collectible":1,"name":"Lord Jaraxxus","description":"Battlecry: Destroy your hero and replace him with Lord Jaraxxus."},{"id":492,"image":"EX1_323h","set":3,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":9,"race":15,"quality":5,"cost":0,"attack":0,"health":15,"name":"Lord Jaraxxus"},{"id":1660,"image":"EX1_323w","set":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":3,"attack":3,"durability":8,"classs":9,"quality":2,"name":"Blood Fury"},{"id":1189,"image":"EX1_332","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":1,"cost":0,"collectible":1,"name":"Silence","description":"Silence a minion."},{"id":220,"image":"EX1_334","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":3,"cost":4,"collectible":1,"name":"Shadow Madness","description":"Gain control of an enemy minion with 3 or less Attack until end of turn."},{"id":886,"image":"EX1_335","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":5,"quality":1,"cost":4,"collectible":1,"attack":0,"health":4,"name":"Lightspawn","description":"This minion's Attack is always equal to its Health."},{"id":30,"image":"EX1_339","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":1,"cost":3,"collectible":1,"name":"Thoughtsteal","description":"Copy 2 cards from your opponent's deck and put them into your hand."},{"id":797,"image":"EX1_341","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":5,"quality":3,"cost":2,"health":5,"attack":0,"collectible":1,"name":"Lightwell","description":"At the start of your turn, restore 3 Health to a damaged friendly character."},{"id":145,"image":"EX1_345","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":5,"quality":4,"cost":4,"collectible":1,"name":"Mindgames","description":"Put a copy of a random minion from your opponent's deck into the battlefield."},{"id":1720,"image":"EX1_345t","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":0,"attack":0,"health":1,"classs":5,"description":"Mindgames whiffed! Your opponent had no minions!","name":"Shadow of Nothing"},{"id":679,"image":"EX1_349","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":3,"cost":2,"collectible":1,"name":"Divine Favor","description":"Draw cards until you have as many in hand as your opponent."},{"id":9,"image":"EX1_350","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":5,"quality":5,"cost":7,"attack":7,"health":7,"elite":1,"collectible":1,"name":"Prophet Velen","description":"Double the damage and healing of your spells."},{"id":594,"image":"EX1_354","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":2,"quality":4,"cost":8,"collectible":1,"name":"Lay on Hands","description":"Restore #8 Health. Draw 3 cards."},{"id":1522,"image":"EX1_355","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":5,"classs":2,"name":"Blessed Champion","description":"Double a minion's Attack."},{"id":854,"image":"EX1_360","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"classs":2,"faction":3,"collectible":1,"name":"Humility","description":"Change a minion's Attack to 1."},{"id":1022,"image":"EX1_362","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"health":2,"attack":2,"faction":3,"classs":2,"collectible":1,"name":"Argent Protector","description":"Battlecry: Give a friendly minion Divine Shield."},{"id":1373,"image":"EX1_363","collectible":1,"set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"classs":2,"name":"Blessing of Wisdom","description":"Choose a minion.  Whenever it attacks, draw a card."},{"id":435,"image":"EX1_365","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":5,"classs":2,"faction":3,"collectible":1,"name":"Holy Wrath","description":"Draw a card and deal damage equal to its cost."},{"id":643,"image":"EX1_366","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":3,"attack":1,"durability":5,"classs":2,"faction":3,"collectible":1,"name":"Sword of Justice","description":"Whenever you summon a minion, give it +1\/+1 and this loses 1 Durability."},{"id":727,"image":"EX1_371","set":2,"quality":0,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"classs":2,"faction":3,"collectible":1,"name":"Hand of Protection","description":"Give a minion Divine Shield."},{"id":232,"image":"EX1_379","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"classs":2,"faction":3,"collectible":1,"name":"Repentance","description":"Secret: When your opponent plays a minion, reduce its Health to 1."},{"id":1167,"image":"EX1_382","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":3,"health":3,"faction":3,"classs":2,"collectible":1,"name":"Aldor Peacekeeper","description":"Battlecry: Change an enemy minion's Attack to 1."},{"id":890,"image":"EX1_383","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":8,"attack":6,"health":6,"faction":3,"classs":2,"elite":1,"collectible":1,"name":"Tirion Fordring","description":"Divine Shield. Taunt. Deathrattle: Equip a 5\/3 Ashbringer."},{"id":1730,"image":"EX1_383t","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":5,"attack":5,"classs":2,"durability":3,"name":"Ashbringer"},{"id":1174,"image":"EX1_384","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":6,"classs":2,"faction":3,"collectible":1,"name":"Avenging Wrath","description":"Shoot 8 missiles at random enemies for 1 damage each."},{"id":45,"image":"EX1_390","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":3,"attack":2,"health":3,"collectible":1,"name":"Tauren Warrior","description":"Taunt. Enrage: +3 Attack"},{"id":1074,"image":"EX1_391","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":1,"cost":2,"collectible":1,"name":"Slam","description":"Deal 2 damage to a minion.  If it survives, draw a card."},{"id":400,"image":"EX1_392","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":1,"cost":2,"collectible":1,"name":"Battle Rage","description":"Draw a card for each damaged minion."},{"id":790,"image":"EX1_393","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":2,"attack":2,"health":3,"collectible":1,"name":"Amani Berserker","description":"Enrage: +3 Attack"},{"id":700,"image":"EX1_396","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":4,"attack":1,"health":7,"collectible":1,"name":"Mogu'shan Warden","description":"Taunt"},{"id":538,"image":"EX1_398","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":1,"quality":1,"cost":4,"attack":3,"health":3,"collectible":1,"name":"Arathi Weaponsmith","description":"Battlecry: Equip a 2\/2 weapon."},{"id":1707,"image":"EX1_398t","set":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"classs":1,"cost":1,"attack":2,"durability":2,"quality":2,"name":"Battle Axe"},{"id":768,"image":"EX1_399","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":5,"attack":2,"health":7,"collectible":1,"name":"Gurubashi Berserker","description":"Whenever this minion takes damage, gain +3 Attack."},{"id":636,"image":"EX1_400","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":1,"cost":1,"collectible":1,"name":"Whirlwind","description":"Deal 1 damage to ALL minions."},{"id":596,"image":"EX1_402","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":1,"quality":3,"cost":2,"attack":1,"health":4,"collectible":1,"name":"Armorsmith","description":"Whenever a friendly minion takes damage, gain 1 Armor."},{"id":866,"image":"EX1_405","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":1,"attack":0,"health":4,"collectible":1,"name":"Shieldbearer","description":"Taunt"},{"id":75,"image":"EX1_407","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":4,"cost":5,"collectible":1,"name":"Brawl","description":"Destroy all minions except one.  (chosen randomly)"},{"id":804,"image":"EX1_408","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":3,"cost":4,"collectible":1,"name":"Mortal Strike","description":"Deal 4 damage.  If your hero has 12 or less Health, deal 6 damage instead."},{"id":511,"image":"EX1_409","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":3,"cost":1,"collectible":1,"name":"Upgrade!","description":"If you have a weapon, give it +1\/+1.  Otherwise equip a 1\/3 weapon."},{"id":1661,"image":"EX1_409t","set":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":1,"attack":1,"classs":1,"durability":3,"quality":2,"name":"Heavy Axe"},{"id":546,"image":"EX1_410","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":1,"quality":4,"cost":1,"collectible":1,"name":"Shield Slam","description":"Deal 1 damage to a minion for each Armor you have."},{"id":810,"image":"EX1_411","set":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"faction":3,"classs":1,"quality":4,"cost":7,"attack":7,"durability":1,"collectible":1,"name":"Gorehowl","description":"Attacking a minion costs 1 Attack instead of 1 Durability."},{"id":1155,"image":"EX1_412","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"cost":3,"health":3,"attack":3,"collectible":1,"name":"Raging Worgen","description":"Enrage: Windfury and +1 Attack"},{"id":338,"image":"EX1_414","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":1,"quality":5,"cost":8,"attack":4,"health":9,"elite":1,"collectible":1,"name":"Grommash Hellscream","description":"Charge.  Enrage: +6 Attack"},{"id":976,"image":"EX1_506","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":1,"cost":2,"attack":2,"health":1,"collectible":1,"name":"Murloc Tidehunter","description":"Battlecry: Summon a 1\/1 Murloc Scout."},{"id":1078,"image":"EX1_506a","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":1,"attack":1,"health":1,"cost":0,"name":"Murloc Scout"},{"id":1063,"image":"EX1_507","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":4,"cost":3,"attack":3,"health":3,"collectible":1,"name":"Murloc Warleader","description":"ALL other Murlocs have +2\/+1."},{"id":510,"image":"EX1_508","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":1,"cost":1,"attack":1,"health":1,"collectible":1,"name":"Grimscale Oracle","description":"ALL other Murlocs have +1 Attack."},{"id":475,"image":"EX1_509","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"race":14,"quality":3,"cost":1,"attack":1,"health":2,"collectible":1,"name":"Murloc Tidecaller","description":"Whenever a Murloc is summoned, gain +1 Attack."},{"id":1133,"image":"EX1_522","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":4,"quality":4,"cost":2,"attack":1,"health":1,"collectible":1,"name":"Patient Assassin","description":"Stealth. Destroy any minion damaged by this minion."},{"id":1281,"image":"EX1_531","collectible":1,"set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":2,"health":2,"classs":3,"race":20,"name":"Scavenging Hyena","description":"Whenever a Beast dies, gain +2\/+1."},{"id":1091,"image":"EX1_533","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":3,"collectible":1,"name":"Misdirection","description":"Secret: When a character attacks your hero, instead he attacks another random character."},{"id":1261,"image":"EX1_534","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"classs":3,"collectible":1,"quality":3,"cost":6,"attack":6,"health":5,"race":20,"name":"Savannah Highmane","description":"Deathrattle: Summon two 2\/2 Hyenas."},{"id":1624,"image":"EX1_534t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"classs":3,"quality":3,"cost":2,"attack":2,"health":2,"race":20,"name":"Hyena"},{"id":1662,"image":"EX1_536","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":3,"attack":3,"durability":2,"classs":3,"name":"Eaglehorn Bow","description":"Whenever a Secret is revealed, gain +1 Durability."},{"id":394,"image":"EX1_537","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":5,"faction":3,"classs":3,"collectible":1,"name":"Explosive Shot","description":"Deal 5 damage to a minion and 2 damage to adjacent ones."},{"id":1243,"image":"EX1_538","collectible":1,"set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"classs":3,"name":"Unleash the Hounds","description":"Give your Beasts +1 Attack and Charge."},{"id":296,"image":"EX1_539","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"faction":3,"classs":3,"collectible":1,"name":"Kill Command","description":"Deal 3 damage.  If you have a Beast, deal 5 damage instead."},{"id":1144,"image":"EX1_543","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":9,"attack":8,"health":8,"faction":3,"classs":3,"race":20,"elite":1,"collectible":1,"name":"King Krush","description":"Charge"},{"id":896,"image":"EX1_544","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"faction":3,"classs":3,"collectible":1,"name":"Flare","description":"All minions lose Stealth. Destroy all enemy Secrets. Draw a card."},{"id":903,"image":"EX1_549","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"faction":3,"classs":3,"collectible":1,"name":"Bestial Wrath","description":"Give a Beast +2 Attack and Immune this turn."},{"id":455,"image":"EX1_554","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":3,"collectible":1,"name":"Snake Trap","description":"Secret: When one of your minions is attacked, summon three 1\/1 Snakes."},{"id":204,"image":"EX1_554t","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"health":1,"attack":1,"faction":3,"classs":3,"cost":0,"race":20,"name":"Snake"},{"id":778,"image":"EX1_556","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":2,"health":3,"faction":3,"collectible":1,"name":"Harvest Golem","description":"Deathrattle: Summon a 2\/1 Damaged Golem."},{"id":1147,"image":"EX1_557","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":0,"health":4,"faction":3,"elite":1,"collectible":1,"name":"Nat Pagle","description":"At the end of your turn, you have a 50% chance to draw a card."},{"id":912,"image":"EX1_558","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"attack":5,"health":4,"faction":3,"elite":1,"collectible":1,"name":"Harrison Jones","description":"Battlecry: Destroy your opponent's weapon and draw cards equal to its Durability."},{"id":1080,"image":"EX1_559","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":7,"attack":5,"health":7,"faction":3,"classs":8,"elite":1,"collectible":1,"name":"Archmage Antonidas","description":"Whenever you cast a spell, put a 'Fireball' spell into your hand."},{"id":411,"image":"EX1_560","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":9,"attack":8,"health":8,"faction":3,"elite":1,"collectible":1,"race":24,"name":"Nozdormu","description":"Players only have 15 seconds to take their turns."},{"id":581,"image":"EX1_561","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":9,"attack":8,"health":8,"faction":3,"race":24,"elite":1,"collectible":1,"name":"Alexstrasza","description":"Battlecry: Set a hero's remaining Health to 15."},{"id":363,"image":"EX1_562","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":9,"attack":8,"health":8,"faction":3,"race":24,"elite":1,"collectible":1,"name":"Onyxia","description":"Battlecry: Summon 1\/1 Whelps until your side of the battlefield is full."},{"id":436,"image":"EX1_563","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":9,"attack":4,"health":12,"faction":3,"elite":1,"collectible":1,"race":24,"name":"Malygos","description":"Spell Power +5"},{"id":531,"image":"EX1_564","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"health":3,"attack":3,"faction":3,"collectible":1,"name":"Faceless Manipulator","description":"Battlecry: Choose a minion and become a copy of it."},{"id":1008,"image":"EX1_565","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":0,"health":3,"faction":3,"classs":7,"race":21,"collectible":1,"name":"Flametongue Totem","description":"Adjacent minions have +2 Attack."},{"id":352,"image":"EX1_567","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":5,"attack":2,"durability":8,"faction":3,"classs":7,"collectible":1,"name":"Doomhammer","description":"Windfury, Overload: (2)"},{"id":577,"image":"EX1_570","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":4,"faction":3,"classs":11,"collectible":1,"name":"Bite","description":"Give your hero +4 Attack this turn and 4 Armor."},{"id":493,"image":"EX1_571","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":6,"faction":3,"classs":11,"collectible":1,"name":"Force of Nature","description":"Summon three 2\/2 Treants with Charge that die at the end of the turn."},{"id":1186,"image":"EX1_572","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":9,"attack":4,"health":12,"faction":3,"elite":1,"collectible":1,"race":24,"name":"Ysera","description":"At the end of your turn, draw a Dream Card."},{"id":36,"image":"EX1_573","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":8,"attack":5,"health":8,"faction":3,"classs":11,"elite":1,"collectible":1,"name":"Cenarius","description":"Choose One - Give your other minions +2\/+2; or Summon two 2\/2 Treants with Taunt."},{"id":1145,"image":"EX1_573a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Demigod's Favor","description":"Give your other minions +2\/+2."},{"id":364,"image":"EX1_573b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"faction":3,"classs":11,"quality":2,"cost":0,"name":"Shan'do's Lesson","description":"Summon two 2\/2 Treants with Taunt."},{"id":678,"image":"EX1_573t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":2,"health":2,"classs":11,"quality":2,"name":"Treant","description":"Taunt"},{"id":513,"image":"EX1_575","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"faction":3,"classs":7,"collectible":1,"attack":0,"health":3,"race":21,"name":"Mana Tide Totem","description":"At the end of your turn, draw a card."},{"id":962,"image":"EX1_577","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"attack":10,"health":6,"faction":3,"elite":1,"collectible":1,"race":20,"name":"The Beast","description":"Deathrattle: Summon a 3\/3 Finkle Einhorn for your opponent."},{"id":481,"image":"EX1_578","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"faction":3,"classs":11,"collectible":1,"name":"Savagery","description":"Deal damage equal to your hero's Attack to all enemy minions."},{"id":461,"image":"EX1_581","set":2,"quality":0,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":4,"collectible":1,"name":"Sap","description":"Return an enemy minion to its owner's hand."},{"id":175,"image":"EX1_582","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"health":4,"attack":2,"faction":3,"collectible":1,"name":"Dalaran Mage","description":"Spell Power +1"},{"id":424,"image":"EX1_583","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"health":4,"attack":5,"faction":3,"collectible":1,"name":"Priestess of Elune","description":"Battlecry: Restore 4 Health to your hero."},{"id":915,"image":"EX1_584","icon":"inv_misc_ticket_tarot_beasts_01","type":4,"quality":3,"cost":4,"health":5,"attack":2,"faction":3,"set":3,"collectible":1,"name":"Ancient Mage","description":"Battlecry: Give adjacent minions Spell Power +1."},{"id":211,"image":"EX1_586","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":10,"health":8,"attack":8,"faction":3,"collectible":1,"name":"Sea Giant","description":"Costs (1) less for each other minion on the battlefield."},{"id":178,"image":"EX1_587","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"health":3,"attack":3,"faction":3,"classs":7,"collectible":1,"name":"Windspeaker","description":"Battlecry: Give a friendly minion Windfury."},{"id":755,"image":"EX1_590","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"faction":3,"attack":3,"health":3,"collectible":1,"name":"Blood Knight","description":"Battlecry: All minions lose Divine Shield. Gain +3\/+3 for each Shield lost."},{"id":237,"image":"EX1_591","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"health":5,"attack":3,"faction":3,"classs":5,"collectible":1,"name":"Auchenai Soulpriest","description":"Your cards and powers that restore Health now deal damage instead."},{"id":670,"image":"EX1_593","set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"health":4,"attack":4,"faction":3,"collectible":1,"name":"Nightblade","description":"Battlecry: Deal 3 damage to the enemy hero."},{"id":286,"image":"EX1_594","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"faction":3,"classs":8,"collectible":1,"name":"Vaporize","description":"Secret: When a minion attacks your hero, destroy it."},{"id":811,"image":"EX1_595","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"health":2,"attack":4,"faction":3,"collectible":1,"name":"Cult Master","description":"Whenever one of your other minions dies, draw a card."},{"id":1142,"image":"EX1_596","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":9,"collectible":1,"name":"Demonfire","description":"Deal 2 damage to a minion.   If it\u2019s a friendly Demon, give it +2\/+2 instead."},{"id":926,"image":"EX1_597","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"health":5,"attack":1,"faction":3,"collectible":1,"name":"Imp Master","description":"At the end of your turn, deal 1 damage to this minion and summon a 1\/1 Imp."},{"id":76,"image":"EX1_598","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"health":1,"attack":1,"faction":3,"race":15,"name":"Imp"},{"id":285,"image":"EX1_603","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"health":1,"attack":2,"faction":3,"classs":1,"collectible":1,"name":"Cruel Taskmaster","description":"Battlecry: Deal 1 damage to a minion and give it +2 Attack."},{"id":654,"image":"EX1_604","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"health":4,"attack":1,"faction":3,"classs":1,"collectible":1,"name":"Frothing Berserker","description":"Whenever a minion takes damage, gain +1 Attack."},{"id":1023,"image":"EX1_606","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"faction":3,"classs":1,"collectible":1,"name":"Shield Block","description":"Gain 5 Armor.  Draw a card."},{"id":22,"image":"EX1_607","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":0,"faction":3,"classs":1,"collectible":1,"name":"Inner Rage","description":"Deal 1 damage to a minion.  It gains +2 Attack this turn."},{"id":614,"image":"EX1_608","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"health":2,"attack":2,"faction":3,"classs":8,"collectible":1,"name":"Sorcerer's Apprentice","description":"Your spells cost (1) less."},{"id":814,"image":"EX1_609","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":3,"collectible":1,"name":"Snipe","description":"Secret: When your opponent plays a minion, deal 4 damage to it."},{"id":585,"image":"EX1_610","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":3,"collectible":1,"name":"Explosive Trap","description":"Secret: When your hero is attacked, deal 2 damage to all enemies."},{"id":519,"image":"EX1_611","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":3,"collectible":1,"name":"Freezing Trap","description":"Secret: When an enemy minion attacks, return it to its owner's hand and it costs (2) more."},{"id":748,"image":"EX1_612","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"health":3,"attack":4,"faction":3,"classs":8,"collectible":1,"name":"Kirin Tor Mage","description":"Battlecry: The next Secret you play this turn costs (0)."},{"id":306,"image":"EX1_613","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"health":1,"attack":1,"faction":3,"classs":4,"elite":1,"collectible":1,"name":"Edwin VanCleef","description":"Stealth. Combo: Gain +2\/+2 for each other card played this turn."},{"id":556,"image":"EX1_614","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"health":5,"attack":7,"faction":3,"elite":1,"collectible":1,"race":15,"name":"Illidan Stormrage","description":"Whenever you play a card, summon a 2\/1 Flame of Azzinoth."},{"id":715,"image":"EX1_616","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"health":3,"attack":1,"faction":3,"collectible":1,"name":"Mana Wraith","description":"ALL minions cost (1) more."},{"id":1093,"image":"EX1_617","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"faction":3,"classs":3,"collectible":1,"name":"Deadly Shot","description":"Destroy a random enemy minion."},{"id":756,"image":"EX1_619","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"classs":2,"collectible":1,"name":"Equality","description":"Change the Health of ALL minions to 1."},{"id":1372,"image":"EX1_620","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":20,"attack":8,"health":8,"collectible":1,"name":"Molten Giant","description":"Costs (1) less for each damage your hero has taken."},{"id":1362,"image":"EX1_621","collectible":1,"set":3,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":0,"classs":5,"name":"Circle of Healing","description":"Restore #4 Health to ALL minions."},{"id":1363,"image":"EX1_622","collectible":1,"set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"classs":5,"name":"Fade","description":"Give your minions Taunt. Draw a card."},{"id":1364,"image":"EX1_623","collectible":1,"set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"classs":5,"attack":6,"health":6,"name":"Temple Enforcer","description":"Battlecry: Give a friendly minion +3 Health."},{"id":1365,"image":"EX1_624","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"classs":5,"name":"Greater Heal","description":"Restore 2 Health to a character for each card in your opponent's hand."},{"id":1368,"image":"EX1_625","collectible":1,"set":3,"quality":4,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"classs":5,"name":"Shadowform","description":"Your Hero Power becomes 'Deal 2 damage'. If already in Shadowform: 3 damage."},{"id":1622,"image":"EX1_625t","set":3,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"cost":2,"classs":5,"quality":2,"name":"Mind Spike","description":"Hero Power   Deal 2 damage."},{"id":1623,"image":"EX1_625t2","set":3,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"cost":2,"classs":5,"quality":2,"name":"Mind Shatter","description":"Hero Power   Deal 3 damage."},{"id":1366,"image":"EX1_626","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":4,"classs":5,"name":"Mass Dispel","description":"Silence all enemy minions. Draw a card."},{"id":1006,"image":"EX1_finkle","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":3,"health":3,"faction":3,"cost":2,"elite":1,"name":"Finkle Einhorn"},{"id":533,"image":"EX1_tk11","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":7,"quality":3,"attack":2,"health":3,"cost":2,"name":"Spirit Wolf","description":"Taunt"},{"id":1190,"image":"EX1_tk28","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"attack":1,"health":1,"cost":1,"race":20,"name":"Squirrel"},{"id":332,"image":"EX1_tk29","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"attack":5,"health":5,"cost":5,"race":20,"name":"Devilsaur"},{"id":1178,"image":"EX1_tk33","set":3,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"faction":3,"cost":2,"classs":9,"quality":2,"name":"INFERNO!","description":"Hero Power   Summon a 6\/6 Infernal."},{"id":1143,"image":"EX1_tk34","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"quality":1,"attack":6,"health":6,"race":15,"cost":6,"classs":9,"name":"Infernal"},{"id":358,"image":"EX1_tk9","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"classs":11,"quality":1,"attack":2,"health":2,"cost":1,"name":"Treant","description":"Charge.  At the end of the turn, destroy this minion."},{"id":1733,"image":"GAME_002","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"quality":0,"cost":0,"attack":1,"health":1,"name":"Avatar of the Coin","description":"You lost the coin flip, but gained a friend."},{"id":1746,"image":"GAME_005","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"quality":2,"cost":0,"name":"The Coin","description":"Gain 1 Mana Crystal this turn only."},{"id":7,"image":"HERO_01","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":1,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Garrosh Hellscream"},{"id":1066,"image":"HERO_02","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":7,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Thrall"},{"id":930,"image":"HERO_03","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":4,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Valeera Sanguinar"},{"id":671,"image":"HERO_04","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":2,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Uther Lightbringer"},{"id":31,"image":"HERO_05","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":3,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Rexxar"},{"id":274,"image":"HERO_06","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":11,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Malfurion Stormrage"},{"id":893,"image":"HERO_07","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":9,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Gul'dan"},{"id":637,"image":"HERO_08","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":8,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Jaina Proudmoore"},{"id":813,"image":"HERO_09","set":2,"icon":"inv_misc_ticket_tarot_nobles","type":3,"faction":3,"classs":5,"quality":0,"health":30,"collectible":1,"cost":0,"name":"Anduin Wrynn"},{"id":227,"image":"Mekka1","set":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"health":1,"cost":1,"attack":0,"name":"Homing Chicken","description":"At the start of your turn, destroy this minion and draw 3 cards."},{"id":329,"image":"Mekka2","set":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":1,"attack":0,"health":5,"name":"Repair Bot","description":"At the end of your turn, restore 3 Health to all characters."},{"id":52,"image":"Mekka3","set":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"cost":1,"attack":0,"health":4,"name":"Emboldener 3000","description":"At the end of your turn, give a random minion +1\/+1."},{"id":146,"image":"Mekka4","set":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":2,"quality":1,"health":3,"cost":1,"attack":0,"name":"Poultryizer","description":"At the start of your turn, transform a random minion into a 1\/1 Chicken."},{"id":262,"image":"Mekka4t","set":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":1,"health":1,"cost":0,"race":20,"quality":2,"name":"Chicken","description":"Hey Chicken!"},{"id":163,"image":"NEW1_003","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"classs":9,"collectible":1,"name":"Sacrificial Pact","description":"Destroy a Demon. Restore #5 Health to your hero."},{"id":196,"image":"NEW1_004","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":6,"classs":4,"collectible":1,"name":"Vanish","description":"Return all minions to their owner's hand."},{"id":287,"image":"NEW1_005","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"attack":5,"health":3,"classs":4,"collectible":1,"name":"Kidnapper","description":"Combo: Return a minion to its owner's hand."},{"id":86,"image":"NEW1_007","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":5,"classs":11,"collectible":1,"name":"Starfall","description":"Choose One - Deal 5 damage to an enemy; or 2 damage to all of them."},{"id":1161,"image":"NEW1_007a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"classs":11,"quality":2,"cost":0,"name":"Starfall","description":"Deal 2 damage to all enemies."},{"id":928,"image":"NEW1_007b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"classs":11,"quality":2,"cost":0,"name":"Starfall","description":"Deal 5 damage."},{"id":920,"image":"NEW1_008","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":7,"attack":5,"health":5,"classs":11,"collectible":1,"name":"Ancient of Lore","description":"Choose One - Draw 2 cards; or Restore 8 Health."},{"id":313,"image":"NEW1_008a","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"classs":11,"quality":2,"cost":0,"name":"Ancient Teachings","description":"Draw 2 cards."},{"id":209,"image":"NEW1_008b","set":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"classs":11,"quality":2,"cost":0,"name":"Ancient Secrets","description":"Restore 8 Health."},{"id":764,"image":"NEW1_009","set":2,"quality":0,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"classs":7,"attack":0,"health":2,"race":21,"name":"Healing Totem","description":"At the end of your turn, restore 1 Health to all friendly characters."},{"id":32,"image":"NEW1_010","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":8,"attack":3,"health":5,"classs":7,"elite":1,"collectible":1,"name":"Al'Akir the Windlord","description":"Windfury, Charge, Divine Shield, Taunt"},{"id":28,"image":"NEW1_011","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"collectible":1,"cost":4,"attack":4,"health":3,"classs":1,"name":"Kor'kron Elite","description":"Charge"},{"id":405,"image":"NEW1_012","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":3,"classs":8,"collectible":1,"name":"Mana Wyrm","description":"Whenever you cast a spell, gain +1 Attack."},{"id":887,"image":"NEW1_014","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":4,"health":4,"collectible":1,"classs":4,"name":"Master of Disguise","description":"Battlecry: Give a friendly minion Stealth."},{"id":530,"image":"NEW1_016","set":4,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":1,"health":2,"collectible":1,"race":20,"name":"Captain's Parrot","description":"Battlecry: Put a random Pirate from your deck into your hand."},{"id":443,"image":"NEW1_017","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":2,"collectible":1,"race":20,"name":"Hungry Crab","description":"Battlecry: Destroy a Murloc and gain +2\/+2."},{"id":999,"image":"NEW1_018","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":2,"health":3,"race":23,"collectible":1,"name":"Bloodsail Raider","description":"Battlecry: Gain Attack equal to the Attack of your weapon."},{"id":1073,"image":"NEW1_019","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":3,"health":2,"collectible":1,"name":"Knife Juggler","description":"After you summon a minion, deal 1 damage to a random enemy."},{"id":1014,"image":"NEW1_020","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":3,"health":2,"collectible":1,"name":"Wild Pyromancer","description":"After you cast a spell, deal 1 damage to ALL minions."},{"id":138,"image":"NEW1_021","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":0,"health":7,"collectible":1,"name":"Doomsayer","description":"At the start of your turn, destroy ALL minions."},{"id":878,"image":"NEW1_022","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":3,"health":3,"race":23,"collectible":1,"name":"Dread Corsair","description":"Taunt. Costs (1) less per Attack of your weapon."},{"id":609,"image":"NEW1_023","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":3,"health":2,"collectible":1,"race":24,"name":"Faerie Dragon","description":"Can't be targeted by Spells or Hero Powers."},{"id":456,"image":"NEW1_024","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"attack":5,"health":5,"race":23,"elite":1,"collectible":1,"name":"Captain Greenskin","description":"Whenever you attack with your hero, draw a card."},{"id":997,"image":"NEW1_025","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":2,"race":23,"collectible":1,"name":"Bloodsail Corsair","description":"Battlecry: Remove 1 Durability from your opponent's weapon."},{"id":1029,"image":"NEW1_026","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":3,"health":5,"collectible":1,"name":"Violet Teacher","description":"Whenever you cast a spell, summon a 1\/1 Violet Apprentice."},{"id":378,"image":"NEW1_026t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":0,"attack":1,"health":1,"quality":2,"name":"Violet Apprentice"},{"id":680,"image":"NEW1_027","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":3,"health":3,"race":23,"collectible":1,"name":"Southsea Captain","description":"Your other Pirates have +1\/+1."},{"id":855,"image":"NEW1_029","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":4,"health":4,"elite":1,"collectible":1,"name":"Millhouse Manastorm","description":"Battlecry: Enemy spells cost (0) next turn."},{"id":834,"image":"NEW1_030","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":10,"attack":12,"health":12,"race":24,"elite":1,"collectible":1,"name":"Deathwing","description":"Battlecry: Destroy all other minions and discard your hand."},{"id":437,"image":"NEW1_031","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"collectible":1,"classs":3,"name":"Animal Companion","description":"Summon a random Beast Companion."},{"id":959,"image":"NEW1_032","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":4,"health":4,"cost":3,"race":20,"quality":1,"classs":3,"name":"Misha","description":"Taunt"},{"id":226,"image":"NEW1_033","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":2,"health":4,"race":20,"classs":3,"cost":3,"quality":1,"name":"Leokk","description":"Other friendly minions have +1 Attack."},{"id":100,"image":"NEW1_034","set":2,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":4,"health":2,"cost":3,"race":20,"quality":1,"classs":3,"name":"Huffer","description":"Charge"},{"id":1026,"image":"NEW1_036","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"classs":1,"collectible":1,"name":"Commanding Shout","description":"Your minions can't be reduced below 1 Health this turn."},{"id":351,"image":"NEW1_037","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":1,"health":3,"collectible":1,"name":"Master Swordsmith","description":"At the end of your turn, give another random friendly minion +1 Attack."},{"id":526,"image":"NEW1_038","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":8,"attack":7,"health":7,"elite":1,"collectible":1,"name":"Gruul","description":"At the end of each turn, gain +1\/+1 ."},{"id":640,"image":"NEW1_040","set":3,"quality":5,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"attack":4,"health":4,"elite":1,"collectible":1,"name":"Hogger","description":"At the end of your turn, summon a 2\/2 Gnoll with Taunt."},{"id":460,"image":"NEW1_040t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":2,"health":2,"quality":2,"name":"Gnoll","description":"Taunt"},{"id":1371,"image":"NEW1_041","collectible":1,"set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":5,"attack":3,"health":5,"race":20,"name":"Stampeding Kodo","description":"Battlecry: Destroy a random enemy minion with 2 or less Attack."},{"id":1301,"image":"TU4a_001","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_nobles","type":3,"health":10,"cost":0,"name":"Hogger"},{"id":1321,"image":"TU4a_002","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":2,"health":1,"name":"Riverpaw Gnoll"},{"id":1322,"image":"TU4a_003","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":1,"name":"Gnoll"},{"id":1323,"image":"TU4a_004","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"name":"Hogger SMASH!","description":"Deal 4 damage."},{"id":1324,"image":"TU4a_005","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":5,"health":2,"name":"Massive Gnoll"},{"id":1325,"image":"TU4a_006","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_nobles","type":3,"health":27,"classs":8,"cost":0,"name":"Jaina Proudmoore"},{"id":1382,"image":"TU4b_001","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_nobles","type":3,"health":20,"classs":8,"cost":0,"name":"Millhouse Manastorm"},{"id":1481,"image":"TU4c_001","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_nobles","type":3,"health":26,"cost":0,"name":"King Mukla"},{"id":784,"image":"TU4c_002","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"faction":3,"name":"Barrel Toss","description":"Deal 2 damage."},{"id":21,"image":"TU4c_003","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":0,"health":2,"faction":3,"name":"Barrel","description":"Is something in this barrel?"},{"id":988,"image":"TU4c_004","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"faction":3,"name":"Stomp","description":"Deal 2 damage to all enemies."},{"id":490,"image":"TU4c_005","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"health":3,"attack":1,"faction":3,"name":"Hidden Gnome","description":"Was hiding in a barrel!"},{"id":317,"image":"TU4c_006","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"faction":3,"name":"Bananas","description":"Give a friendly minion +1\/+1. (+1 Attack\/+1 Health)"},{"id":1501,"image":"TU4c_007","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":6,"attack":10,"health":10,"name":"Mukla's Big Brother","description":"So strong! And only 6 Mana?!"},{"id":1541,"image":"TU4c_008","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"name":"Will of Mukla","description":"Restore 8 Health."},{"id":1602,"image":"TU4d_001","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_nobles","type":3,"health":20,"classs":3,"cost":0,"name":"Hemet Nesingwary"},{"id":1603,"image":"TU4d_002","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":1,"name":"Crazed Hunter"},{"id":1683,"image":"TU4d_003","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"cost":2,"classs":3,"name":"Shotgun Blast","description":"Hero Power   Deal 1 damage."},{"id":1636,"image":"TU4e_001","set":5,"icon":"inv_misc_ticket_tarot_nobles","type":3,"health":30,"classs":3,"quality":2,"cost":0,"name":"Illidan Stormrage"},{"id":1637,"image":"TU4e_002","set":5,"icon":"inv_misc_ticket_tarot_heroism_01","type":10,"cost":2,"quality":2,"name":"Flames of Azzinoth","description":"Hero Power   Summon two 2\/1 minions."},{"id":1643,"image":"TU4e_002t","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":2,"health":1,"name":"Flame of Azzinoth"},{"id":1638,"image":"TU4e_003","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":1,"name":"Naga Myrmidon","description":" "},{"id":1639,"image":"TU4e_004","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":2,"attack":2,"durability":2,"name":"Warglaive of Azzinoth"},{"id":1640,"image":"TU4e_005","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"name":"Flame Burst","description":"Shoot 5 missiles at random enemies for 1 damage each."},{"id":1641,"image":"TU4e_006","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":6,"name":"Metamorphosis","description":"Do something crazy."},{"id":1642,"image":"TU4e_007","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_swords","type":7,"cost":6,"attack":4,"durability":2,"name":"Dual Warglaives"},{"id":1667,"image":"TU4f_001","set":5,"icon":"inv_misc_ticket_tarot_nobles","type":3,"health":25,"quality":2,"cost":0,"name":"Lorewalker Cho"},{"id":1669,"image":"TU4f_002","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":1,"name":"Pandaren Scout"},{"id":1671,"image":"TU4f_003","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":2,"attack":2,"health":2,"name":"Shado-Pan Monk"},{"id":1672,"image":"TU4f_004","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"name":"Legacy of the Emperor","description":"Give your minions +2\/+2. (+2 Attack\/+2 Health)"},{"id":1673,"image":"TU4f_005","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":4,"attack":4,"health":4,"name":"Brewmaster"},{"id":1674,"image":"TU4f_006","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":1,"name":"Transcendence","description":"Until you kill Cho's minions, he can't be attacked."},{"id":1677,"image":"TU4f_007","set":5,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":1,"health":2,"name":"Crazy Monkey","description":"Battlecry: Throw Bananas."},{"id":54,"image":"ds1_whelptoken","icon":"inv_misc_ticket_tarot_beasts_01","type":4,"faction":3,"attack":1,"health":1,"set":3,"cost":1,"race":24,"quality":2,"name":"Whelp"},{"id":548,"image":"hexfrog","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":0,"health":1,"faction":3,"cost":0,"name":"Frog","description":"Taunt"},{"id":1077,"image":"skele11","set":2,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"health":1,"attack":1,"faction":3,"cost":1,"name":"Skeleton","description":" "},{"id":471,"image":"skele21","set":3,"quality":1,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"attack":2,"health":1,"faction":3,"cost":1,"name":"Damaged Golem"},{"id":397,"image":"tt_004","set":3,"quality":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":3,"attack":2,"health":3,"faction":3,"collectible":1,"name":"Flesheating Ghoul","description":"Whenever a minion dies, gain +1 Attack."},{"id":366,"image":"tt_010","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":3,"faction":3,"classs":8,"collectible":1,"name":"Spellbender","description":"Secret: When an enemy casts a spell on a minion, summon a 1\/3 as the new target."},{"id":1086,"image":"tt_010a","set":3,"quality":4,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"health":3,"attack":1,"classs":8,"cost":0,"name":"Spellbender","description":""},{"id":1751,"image":"EX1_614t","set":3,"icon":"inv_misc_ticket_tarot_beasts_01","type":4,"cost":1,"attack":2,"health":1,"quality":2,"name":"Flame of Azzinoth"},{"id":1748,"image":"GAME_006","set":2,"icon":"inv_misc_ticket_tarot_elemental02","type":5,"cost":2,"quality":2,"name":"NOOOOOOOOOOOO","description":"Somehow, the card you USED to have has been deleted.  Here, have this one instead!"}];
-	for(var idx in hearthstonecards) {
-		var card = hearthstonecards[idx];
-		var new_card = new app.db.models.Card(card);
-		new_card.save(function(err) {
-			if(err) {
-				console.log(err);
-			} else {
-				console.log('card: ' + idx + " saved.");
-			}
-		});
-	}
-	res.json(200, hearthstonecards);
-});*/
 
 /* TEST FORCE ERROR
 app.get('/error', function(req, res, next) {
-	var err = 'final error message';
-	next(err);
+    var err = 'final error message';
+    next(err);
 });*/
 
 // Passport Auth
 app.post('/login', function(req, res, next) {
-	passport.authenticate('local', function(err, user, info) {
-		if (err) { return next(err) }
-		if (!user) {
-			req.session.messages =  [info.message];
-			return res.json(200, { 'status': 'error', 'message': info.message });
-		}
-		req.logIn(user, function(err) {
-			if (err) { return next(err); }
-			return res.json(200, { 'status': 'success', 'message': user.profile.display_name });
-		});
-	})(req, res, next);
+    passport.authenticate('local', function(err, user, info) {
+        if (err) { return next(err) }
+        if (!user) {
+            req.session.messages =  [info.message];
+            return res.json(200, { 'status': 'error', 'message': info.message });
+        }
+        req.logIn(user, function(err) {
+            if (err) { return next(err); }
+            return res.json(200, { 'status': 'success', 'message': user.profile.display_name });
+        });
+    })(req, res, next);
 });
 
 app.post('/api/logout', function(req, res){
-	res.setTimeout(30 * 1000);
-	req.logout();
-	res.redirect('/');
+    res.setTimeout(30 * 1000);
+    req.logout();
+    res.redirect('/');
 });
 
 // RESTful API
 app.get('/api/cards', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	// Get an item from the cache
-	try {
-		c.get('cards', function(err, val) {
-			if(err) res.json(200, { 'errno': err.errno, 'code': err.code, 'syscall': err.syscall });
-			else {
-				if(val) {
-					res.json(200, JSON.parse(val));
+    res.setTimeout(30 * 1000);
+    // Get an item from the cache
+    try {
+        c.get('cards', function(err, val) {
+            if(err) res.json(200, { 'errno': err.errno, 'code': err.code, 'syscall': err.syscall });
+            else {
+                if(val) {
+                    res.json(200, JSON.parse(val));
 
-					res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-						if (err) next(err);
-						else {
-							c.put('cards', JSON.stringify(response), function(err) {
-								if(err) console.log(err);
-							});
-						}
-					});
-				} else {
-					res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-						if (err) next(err);
-						else {
-							c.put('cards', JSON.stringify(response), function(err) {
-								if(err) next(err);
-								else res.json(200, response);
-							});
-						}
-					});
-				}
-			}
-		});
-	} catch(e) {
-		res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
-			if (err) next(err);
-			else res.json(200, response);
-		});
-	}
+                    res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
+                        if (err) next(err);
+                        else {
+                            c.put('cards', JSON.stringify(response), function(err) {
+                                if(err) logger.info(err);
+                            });
+                        }
+                    });
+                } else {
+                    res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
+                        if (err) next(err);
+                        else {
+                            c.put('cards', JSON.stringify(response), function(err) {
+                                if(err) next(err);
+                                else res.json(200, response);
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    } catch(e) {
+        res.app.db.models.Card.find({}).sort({ name: 'asc' }).exec(function(err, response) {
+            if (err) next(err);
+            else res.json(200, response);
+        });
+    }
 });
 app.get('/api/cards/images', cards.images);
 app.get('/api/cards/images/download', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	res.app.db.models.Card.find({}, { _id: false, image: true }).exec(function(err, response) {
-		if (err) next(err);
-		else {
-			var download = function(uri, filename){
-				request({ 'uri': uri, 'encoding': 'binary' }, function(err, res, body) {
-					if(err) next(err);
-					console.log('content-type:', res.headers['content-type']);
-					console.log('content-length:', res.headers['content-length']);
-					console.log('file:', filename);
-					fs.writeFileSync(filename, body, 'binary');
-				});
-			};
-			for(var idx in response) {
-				download('http://wow.zamimg.com/images/hearthstone/cards/enus/original/' + response[idx].image + '.png', 'app/images/cards/' + response[idx].image + '.png');
-			}
-		}
-	});
+    res.setTimeout(30 * 1000);
+    res.app.db.models.Card.find({}, { _id: false, image: true }).exec(function(err, response) {
+        if (err) next(err);
+        else {
+            var download = function(uri, filename){
+                request({ 'uri': uri, 'encoding': 'binary' }, function(err, res, body) {
+                    if(err) next(err);
+                    logger.info('content-type:', res.headers['content-type']);
+                    logger.info('content-length:', res.headers['content-length']);
+                    logger.info('file:', filename);
+                    fs.writeFileSync(filename, body, 'binary');
+                });
+            };
+            for(var idx in response) {
+                download('http://wow.zamimg.com/images/hearthstone/cards/enus/original/' + response[idx].image + '.png', 'app/images/cards/' + response[idx].image + '.png');
+            }
+        }
+    });
 });
 app.get('/api/cards/class/:classId', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	// Get an item from the cache
-	c.get('cards_class_' + req.params.classId, function(err, val) {
-		if(err) res.json(200, { 'status': 'error' });
-		if(val) {
-			res.json(200, JSON.parse(val));
+    res.setTimeout(30 * 1000);
+    // Get an item from the cache
+    c.get('cards_class_' + req.params.classId, function(err, val) {
+        if(err) res.json(200, { 'status': 'error' });
+        if(val) {
+            res.json(200, JSON.parse(val));
 
-			res.app.db.models.Card.find({}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					for(var i=0; i<response.length; i++) {
-						if(response[i].quality == 5) {
-							response[i].limit = 1;
-						} else {
-							response[i].limit = 2;
-						}
-					}
-					c.put('cards_class_' + req.params.classId, JSON.stringify(response), function(err) {
-						if(err) next(err);
-					});
-				}
-			});
-		} else {
-			res.app.db.models.Card.find({}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					for(var i=0; i<response.length; i++) {
-						if(response[i].quality == 5) {
-							response[i].limit = 1;
-						} else {
-							response[i].limit = 2;
-						}
-					}
-					c.put('cards_class_' + req.params.classId, JSON.stringify(response), function(err) {
-						if(err) next(err);
-						else res.json(200, response);
-					});
-				}
-			});
-		}
-	});
+            res.app.db.models.Card.find({}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+                if (err) next(err);
+                else {
+                    for(var i=0; i<response.length; i++) {
+                        if(response[i].quality == 5) {
+                            response[i].limit = 1;
+                        } else {
+                            response[i].limit = 2;
+                        }
+                    }
+                    c.put('cards_class_' + req.params.classId, JSON.stringify(response), function(err) {
+                        if(err) next(err);
+                    });
+                }
+            });
+        } else {
+            res.app.db.models.Card.find({}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+                if (err) next(err);
+                else {
+                    for(var i=0; i<response.length; i++) {
+                        if(response[i].quality == 5) {
+                            response[i].limit = 1;
+                        } else {
+                            response[i].limit = 2;
+                        }
+                    }
+                    c.put('cards_class_' + req.params.classId, JSON.stringify(response), function(err) {
+                        if(err) next(err);
+                        else res.json(200, response);
+                    });
+                }
+            });
+        }
+    });
 });
 app.get('/api/cards/type/:typeId', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	// Get an item from the cache
-	c.get('cards_type_' + req.params.typeId, function(err, val) {
-		if(err) res.json(200, { 'status': 'error' });
-		if(val) {
-			res.json(200, JSON.parse(val));
+    res.setTimeout(30 * 1000);
+    // Get an item from the cache
+    c.get('cards_type_' + req.params.typeId, function(err, val) {
+        if(err) res.json(200, { 'status': 'error' });
+        if(val) {
+            res.json(200, JSON.parse(val));
 
-			res.app.db.models.Card.find({type:req.params.typeId}).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					for(var i=0; i<response.length; i++) {
-						if(response[i].quality == 5) {
-							response[i].limit = 1;
-						} else {
-							response[i].limit = 2;
-						}
-					}
-					c.put('cards_type_' + req.params.typeId, JSON.stringify(response), function(err) {
-						if(err) next(err);
-					});
-				}
-			});
-		} else {
-			res.app.db.models.Card.find({type:req.params.typeId}).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					for(var i=0; i<response.length; i++) {
-						if(response[i].quality == 5) {
-							response[i].limit = 1;
-						} else {
-							response[i].limit = 2;
-						}
-					}
-					c.put('cards_type_' + req.params.typeId, JSON.stringify(response), function(err) {
-						if(err) next(err);
-						else res.json(200, response);
-					});
-				}
-			});
-		}
-	});
+            res.app.db.models.Card.find({type:req.params.typeId}).sort({ name: 'asc' }).exec(function(err, response) {
+                if (err) next(err);
+                else {
+                    for(var i=0; i<response.length; i++) {
+                        if(response[i].quality == 5) {
+                            response[i].limit = 1;
+                        } else {
+                            response[i].limit = 2;
+                        }
+                    }
+                    c.put('cards_type_' + req.params.typeId, JSON.stringify(response), function(err) {
+                        if(err) next(err);
+                    });
+                }
+            });
+        } else {
+            res.app.db.models.Card.find({type:req.params.typeId}).sort({ name: 'asc' }).exec(function(err, response) {
+                if (err) next(err);
+                else {
+                    for(var i=0; i<response.length; i++) {
+                        if(response[i].quality == 5) {
+                            response[i].limit = 1;
+                        } else {
+                            response[i].limit = 2;
+                        }
+                    }
+                    c.put('cards_type_' + req.params.typeId, JSON.stringify(response), function(err) {
+                        if(err) next(err);
+                        else res.json(200, response);
+                    });
+                }
+            });
+        }
+    });
 });
 app.get('/api/cards/type/:typeId/class/:classId', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	// Get an item from the cache
-	c.get('cards_type_' + req.params.typeId + '_class_' + req.params.classId, function(err, val) {
-		if(err) res.json(200, { 'status': 'error' });
-		if(val) {
-			res.json(200, JSON.parse(val));
+    res.setTimeout(30 * 1000);
+    // Get an item from the cache
+    c.get('cards_type_' + req.params.typeId + '_class_' + req.params.classId, function(err, val) {
+        if(err) res.json(200, { 'status': 'error' });
+        if(val) {
+            res.json(200, JSON.parse(val));
 
-			res.app.db.models.Card.find({type:req.params.typeId}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					for(var i=0; i<response.length; i++) {
-						if(response[i].quality == 5) {
-							response[i].limit = 1;
-						} else {
-							response[i].limit = 2;
-						}
-					}
-					c.put('cards_type_' + req.params.typeId + '_class_' + req.params.classId, JSON.stringify(response), function(err) {
-						if(err) next(err);
-					});
-				}
-			});
-		} else {
-			res.app.db.models.Card.find({type:req.params.typeId}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
-				if (err) next(err);
-				else {
-					for(var i=0; i<response.length; i++) {
-						if(response[i].quality == 5) {
-							response[i].limit = 1;
-						} else {
-							response[i].limit = 2;
-						}
-					}
-					c.put('cards_type_' + req.params.typeId + '_class_' + req.params.classId, JSON.stringify(response), function(err) {
-						if(err) next(err);
-						else res.json(200, response);
-					});
-				}
-			});
-		}
-	});
+            res.app.db.models.Card.find({type:req.params.typeId}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+                if (err) next(err);
+                else {
+                    for(var i=0; i<response.length; i++) {
+                        if(response[i].quality == 5) {
+                            response[i].limit = 1;
+                        } else {
+                            response[i].limit = 2;
+                        }
+                    }
+                    c.put('cards_type_' + req.params.typeId + '_class_' + req.params.classId, JSON.stringify(response), function(err) {
+                        if(err) next(err);
+                    });
+                }
+            });
+        } else {
+            res.app.db.models.Card.find({type:req.params.typeId}).or([{classs:req.params.classId}, {classs: null}]).sort({ name: 'asc' }).exec(function(err, response) {
+                if (err) next(err);
+                else {
+                    for(var i=0; i<response.length; i++) {
+                        if(response[i].quality == 5) {
+                            response[i].limit = 1;
+                        } else {
+                            response[i].limit = 2;
+                        }
+                    }
+                    c.put('cards_type_' + req.params.typeId + '_class_' + req.params.classId, JSON.stringify(response), function(err) {
+                        if(err) next(err);
+                        else res.json(200, response);
+                    });
+                }
+            });
+        }
+    });
 });
 app.get('/api/card/:id', cards.getCardsById);
 
 app.get('/api/users', users.list);
 app.get('/api/user', ensureAuthenticated, function(req, res){
-	res.setTimeout(30 * 1000);
-	res.json(200, req.user);
+    res.setTimeout(30 * 1000);
+    res.json(200, req.user);
 });
 app.post('/api/user', function(req, res){
-	res.setTimeout(30 * 1000);
-	var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": "https://s3.amazonaws.com/hearthstonebuilder/avatars/default_gravatar.jpg" } });
-	new_user.save(function(err) {
-	  if(err) {
-	    res.json(200, { 'status': 'error', 'message': err });
-	  } else {
-	    res.json(200, { 'status': 'success', 'message': req.body.username + ' created successfully!' });
-	  }
-	});
+    res.setTimeout(30 * 1000);
+    var new_user = new app.db.models.User({ "password": req.body.password, "profile": { "username": req.body.username, "display_name": req.body.display_name, "avatar": "https://s3.amazonaws.com/hearthstonebuilder/avatars/default_gravatar.jpg" } });
+    new_user.save(function(err) {
+      if(err) {
+        res.json(200, { 'status': 'error', 'message': err });
+      } else {
+        res.json(200, { 'status': 'success', 'message': req.body.username + ' created successfully!' });
+      }
+    });
 });
 app.get('/api/user/:username', users.getByUsername);
 app.get('/api/user/:id', users.getById);
@@ -396,36 +365,6 @@ app.put('/api/user/:id', ensureAuthenticated, users.updateUser);
 app.put('/api/user/:id/password', ensureAuthenticated, users.updateUserPassword);
 
 app.get('/api/deck/:id', decks.getDeckById);
-/*app.get('/api/deck/:id', function(req, res, next) {
-	res.setTimeout(30 * 1000);
-	// Get a deck from the cache
-	c.get('deck_' + req.params.id, function(err, val) {
-		if(val) {
-			res.json(200, JSON.parse(val));
-
-			res.app.db.models.Deck.findOne({ _id: req.params.id }, function(err, deck) {
-				if (err) next(err);
-				else {
-					c.put('deck_' + req.params.id, JSON.stringify(deck), function(err) {
-						if(err) next(err);
-					});
-				}
-			});
-		} else {
-			res.app.db.models.Deck.findOne({ _id: req.params.id }, function(err, deck) {
-				if (err) next(err);
-				else {
-					c.put('deck_' + req.params.id, JSON.stringify(deck), function(err) {
-						if (err) next(err);
-						else {
-							res.json(200, deck);
-						}
-					});
-				}
-			});
-		}
-	});
-});*/
 app.delete('/api/deck/:id', ensureAuthenticated, decks.deleteDeckById);
 app.get('/api/decks', decks.list);
 app.get('/api/decks/:username', decks.getDecksByUsername);
@@ -437,58 +376,57 @@ app.get('/api/messages/:username', ensureAuthenticated, messages.getByUsername);
 app.get('/api/messages/:username/sent', ensureAuthenticated, messages.getSentByUsername);
 
 app.post('/api/message', ensureAuthenticated, function(req, res){
-	var message = req.body.message;
-	var new_message = new app.db.models.Message({ "username": message.to, "message": message.message, "created": new Date(), "from": message.from, "subject": message.subject, "status": "new" });
-	new_message.save(function(err) {
-	  if(err) {
-	    res.json(200, { 'status': 'error', 'message': err });
-	  } else {
-	    res.json(200, { 'status': 'success', 'message': 'Message sent!' });
-	  }
-	});
+    var message = req.body.message;
+    var new_message = new app.db.models.Message({ "username": message.to, "message": message.message, "created": new Date(), "from": message.from, "subject": message.subject, "status": "new" });
+    new_message.save(function(err) {
+      if(err) {
+        res.json(200, { 'status': 'error', 'message': err });
+      } else {
+        res.json(200, { 'status': 'success', 'message': 'Message sent!' });
+      }
+    });
 });
 app.delete('/api/message/:id', ensureAuthenticated, function(req, res){
-	res.setTimeout(30 * 1000);
-	res.app.db.models.Message.remove({ _id: req.params.id }).exec(function(err, response) {
-		if (err) res.send(500, err);
-		else {
-			res.json(200, { 'status': 'success', 'message': 'Message deleted' });
-		}
-	});
+    res.setTimeout(30 * 1000);
+    res.app.db.models.Message.remove({ _id: req.params.id }).exec(function(err, response) {
+        if (err) res.send(500, err);
+        else {
+            res.json(200, { 'status': 'success', 'message': 'Message deleted' });
+        }
+    });
 });
 app.put('/api/message/:id/status', ensureAuthenticated, messages.updateStatus);
 
 // upload to S3
 app.post('/api/upload', ensureAuthenticated, function(req, res, next){
-	res.setTimeout(30 * 1000);
-	AWS.config.loadFromPath('./aws.json');
-	
-	var s3 = new AWS.S3({computeChecksums: true});
-	var params = { 
-		Bucket: 'hearthstonebuilder', 
-		Key: req.body.File, 
-		ACL: 'private',
-		ContentType: req.body.ContentType 
-	};
-	s3.getSignedUrl('putObject', params, function(err, signedUrl) {
-		if(err) next(err);
-		else res.json(200, { 'status': 'success', 'upload_url': signedUrl });
-	});	
+    res.setTimeout(30 * 1000);
+    AWS.config.loadFromPath('./aws.json');
+    
+    var s3 = new AWS.S3({computeChecksums: true});
+    var params = { 
+        Bucket: 'hearthstonebuilder', 
+        Key: req.body.File, 
+        ACL: 'private',
+        ContentType: req.body.ContentType 
+    };
+    s3.getSignedUrl('putObject', params, function(err, signedUrl) {
+        if(err) next(err);
+        else res.json(200, { 'status': 'success', 'upload_url': signedUrl });
+    }); 
 });
 
 // catch-all redirect to homepage
 app.get('/api/*', routes.index);
 
 http.createServer(app).on('connection', function(socket) {
-  //console.log("A new connection was made by a client.");
   socket.setTimeout(30 * 1000); 
 }).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-  console.log('Node Version: ' + process.version);
-  console.log('App Version: ' + app.get('version'));
+  logger.info('Express server listening on port ' + app.get('port'));
+  logger.info('Node Version: ' + process.version);
+  logger.info('App Version: ' + app.get('version'));
 });
 
 function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) { return next(); }
-	res.redirect('/login')
+    if (req.isAuthenticated()) { return next(); }
+    res.redirect('/login')
 }

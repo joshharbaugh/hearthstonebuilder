@@ -22,7 +22,9 @@
     "raven": "*",
     "memjs": "*",
     "bounscale": "*",
-    "ejs": "*"
+    "ejs": "*",
+    "winston": "*",
+    "winston-papertrail": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
