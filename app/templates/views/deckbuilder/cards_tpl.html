@@ -17,16 +17,16 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Name</th>
-							<th class="hidden-phone">Class</th>
-							<th>Cost</th>
-							<th>Attack</th>
-							<th>Health</th>
-							<th class="hidden-phone">Type</th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
+							<th><a data-ng-click="predicate = 'health'; reverse=!reverse">Health</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.all | filter:searchText">
+						<tr data-ng-repeat="card in cards.all | filter:searchText | orderBy:predicate:reverse">
 							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}" data-ng-hide="disableAllCards">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
 							<td data-ng-switch on="card.classs" class="hidden-phone">
@@ -59,17 +59,17 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Type</th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.ability | filter:searchText">
+						<tr data-ng-repeat="card in cards.ability | filter:searchText | orderBy:predicate:reverse">
 							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td data-ng-switch on="card.classs" class="hidden-phone">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -81,76 +81,8 @@
 								<span data-ng-switch-when="11">Druid</span>
 							</td>
 							<td data-ng-bind="card.cost"></td>
-							<td>
+							<td class="hidden-phone">
 								<span>Ability</span>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='hero'}" id="hero">
-				<table class="table table-hover table-striped">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Health</th>
-							<th>Type</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr data-ng-repeat="card in cards.hero | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
-								<span data-ng-switch-when="1">Warrior</span>
-								<span data-ng-switch-when="2">Paladin</span>
-								<span data-ng-switch-when="3">Hunter</span>
-								<span data-ng-switch-when="4">Rogue</span>
-								<span data-ng-switch-when="5">Priest</span>
-								<span data-ng-switch-when="7">Shaman</span>
-								<span data-ng-switch-when="8">Mage</span>
-								<span data-ng-switch-when="9">Warlock</span>
-								<span data-ng-switch-when="11">Druid</span>
-							</td>
-							<td data-ng-bind="card.health"></td>
-							<td>
-								<span>Hero</span>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='hero-power'}" id="hero-power">
-				<table class="table table-hover table-striped">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Type</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr data-ng-repeat="card in cards.heroPower | filter:searchText">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
-								<span data-ng-switch-when="1">Warrior</span>
-								<span data-ng-switch-when="2">Paladin</span>
-								<span data-ng-switch-when="3">Hunter</span>
-								<span data-ng-switch-when="4">Rogue</span>
-								<span data-ng-switch-when="5">Priest</span>
-								<span data-ng-switch-when="7">Shaman</span>
-								<span data-ng-switch-when="8">Mage</span>
-								<span data-ng-switch-when="9">Warlock</span>
-								<span data-ng-switch-when="11">Druid</span>
-							</td>
-							<td data-ng-bind="card.cost"></td>
-							<td>
-								<span>Hero Power</span>
 							</td>
 						</tr>
 					</tbody>
@@ -161,19 +93,19 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Attack</th>
-							<th>Health</th>
-							<th>Type</th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
+							<th><a data-ng-click="predicate = 'health'; reverse=!reverse">Health</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.minion | filter:searchText">
+						<tr data-ng-repeat="card in cards.minion | filter:searchText | orderBy:predicate:reverse">
 							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td data-ng-switch on="card.classs" class="hidden-phone">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -187,7 +119,7 @@
 							<td data-ng-bind="card.cost"></td>
 							<td data-ng-bind="card.attack"></td>
 							<td data-ng-bind="card.health"></td>
-							<td>
+							<td class="hidden-phone">
 								<span>Minion</span>
 							</td>
 						</tr>
@@ -199,18 +131,18 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Attack</th>
-							<th>Type</th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
+							<th class="hidden-phone"><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.weapon | filter:searchText">
+						<tr data-ng-repeat="card in cards.weapon | filter:searchText | orderBy:predicate:reverse">
 							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
 							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td data-ng-switch on="card.classs">
+							<td data-ng-switch on="card.classs" class="hidden-phone">
 								<span data-ng-switch-when="1">Warrior</span>
 								<span data-ng-switch-when="2">Paladin</span>
 								<span data-ng-switch-when="3">Hunter</span>
@@ -223,7 +155,7 @@
 							</td>
 							<td data-ng-bind="card.cost"></td>
 							<td data-ng-bind="card.attack"></td>
-							<td>
+							<td class="hidden-phone">
 								<span>Weapon</span>
 							</td>
 						</tr>

@@ -12,6 +12,14 @@
 	<div class="panel-content">
 		<div class="description">
 			<input type="text" data-ng-model="searchText" placeholder="Search within results...">
+			<select style="display:none" name="columnId" id="columnId" data-ng-model="columnId">
+				<option value="name" selected="selected">Name</option>
+				<option value="classs">Class</option>
+				<option value="cost">Cost</option>
+				<option value="attack">Attack</option>
+				<option value="health">Health</option>
+				<option value="type">Type</option>
+			</select>
 		</div>
 		<div class="pill-content">
 			<div class="pill-pane" data-ng-class="{'active': !$stateParams.cardType}" id="all">
@@ -19,16 +27,16 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Attack</th>
-							<th>Health</th>
-							<th>Type</th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
+							<th><a data-ng-click="predicate = 'health'; reverse=!reverse">Health</a></th>
+							<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.all | filter:searchText">
+						<tr data-ng-repeat="card in cards.all | filter:searchText | orderBy:predicate:reverse">
 							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
@@ -60,14 +68,15 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Type</th>
+							<th></th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.ability | filter:searchText">							
+						<tr data-ng-repeat="card in cards.ability | filter:searchText | orderBy:predicate:reverse">		
 							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
@@ -93,14 +102,15 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Health</th>
-							<th>Type</th>
+							<th></th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'health'; reverse=!reverse">Health</a></th>
+							<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.hero | filter:searchText">
+						<tr data-ng-repeat="card in cards.hero | filter:searchText | orderBy:predicate:reverse">
 							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
@@ -126,14 +136,15 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Type</th>
+							<th></th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.heroPower | filter:searchText">
+						<tr data-ng-repeat="card in cards.heroPower | filter:searchText | orderBy:predicate:reverse">
 							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
@@ -159,16 +170,17 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Attack</th>
-							<th>Health</th>
-							<th>Type</th>
+							<th></th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
+							<th><a data-ng-click="predicate = 'health'; reverse=!reverse">Health</a></th>
+							<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.minion | filter:searchText">
+						<tr data-ng-repeat="card in cards.minion | filter:searchText | orderBy:predicate:reverse">
 							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
@@ -196,15 +208,16 @@
 				<table class="table table-hover table-striped">
 					<thead>
 						<tr>
-							<th>Name</th>
-							<th>Class</th>
-							<th>Cost</th>
-							<th>Attack</th>
-							<th>Type</th>
+							<th></th>
+							<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+							<th><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+							<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+							<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
+							<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.weapon | filter:searchText">
+						<tr data-ng-repeat="card in cards.weapon | filter:searchText | orderBy:predicate:reverse">
 							<td style="vertical-align:middle;width:92px"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 							<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a></strong> <p class="muted">{{ card.description }}</p></td>
 							<td style="vertical-align:middle" data-ng-switch="" on="card.classs">
