@@ -11,16 +11,16 @@
 			<thead>
 				<tr>
 					<th class="hidden-phone"></th>
-					<th>Name</th>
-					<th class="hidden-phone">Class</th>
-					<th>Cost</th>
-					<th>Attack</th>
-					<th>Health</th>
-					<th>Type</th>
+					<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+					<th class="hidden-phone"><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
+					<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+					<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
+					<th><a data-ng-click="predicate = 'health'; reverse=!reverse">Health</a></th>
+					<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr data-ng-repeat="card in deck.cards | filter:deckFilterText">
+				<tr data-ng-repeat="card in deck.cards | filter:deckFilterText | orderBy:predicate:reverse">
 					<td style="vertical-align:middle;width:92px;" class="hidden-phone"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 					<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.qty">x{{ card.qty }}</span></strong> <p class="muted">{{ card.description }}</p></td>
 					<td style="vertical-align:middle" data-ng-switch on="card.classs" class="hidden-phone">
