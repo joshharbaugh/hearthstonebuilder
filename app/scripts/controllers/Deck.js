@@ -109,7 +109,7 @@ angular.module('hsbApp.DeckControllers', [])
 
     }])
 
-    .controller('DeckStatsCtrl',['$scope','deck','cards','rawDeck', function ($scope, deck, cards, rawDeck){
+    .controller('DeckStatsCtrl',['$scope','deck','cards','rawDeck','$filter', function ($scope, deck, cards, rawDeck, $filter){
 
         if(!cards) {
             var DeckCards = deck.cards;
@@ -120,8 +120,6 @@ angular.module('hsbApp.DeckControllers', [])
         $scope.stats = {
             type: {
                 ability: [],
-                hero: [],
-                heroPower: [],
                 minion: [],
                 weapon: []
             },
@@ -157,98 +155,204 @@ angular.module('hsbApp.DeckControllers', [])
             }
             // by type
             if(parseInt(obj.type) == 5) {
-                $scope.stats.type.ability.push(obj);
-            }
-            if(parseInt(obj.type) == 3) {
-                $scope.stats.type.hero.push(obj);
-            }
-            if(parseInt(obj.type) == 10) {
-                $scope.stats.type.heroPower.push(obj);
+                if(obj.qty) {
+                    $scope.stats.type.ability.push(obj);
+                    $scope.stats.type.ability.push(obj);
+                } else {
+                    $scope.stats.type.ability.push(obj);
+                }
             }
             if(parseInt(obj.type) == 4) {
-                $scope.stats.type.minion.push(obj);
+                if(obj.qty) {
+                    $scope.stats.type.minion.push(obj);
+                    $scope.stats.type.minion.push(obj);
+                } else {
+                    $scope.stats.type.minion.push(obj);
+                }
             }
             if(parseInt(obj.type) == 7) {
-                $scope.stats.type.weapon.push(obj);
+                if(obj.qty) {
+                    $scope.stats.type.weapon.push(obj);
+                    $scope.stats.type.weapon.push(obj);
+                } else {
+                    $scope.stats.type.weapon.push(obj);
+                }
             }
 
             // by rarity/quality
             if(parseInt(obj.quality) == 0) {
-                $scope.stats.rarity.free.push(obj);
+                if(obj.qty) {
+                    $scope.stats.rarity.free.push(obj);
+                    $scope.stats.rarity.free.push(obj);
+                } else {
+                    $scope.stats.rarity.free.push(obj);
+                }
             }
             if(parseInt(obj.quality) == 1) {
-                $scope.stats.rarity.common.push(obj);
+                if(obj.qty) {
+                    $scope.stats.rarity.common.push(obj);
+                    $scope.stats.rarity.common.push(obj);
+                } else {
+                    $scope.stats.rarity.common.push(obj);
+                }
             }
             if(parseInt(obj.quality) == 3) {
-                $scope.stats.rarity.rare.push(obj);
+                if(obj.qty) {
+                    $scope.stats.rarity.rare.push(obj);
+                    $scope.stats.rarity.rare.push(obj);
+                } else {
+                    $scope.stats.rarity.rare.push(obj);
+                }
             }
             if(parseInt(obj.quality) == 4) {
-                $scope.stats.rarity.epic.push(obj);
+                if(obj.qty) {
+                    $scope.stats.rarity.epic.push(obj);
+                    $scope.stats.rarity.epic.push(obj);
+                } else {
+                    $scope.stats.rarity.epic.push(obj);
+                }
             }
             if(parseInt(obj.quality) == 5) {
-                $scope.stats.rarity.legendary.push(obj);
+                if(obj.qty) {
+                    $scope.stats.rarity.legendary.push(obj);
+                    $scope.stats.rarity.legendary.push(obj);
+                } else {
+                    $scope.stats.rarity.legendary.push(obj);
+                }
             }
 
             // by cost
             if(parseInt(obj.cost) == 0) {
-                $scope.stats.cost.zero.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.zero.push(obj);
+                    $scope.stats.cost.zero.push(obj);
+                } else {
+                    $scope.stats.cost.zero.push(obj);
+                }                
             }
             if(parseInt(obj.cost) == 1) {
-                $scope.stats.cost.one.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.one.push(obj);
+                    $scope.stats.cost.one.push(obj);
+                } else {
+                    $scope.stats.cost.one.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 2) {
-                $scope.stats.cost.two.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.two.push(obj);
+                    $scope.stats.cost.two.push(obj);
+                } else {
+                    $scope.stats.cost.two.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 3) {
-                $scope.stats.cost.three.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.three.push(obj);
+                    $scope.stats.cost.three.push(obj);
+                } else {
+                    $scope.stats.cost.three.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 4) {
-                $scope.stats.cost.four.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.four.push(obj);
+                    $scope.stats.cost.four.push(obj);
+                } else {
+                    $scope.stats.cost.four.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 5) {
-                $scope.stats.cost.five.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.five.push(obj);
+                    $scope.stats.cost.five.push(obj);
+                } else {
+                    $scope.stats.cost.five.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 6) {
-                $scope.stats.cost.six.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.six.push(obj);
+                    $scope.stats.cost.six.push(obj);
+                } else {
+                    $scope.stats.cost.six.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 7) {
-                $scope.stats.cost.seven.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.seven.push(obj);
+                    $scope.stats.cost.seven.push(obj);
+                } else {
+                    $scope.stats.cost.seven.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 8) {
-                $scope.stats.cost.eight.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.eight.push(obj);
+                    $scope.stats.cost.eight.push(obj);
+                } else {
+                    $scope.stats.cost.eight.push(obj);
+                }
             }
             if(parseInt(obj.cost) == 9) {
-                $scope.stats.cost.nine.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.nine.push(obj);
+                    $scope.stats.cost.nine.push(obj);
+                } else {
+                    $scope.stats.cost.nine.push(obj);
+                }
             }
             if(parseInt(obj.cost) >= 10) {
-                $scope.stats.cost.tenplus.push(obj);
+                if(obj.qty) {
+                    $scope.stats.cost.tenplus.push(obj);
+                    $scope.stats.cost.tenplus.push(obj);
+                } else {
+                    $scope.stats.cost.tenplus.push(obj);
+                }
             }
         });
 
         $scope.deckCounter = $scope.unfilteredCards.length;
 
+        var stats_rarity_data   = [],
+            stats_rarity_colors = ['#ff8000', '#a335ee', '#0070dd', '#eee', '#9d9d9d'],
+            stats_type_data     = [],
+            stats_type_colors   = ['#625e7d', '#767197', '#8a84b0', '#9e97c9', '#b2aae3'];
+
+        angular.forEach($scope.stats.rarity, function(arr, idx) {
+            if(arr)
+                stats_rarity_data.push({label: $filter('capitalize')(idx), value: arr.length});
+        });
+
+        angular.forEach(stats_rarity_data, function(obj, idx) {
+            if(obj.value == 0) {
+                stats_rarity_data.splice(idx, 1);
+                stats_rarity_colors.splice(idx, 1);
+            }
+        });
+
+        angular.forEach($scope.stats.type, function(arr, idx) {
+            if(arr)
+                stats_type_data.push({label: $filter('capitalize')(idx), value: arr.length});
+        });
+
+        angular.forEach(stats_type_data, function(obj, idx) {
+            if(obj.value == 0) {
+                stats_type_data.splice(idx, 1);
+                stats_type_colors.splice(idx, 1);
+            }
+        });
+        
         var stats_rarity = new Morris.Donut({
             element: 'stats-rarity',
-            data: [
-                {label: "Legendary", value: $scope.stats.rarity.legendary.length},
-                {label: "Epic", value: $scope.stats.rarity.epic.length},
-                {label: "Rare", value: $scope.stats.rarity.rare.length},
-                {label: "Common", value: $scope.stats.rarity.common.length},
-                {label: "Free", value: $scope.stats.rarity.free.length}
-            ],
-            colors: ['#ff8000', '#a335ee', '#0070dd', '#eee', '#9d9d9d']
+            data: stats_rarity_data,
+            colors: stats_rarity_colors
         });
 
         var stats_type = new Morris.Donut({
             element: 'stats-type',
-            data: [
-                {label: "Ability", value: $scope.stats.type.ability.length},
-                {label: "Hero", value: $scope.stats.type.hero.length},
-                {label: "Hero Power", value: $scope.stats.type.heroPower.length},
-                {label: "Minion", value: $scope.stats.type.minion.length},
-                {label: "Weapon", value: $scope.stats.type.weapon.length}
-            ],
-            colors: ['#625e7d', '#767197', '#8a84b0', '#9e97c9', '#b2aae3']
+            data: stats_type_data,
+            colors: stats_type_colors
         });
 
         var stats_cost = new Morris.Bar({

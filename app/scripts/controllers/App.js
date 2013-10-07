@@ -29,5 +29,5 @@ angular.module('hsbApp.AppControllers', [])
 	.controller('AppCtrl', ['$appTimer', '$appStorage', '$location', '$scope', '$app', function ($appTimer, $appStorage, $location, $scope, $app) {
 		
 		$scope.app = $app;
-	
+
 	}]);
