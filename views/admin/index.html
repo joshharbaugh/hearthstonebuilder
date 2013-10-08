@@ -1,0 +1,256 @@
+<!doctype html>
+<html data-ng-app="admin">
+    <head>
+        <base href="/admin">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title><%= title %></title>
+        <meta name="description" content="A Deck Builder for Blizzard's HearthStone Online Game">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+
+        <link href="//fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/responsive.css">
+
+        <style>
+        header {
+            background: #fff;
+        }
+        </style>
+
+        <script>
+        window.app = {
+            'name': '<%= title %>',
+            'version': '<%= version %>'
+        };
+        </script>
+    </head>
+    <body>
+        
+        <div id="wrapper">
+
+            <header class="row-fluid">
+                <span class="pull-left">Admin</span>
+
+                <ul class="nav nav-pills pull-right" style="margin: 10px;">
+                    <li class="active"><a href="#users" data-toggle="tab">Users</a></li>
+                    <li><a href="#decks" data-toggle="tab">Decks</a></li>                    
+                </ul>
+            </header>
+
+            <div class="pill-content">
+
+                <div class="container-fluid pill-pane active" id="users" data-ng-controller="UsersCtrl">
+                    
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="32"></th>
+                                <th>Username</th>
+                                <th>Display Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="user in users">
+                                <td><img data-ng-show="user.profile.avatar" data-ng-src="{{ user.profile.avatar }}" alt="" width="32" /></td>
+                                <td>{{ user.profile.username }}</td>
+                                <td>{{ user.profile.display_name }}</td> 
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2"><strong>Total Users:</strong> {{ users.length }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+                <div class="container-fluid pill-pane" id="decks" data-ng-controller="DecksCtrl">
+                    
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Author</th>
+                                <th>Class</th>
+                                <th>Rating</th>
+                                <th>Created</th>
+                                <th>Modified</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="deck in decks | orderBy:deck.name:reverse">
+                                <td><a data-ng-href="/api/deck/{{ deck._id }}" target="_blank">{{ deck.name }}</a></td>
+                                <td>{{ deck.author }} <span class="muted">({{ deck.username }})</span></td>
+                                <td>{{ deck.class }}</td>
+                                <td><span class="badge">{{ deck.rating }}</span></td>
+                                <td>{{ deck.created | date }}</td>
+                                <td>{{ deck.last_modified | date }}</td>
+                                <td><i data-ng-class="{'icon-ok': deck.length == 30, 'icon-remove': deck.length != 30}"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
+        <script>
+        var admin = window.admin = angular.module('admin', []);
+
+        admin.controller('UsersCtrl', ['$scope','$users', function($scope, $users) {
+
+            var users = $scope.users = $users.getAll();
+            users.then(function(response) {
+
+                if(response) {
+                    $scope.users = response;
+
+                    console.log($scope.users);
+                }
+
+            });
+
+        }]);
+
+        admin.controller('DecksCtrl', ['$scope','$decks', function($scope, $decks) {
+
+            var decks = $scope.decks = $decks.get();
+            decks.then(function(response) {
+
+                if(response) {
+                    $scope.decks = response;
+
+                    console.log($scope.decks);
+                }
+
+            });
+
+        }]);
+
+        admin.factory('$users', ['$http', '$q', function ($http, $q) {
+        
+            return {
+                getAll: function() {
+                    var deferred = $q.defer();              
+                    $http({ method:'GET',url:'/api/users' })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    
+                    return deferred.promise;
+                },
+                getByUsername: function(username) {
+                    var deferred = $q.defer();              
+                    $http({ method:'GET',url:'/api/user/' + username })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    
+                    return deferred.promise;
+                }
+            };
+
+        }]);
+
+        admin.factory('$decks', ['$http', '$q', function ($http, $q) {
+        
+            return {
+                get: function() {
+                    var deferred = $q.defer();              
+                    $http({ method:'GET',url:'/api/decks' })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    return deferred.promise;
+                },
+                getById: function(id) {
+                    var deferred = $q.defer();              
+                    $http({ method:'GET',url:'/api/deck/' + id })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    return deferred.promise;
+                },
+                getByUsername: function(username) {
+                    var deferred = $q.defer();              
+                    $http({ method:'GET',url:'/api/decks/' + username })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    return deferred.promise;
+                },
+                saveDeck: function(deckToSave) {
+                    var deferred = $q.defer();              
+                    $http({ method:'POST', url:'/api/decks/' + deckToSave.username, data: deckToSave })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    return deferred.promise;
+                },
+                updateDeck: function(deckToSave) {
+                    var deferred = $q.defer();              
+                    $http({ method:'PUT', url:'/api/decks/' + deckToSave._id, data: deckToSave })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    return deferred.promise;
+                },
+                updateDeckRating: function(payload) {
+                    var deferred = $q.defer();              
+                    $http({ method:'PUT', url:'/api/decks/' + payload.deck_id + '/rating', data: payload })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    return deferred.promise;
+                },
+                deleteById: function(id) {
+                    var deferred = $q.defer();              
+                    $http({ method:'DELETE',url:'/api/deck/' + id })
+                        .success(function(data,status,headers,request) {
+                            deferred.resolve(data);
+                        })
+                        .error(function(data,status) {
+                            deferred.reject(status);
+                        });
+                    return deferred.promise;
+                },
+            };
+
+        }]);
+        </script>
+
+    </body>
+</html>
