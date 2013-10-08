@@ -147,7 +147,7 @@ angular.module('hsbApp.DeckControllers', [])
         
         // loopthrough and sort 
         angular.forEach(DeckCards, function(obj, idx) {
-            if(obj.qty) {
+            if(obj.qty == 2) {
                 $scope.unfilteredCards.push(obj);
                 $scope.unfilteredCards.push(obj);
             } else {
@@ -155,7 +155,7 @@ angular.module('hsbApp.DeckControllers', [])
             }
             // by type
             if(parseInt(obj.type) == 5) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.type.ability.push(obj);
                     $scope.stats.type.ability.push(obj);
                 } else {
@@ -163,7 +163,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.type) == 4) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.type.minion.push(obj);
                     $scope.stats.type.minion.push(obj);
                 } else {
@@ -171,7 +171,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.type) == 7) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.type.weapon.push(obj);
                     $scope.stats.type.weapon.push(obj);
                 } else {
@@ -181,7 +181,7 @@ angular.module('hsbApp.DeckControllers', [])
 
             // by rarity/quality
             if(parseInt(obj.quality) == 0) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.rarity.free.push(obj);
                     $scope.stats.rarity.free.push(obj);
                 } else {
@@ -189,7 +189,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.quality) == 1) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.rarity.common.push(obj);
                     $scope.stats.rarity.common.push(obj);
                 } else {
@@ -197,7 +197,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.quality) == 3) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.rarity.rare.push(obj);
                     $scope.stats.rarity.rare.push(obj);
                 } else {
@@ -205,7 +205,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.quality) == 4) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.rarity.epic.push(obj);
                     $scope.stats.rarity.epic.push(obj);
                 } else {
@@ -213,7 +213,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.quality) == 5) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.rarity.legendary.push(obj);
                     $scope.stats.rarity.legendary.push(obj);
                 } else {
@@ -223,7 +223,7 @@ angular.module('hsbApp.DeckControllers', [])
 
             // by cost
             if(parseInt(obj.cost) == 0) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.zero.push(obj);
                     $scope.stats.cost.zero.push(obj);
                 } else {
@@ -231,7 +231,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }                
             }
             if(parseInt(obj.cost) == 1) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.one.push(obj);
                     $scope.stats.cost.one.push(obj);
                 } else {
@@ -239,7 +239,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 2) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.two.push(obj);
                     $scope.stats.cost.two.push(obj);
                 } else {
@@ -247,7 +247,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 3) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.three.push(obj);
                     $scope.stats.cost.three.push(obj);
                 } else {
@@ -255,7 +255,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 4) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.four.push(obj);
                     $scope.stats.cost.four.push(obj);
                 } else {
@@ -263,7 +263,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 5) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.five.push(obj);
                     $scope.stats.cost.five.push(obj);
                 } else {
@@ -271,7 +271,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 6) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.six.push(obj);
                     $scope.stats.cost.six.push(obj);
                 } else {
@@ -279,7 +279,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 7) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.seven.push(obj);
                     $scope.stats.cost.seven.push(obj);
                 } else {
@@ -287,7 +287,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 8) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.eight.push(obj);
                     $scope.stats.cost.eight.push(obj);
                 } else {
@@ -295,7 +295,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) == 9) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.nine.push(obj);
                     $scope.stats.cost.nine.push(obj);
                 } else {
@@ -303,7 +303,7 @@ angular.module('hsbApp.DeckControllers', [])
                 }
             }
             if(parseInt(obj.cost) >= 10) {
-                if(obj.qty) {
+                if(obj.qty == 2) {
                     $scope.stats.cost.tenplus.push(obj);
                     $scope.stats.cost.tenplus.push(obj);
                 } else {
