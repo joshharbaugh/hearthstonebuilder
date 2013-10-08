@@ -146,6 +146,12 @@ app.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
+app.get('/admin', ensureAdmin, function(req, res){
+    app.use(express.static(path.join(__dirname, 'views')));
+    app.use(express.static(path.join(__dirname, '.tmp')));
+    res.render( __dirname + '/views/admin/index.html', { title: 'Hearthstone Builder', version: version } );
+});
+
 app.post('/api/logout', function(req, res){
     res.setTimeout(30 * 1000);
     req.logout();
@@ -428,5 +434,12 @@ http.createServer(app).on('connection', function(socket) {
 
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) { return next(); }
+    res.redirect('/login')
+}
+
+function ensureAdmin(req, res, next) {
+    if(req.user.profile.username == 'jharbaugh') {
+        if (req.isAuthenticated()) { return next(); }
+    }
     res.redirect('/login')
 }
