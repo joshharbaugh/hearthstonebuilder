@@ -1,8 +1,8 @@
 <!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <!--<![endif]-->
+<!--[if lt IE 7]>      <html xmlns:ng="http://angularjs.org" class="no-js lt-ie9 lt-ie8 lt-ie7" id="ng-app" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
+<!--[if IE 7]>         <html xmlns:ng="http://angularjs.org" class="no-js lt-ie9 lt-ie8" id="ng-app" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
+<!--[if IE 8]>         <html xmlns:ng="http://angularjs.org" class="no-js lt-ie9" id="ng-app" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <![endif]-->
+<!--[if gt IE 8]><!--> <html xmlns:ng="http://angularjs.org" class="no-js" id="ng-app" data-ng-app="hsbApp" data-ng-controller="AppCtrl"> <!--<![endif]-->
   <head>
     <base href="/">
     <meta charset="utf-8">
@@ -35,7 +35,10 @@
         'name': 'HearthStone Builder',
         'version': '<%= version %>'
     };
-    </script>   
+    </script>
+    <!--[if lte IE 8]>
+    <script src="bower_components/json3/lib/json3.min.js"></script>
+    <![endif]-->  
   </head>
   <body data-state="{{ $state.current.name }}" data-status="{{ status }}" data-version="{{ app.version }}" data-ng-cloak>
     <!--[if lt IE 7]>
