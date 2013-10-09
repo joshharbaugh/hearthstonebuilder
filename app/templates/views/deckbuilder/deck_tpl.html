@@ -9,21 +9,21 @@
 				<thead>
 					<tr>
 						<th class="hidden-phone"></th>
-						<th>Name</th>
-						<th>Cost</th>
-						<th>Attack</th>
-						<th>Health</th>
-						<th>Type</th>
+						<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
+						<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
+						<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Atk</a></th>
+						<th><a data-ng-click="predicate = 'health'; reverse=!reverse">HP</a></th>
+						<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
 						<th></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr data-ng-repeat="card in deckCards">
+					<tr data-ng-repeat="card in deckCards | orderBy:predicate:reverse">
 						<td class="hidden-phone" style="vertical-align:middle;width:92px;"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
 						<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.qty">x{{ card.qty }}</span></strong> <p class="muted">{{ card.description }}</p></td>
-						<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
-						<td style="vertical-align:middle" data-ng-bind="card.attack"></td>
-						<td style="vertical-align:middle" data-ng-bind="card.health"></td>
+						<td style="vertical-align:middle"><span data-ng-bind="card.cost" class="badge badge-info"></span></td>
+						<td style="vertical-align:middle"><span data-ng-bind="card.attack" class="badge badge-warning"></span></td>
+						<td style="vertical-align:middle"><span data-ng-bind="card.health" class="badge badge-important"></span></td>
 						<td style="vertical-align:middle" data-ng-switch on="card.type">
 							<span data-ng-switch-when="5">Ability</span>
 							<span data-ng-switch-when="3">Hero</span>
@@ -31,7 +31,7 @@
 							<span data-ng-switch-when="4">Minion</span>
 							<span data-ng-switch-when="7">Weapon</span>
 						</td>
-						<td style="vertical-align:middle" ><button data-ng-click="removeCard(card)" type="button" class="btn btn-flat btn-flat-red pull-right"><i class="icon-remove icon-white"></i></button></td>
+						<td style="vertical-align:middle"><button data-ng-click="removeCard(card)" type="button" class="btn btn-flat btn-flat-red pull-right"><i class="icon-remove icon-white"></i></button></td>
 					</tr>
 				</tbody>
 			</table>

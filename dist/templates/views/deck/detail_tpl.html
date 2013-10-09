@@ -34,15 +34,15 @@
 						<span data-ng-switch-when="9" class="class-warlock">Warlock</span>
 						<span data-ng-switch-when="11" class="class-druid">Druid</span>
 					</td>
-					<td style="vertical-align:middle" data-ng-bind="card.cost"></td>
-					<td style="vertical-align:middle" data-ng-bind="card.attack"></td>
-					<td style="vertical-align:middle" data-ng-bind="card.health"></td>
+					<td style="vertical-align:middle"><span data-ng-bind="card.cost" class="badge badge-info"></span></td>
+					<td style="vertical-align:middle"><span data-ng-bind="card.attack" class="badge badge-warning"></span></td>
+					<td style="vertical-align:middle"><span data-ng-bind="card.health" class="badge badge-important"></span></td>
 					<td style="vertical-align:middle" data-ng-switch="" on="card.type">
-						<span data-ng-switch-when="5">Ability</span>
-						<span data-ng-switch-when="3">Hero</span>
-						<span data-ng-switch-when="10">Hero Power</span>
-						<span data-ng-switch-when="4">Minion</span>
-						<span data-ng-switch-when="7">Weapon</span>
+						<span data-ng-switch-when="5" class="muted">Ability</span>
+						<span data-ng-switch-when="3" class="muted">Hero</span>
+						<span data-ng-switch-when="10" class="muted">Hero Power</span>
+						<span data-ng-switch-when="4" class="muted">Minion</span>
+						<span data-ng-switch-when="7" class="muted">Weapon</span>
 					</td>
 				</tr>				
 			</tbody>

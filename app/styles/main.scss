@@ -82,6 +82,12 @@ h1,h2,h3,h4,h5,h6 {
     box-shadow: none;
     border: none;
     line-height: 30px;
+
+    &:active,
+    &:focus {
+        background-image: none;
+        outline: 0;
+    }
 }
 
 .btn-flat-green { 
@@ -91,6 +97,13 @@ h1,h2,h3,h4,h5,h6 {
     &:hover {
         background: lighten(#62c462, 10%);
         color: #fff;
+    }
+
+    &:active,
+    &:focus {
+        background: lighten(#62c462, 10%);
+        color: #fff;
+        outline: 0;
     }
 }
 .btn-flat-teal { background: #5bc0de; text-shadow: none !important; }
@@ -103,6 +116,13 @@ h1,h2,h3,h4,h5,h6 {
     &:hover {
         background: lighten(#ee5f5b, 10%);
         color: #fff;
+    }
+
+    &:active,
+    &:focus {
+        background: lighten(#ee5f5b, 10%);
+        color: #fff;
+        outline: 0;
     }
 }
 .btn-flat-black { background: #222; text-shadow: none !important; }
