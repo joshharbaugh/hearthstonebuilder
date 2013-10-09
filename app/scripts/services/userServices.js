@@ -5,7 +5,7 @@ angular.module('hsbApp.UserServices', [])
 		return {
 			getCurrent: function() {
 				var deferred = $q.defer();				
-				$http({ method:'GET',url:'/api/user', cache:true })
+				$http({ method:'GET',url:'/api/user' })
 					.success(function(data,status,headers,request) {
 						deferred.resolve(data);
 					})
@@ -17,7 +17,7 @@ angular.module('hsbApp.UserServices', [])
 			},
 			getByUsername: function(username) {
 				var deferred = $q.defer();				
-				$http({ method:'GET',url:'/api/user/' + username, cache:true })
+				$http({ method:'GET',url:'/api/user/' + username })
 					.success(function(data,status,headers,request) {
 						deferred.resolve(data);
 					})
