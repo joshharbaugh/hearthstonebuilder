@@ -9,7 +9,7 @@ angular.module('hsbApp.CardServices', [])
 				if($appStorage.get(STORAGE_KEY)) {
 					return $appStorage.get(STORAGE_KEY);
 				} else {
-					$http({ method:'GET',url:'/api/cards' })
+					$http({ method:'GET', url:'/api/cards', cache:true })
 						.success(function(data,status,headers,request) {
 							deferred.resolve(data);
 						})
@@ -25,7 +25,7 @@ angular.module('hsbApp.CardServices', [])
 				if($appStorage.get(STORAGE_KEY)) {
 					return $appStorage.get(STORAGE_KEY);
 				} else {
-					$http({ method:'GET',url:'/api/card/' + id })
+					$http({ method:'GET', url:'/api/card/' + id, cache:true })
 						.success(function(data,status,headers,request) {
 							deferred.resolve(data);
 						})
@@ -41,7 +41,7 @@ angular.module('hsbApp.CardServices', [])
 				if($appStorage.get(STORAGE_KEY)) {
 					return $appStorage.get(STORAGE_KEY);
 				} else {
-					$http({ method:'GET',url:'/api/cards/class/' + classId })
+					$http({ method:'GET', url:'/api/cards/class/' + classId, cache:true })
 						.success(function(data,status,headers,request) {
 							deferred.resolve(data);
 						})
@@ -57,7 +57,7 @@ angular.module('hsbApp.CardServices', [])
 				if($appStorage.get(STORAGE_KEY)) {
 					return $appStorage.get(STORAGE_KEY);
 				} else {
-					$http({ method:'GET',url:'/api/cards/type/' + typeId })
+					$http({ method:'GET', url:'/api/cards/type/' + typeId, cache:true })
 						.success(function(data,status,headers,request) {
 							deferred.resolve(data);
 						})
@@ -73,7 +73,7 @@ angular.module('hsbApp.CardServices', [])
 				if($appStorage.get(STORAGE_KEY)) {
 					return $appStorage.get(STORAGE_KEY);
 				} else {
-					$http({ method:'GET',url:'/api/cards/type/' + typeId + '/class/' + classId })
+					$http({ method:'GET', url:'/api/cards/type/' + typeId + '/class/' + classId, cache:true })
 						.success(function(data,status,headers,request) {
 							deferred.resolve(data);
 						})

@@ -4,7 +4,7 @@ angular.module('hsbApp.DeckServices', [])
 		
 		return {
 			get: function() {
-				var deferred = $q.defer();				
+				var deferred = $q.defer();
 				$http({ method:'GET',url:'/api/decks' })
 					.success(function(data,status,headers,request) {
 						deferred.resolve(data);
