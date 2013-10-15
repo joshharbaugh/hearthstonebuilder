@@ -18,7 +18,7 @@ angular.module('hsbApp.CardControllers', [])
 
         $scope.addCard = function() {
             $scope.$parent.$broadcast('addCard', {data:this.card});
-        };
+        };        
 
         $scope.onReady();
 

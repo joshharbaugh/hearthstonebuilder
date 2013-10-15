@@ -2,6 +2,10 @@
 	<h2 class="panel-title">Summary</h2>
 	<div class="panel-content">
 		<table class="table">
+			<tr data-ng-show="deck.description">
+				<td><strong>Description</strong></td>
+				<td><p>{{ deck.description }}</p></td>
+			</tr>
 			<tr>
 				<td><strong>Class</strong></td>
 				<td style="text-transform:capitalize;">{{ deck.class }}</td>

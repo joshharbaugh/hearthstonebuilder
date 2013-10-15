@@ -11,9 +11,9 @@
 			</thead>
 			<tbody>
 				<tr data-ng-repeat="deck in topDecks">
-					<td><a ui-sref="decks.detail({ deckId:deck._id })" data-ng-href="/decks/{{ deck._id }}">{{ deck.name }}</a></td>
-					<td>{{ deck.author }}</td>
-					<td><strong class="badge" data-ng-class="{'badge-important': deck.rating < 5, 'badge-warning': deck.rating > 10, 'badge-success': deck.rating > 20}">{{ deck.rating }}</strong></td>
+					<td style="word-break:break-word"><a ui-sref="decks.detail({ deckId:deck._id })" data-ng-href="/decks/{{ deck._id }}">{{ deck.name }}</a></td>
+					<td style="word-break:break-word" class="hidden-phone hidden-tablet">{{ deck.author }}</td>
+					<td style="word-break:break-word"><strong class="badge" data-ng-class="{'badge-important': deck.rating < 5, 'badge-warning': deck.rating > 10, 'badge-success': deck.rating > 20}">{{ deck.rating }}</strong></td>
 				</tr>
 			</tbody>
 		</table>

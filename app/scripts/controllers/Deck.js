@@ -1102,6 +1102,40 @@ angular.module('hsbApp.DeckControllers', [])
             }
         }, true);
 
+        $scope.columns = [
+            { field: 'cost', title: 'Cost' },
+            { field: 'name', title: 'Name' },
+            { field: 'attack', title: 'Attack' },
+            { field: 'health', title: 'Health' }
+        ];
+
+        $scope.sorting = {
+            field: 'cost',
+            asc: true
+        };
+
+        $scope.columnClass = function(field) {
+            return this.sorting.field === field ? "sorted sortable col-" + field : "sortable col-" + field;
+        };
+
+        $scope.columnSortingIcon = function(field) {
+            if(this.sorting.field === field) {
+                return this.sorting.asc ? "icon-chevron-up" : "icon-chevron-down";
+            } else {
+                return "icon-chevron-down";
+            }
+        };
+
+        $scope.setSorting = function(field) {
+            var sorting = this.sorting;
+            if(sorting.field === field) {
+                sorting.asc = !sorting.asc;
+            } else {
+                sorting.field = field;
+                sorting.asc = true;
+            }
+        };
+
         $scope.onReady();
 
     }]);

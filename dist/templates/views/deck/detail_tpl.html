@@ -1,54 +1,37 @@
-<div class="span6 panel">
-	<h2 class="panel-title">
-		{{ deck.name }}
-		<input type="text" data-ng-model="deckFilterText" class="pull-right hidden-phone" placeholder="Search within deck...">
-	</h2>
-	<div class="panel-content">
-		<div class="description" data-ng-show="deck.description">
-			<p>{{ deck.description }}</p>
+<div class="span5">
+	<div class="row-fluid">
+		<div class="span12 panel">
+			<h2 class="panel-title">{{ deck.name }}</h2>
+			<div class="panel-content">
+				<div class="description" data-ng-show="deck.description">
+					<p>{{ deck.description }}</p>
+				</div>
+				<table class="table table-striped">
+					<tbody>
+						<tr data-ng-repeat="card in deck.cards | filter:deckFilterText | orderBy:'cost':reverse">
+							<td class="pull-left" style="width:100%;vertical-align:middle;padding:0;height:36px">
+								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%" target="_blank">
+									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center">
+										<strong>{{ card.cost }}</strong>
+									</span>
+									<strong class="pull-left" style="padding:7px 0 0 8px">{{ card.name }}</strong>
+									<span data-ng-show="card.health" data-ng-bind="card.health" class="pull-right hidden-phone hidden-tablet" style="padding:8px 10px;background:#b94a48;color:#fff;width:24px;text-align:center"></span>
+									<span data-ng-show="card.attack" data-ng-bind="card.attack" class="pull-right hidden-phone hidden-tablet" style="padding:8px 10px;background:#f89406;color:#fff;width:24px;text-align:center"></span>
+								</a>
+							</td>
+							<td style="vertical-align:middle;padding:0;height:36px;width:36px">
+								<span class="pull-right" data-ng-show="card.qty" style="background:#32383d;color:#fff;padding:8px 10px;width:24px;text-align:center">{{ card.qty }}</span>
+							</td>
+						</tr>				
+					</tbody>
+				</table>
+			</div>
 		</div>
-		<table class="table table-hover table-striped">
-			<thead>
-				<tr>
-					<th class="hidden-phone"></th>
-					<th><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
-					<th class="hidden-phone"><a data-ng-click="predicate = 'classs'; reverse=!reverse">Class</a></th>
-					<th><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
-					<th><a data-ng-click="predicate = 'attack'; reverse=!reverse">Attack</a></th>
-					<th><a data-ng-click="predicate = 'health'; reverse=!reverse">Health</a></th>
-					<th><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr data-ng-repeat="card in deck.cards | filter:deckFilterText | orderBy:predicate:reverse">
-					<td style="vertical-align:middle;width:92px" class="hidden-phone"><img width="92" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt=""></td>
-					<td style="vertical-align:middle"><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.qty">x{{ card.qty }}</span></strong> <p class="muted">{{ card.description }}</p></td>
-					<td style="vertical-align:middle" data-ng-switch="" on="card.classs" class="hidden-phone">
-						<span data-ng-switch-when="1" class="class-warrior">Warrior</span>
-						<span data-ng-switch-when="2" class="class-paladin">Paladin</span>
-						<span data-ng-switch-when="3" class="class-hunter">Hunter</span>
-						<span data-ng-switch-when="4" class="class-rogue">Rogue</span>
-						<span data-ng-switch-when="5" class="class-priest">Priest</span>
-						<span data-ng-switch-when="7" class="class-shaman">Shaman</span>
-						<span data-ng-switch-when="8" class="class-mage">Mage</span>
-						<span data-ng-switch-when="9" class="class-warlock">Warlock</span>
-						<span data-ng-switch-when="11" class="class-druid">Druid</span>
-					</td>
-					<td style="vertical-align:middle"><span data-ng-bind="card.cost" class="badge badge-info"></span></td>
-					<td style="vertical-align:middle"><span data-ng-bind="card.attack" class="badge badge-warning"></span></td>
-					<td style="vertical-align:middle"><span data-ng-bind="card.health" class="badge badge-important"></span></td>
-					<td style="vertical-align:middle" data-ng-switch="" on="card.type">
-						<span data-ng-switch-when="5" class="muted">Ability</span>
-						<span data-ng-switch-when="3" class="muted">Hero</span>
-						<span data-ng-switch-when="10" class="muted">Hero Power</span>
-						<span data-ng-switch-when="4" class="muted">Minion</span>
-						<span data-ng-switch-when="7" class="muted">Weapon</span>
-					</td>
-				</tr>				
-			</tbody>
-		</table>
+	</div>
+
+	<div class="row-fluid">
+		<div class="span12" ui-view="summary"></div>
 	</div>
 </div>
 
-<div class="span6" ui-view="summary"></div>
-<div class="span6" ui-view="stats"></div>
+<div class="span7" ui-view="stats"></div>

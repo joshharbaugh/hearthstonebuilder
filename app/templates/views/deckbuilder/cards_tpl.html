@@ -13,97 +13,118 @@
 		</div>
 		<div class="pill-content">
 			<div class="pill-pane" data-ng-class="{'active': !$stateParams.cardType}" id="all">
-				<table class="table table-hover table-striped">
+				{{ predicate }}
+				<table class="table table-hover table-striped cards">
 					<thead>
 						<tr>
-							<th style="width:10%">&nbsp;</th>
-							<th style="width:45%"><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'attack'; reverse=!reverse">Atk</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'health'; reverse=!reverse">HP</a></th>
-							<th class="hidden-phone" style="width:15%"><a data-ng-click="predicate = 'type'; reverse=!reverse">Type</a></th>
+							<th>
+								<a data-ng-repeat="column in columns" data-ng-click="setSorting(column.field)" data-ng-class="columnClass(column.field)"><i class="{{ columnSortingIcon(column.field) }}"></i></a>
+							</th>
+							<th>&nbsp;</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.all | filter:searchText | orderBy:predicate:reverse">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}" data-ng-hide="disableAllCards">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td><span data-ng-bind="card.cost" class="badge badge-info"></span></td>
-							<td><span data-ng-bind="card.attack" class="badge badge-warning"></span></td>
-							<td><span data-ng-bind="card.health" class="badge badge-important"></span></td>
-							<td data-ng-switch on="card.type" class="hidden-phone">
-								<span data-ng-switch-when="5" class="muted">Ability</span>
-								<span data-ng-switch-when="3" class="muted">Hero</span>
-								<span data-ng-switch-when="10" class="muted">Hero Power</span>
-								<span data-ng-switch-when="4" class="muted">Minion</span>
-								<span data-ng-switch-when="7" class="muted">Weapon</span>
+						<tr data-ng-repeat="card in cards.all | filter:searchText | orderBy:sorting.field:!sorting.asc">
+							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
+								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
+										<strong>{{ card.cost }}</strong>
+									</span>
+									<strong class="pull-left" style="padding:7px 0 0 8px">{{ card.name }}</strong>
+									<span data-ng-show="card.health" data-ng-bind="card.health" class="pull-right" style="padding:8px 10px;background:#b94a48;color:#fff;width:24px;text-align:center;"></span>
+									<span data-ng-show="card.attack" data-ng-bind="card.attack" class="pull-right" style="padding:8px 10px;background:#f89406;color:#fff;width:24px;text-align:center;"></span>
+								</a>								
+							</td>
+							<td style="vertical-align:middle;padding:0;height:36px;width:36px;">
+								<button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}" data-ng-hide="disableAllCards" style="line-height:28px;"><i class="icon-plus icon-white"></i></button>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='ability'}" id="ability">
-				<table class="table table-hover table-striped">
+				<table class="table table-hover table-striped cards">
 					<thead>
 						<tr>
-							<th style="width:10%">&nbsp;</th>
-							<th style="width:45%"><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
-							<th style="width:10%">&nbsp;</th>
-							<th style="width:10%">&nbsp;</th>
-							<th class="hidden-phone" style="width:15%">&nbsp;</th>
+							<th>
+								<a data-ng-repeat="column in columns" data-ng-click="setSorting(column.field)" data-ng-class="columnClass(column.field)"><i class="{{ columnSortingIcon(column.field) }}"></i></a>
+							</th>
+							<th>&nbsp;</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.ability | filter:searchText | orderBy:predicate:reverse">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td colspan="4"><span data-ng-bind="card.cost" class="badge badge-info"></span></td>
+						<tr data-ng-repeat="card in cards.ability | filter:searchText | orderBy:sorting.field:!sorting.asc">
+							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
+								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
+										<strong>{{ card.cost }}</strong>
+									</span>
+									<strong class="pull-left" style="padding:7px 0 0 8px">{{ card.name }}</strong>
+									<span data-ng-show="card.health" data-ng-bind="card.health" class="pull-right" style="padding:8px 10px;background:#b94a48;color:#fff;width:24px;text-align:center;"></span>
+									<span data-ng-show="card.attack" data-ng-bind="card.attack" class="pull-right" style="padding:8px 10px;background:#f89406;color:#fff;width:24px;text-align:center;"></span>
+								</a>								
+							</td>
+							<td style="vertical-align:middle;padding:0;height:36px;width:36px;">
+								<button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}" data-ng-hide="disableAllCards" style="line-height:28px;"><i class="icon-plus icon-white"></i></button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='minion'}" id="minion">
-				<table class="table table-hover table-striped">
+				<table class="table table-hover table-striped cards">
 					<thead>
 						<tr>
-							<th style="width:10%">&nbsp;</th>
-							<th style="width:45%"><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'attack'; reverse=!reverse">Atk</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'health'; reverse=!reverse">HP</a></th>
-							<th class="hidden-phone" style="width:15%">&nbsp;</th>
+							<th>
+								<a data-ng-repeat="column in columns" data-ng-click="setSorting(column.field)" data-ng-class="columnClass(column.field)"><i class="{{ columnSortingIcon(column.field) }}"></i></a>
+							</th>
+							<th>&nbsp;</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.minion | filter:searchText | orderBy:predicate:reverse">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td><span data-ng-bind="card.cost" class="badge badge-info"></span></td>
-							<td><span data-ng-bind="card.attack" class="badge badge-warning"></span></td>
-							<td colspan="2"><span data-ng-bind="card.health" class="badge badge-important"></span></td>
+						<tr data-ng-repeat="card in cards.minion | filter:searchText | orderBy:sorting.field:!sorting.asc">
+							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
+								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
+										<strong>{{ card.cost }}</strong>
+									</span>
+									<strong class="pull-left" style="padding:7px 0 0 8px">{{ card.name }}</strong>
+									<span data-ng-show="card.health" data-ng-bind="card.health" class="pull-right" style="padding:8px 10px;background:#b94a48;color:#fff;width:24px;text-align:center;"></span>
+									<span data-ng-show="card.attack" data-ng-bind="card.attack" class="pull-right" style="padding:8px 10px;background:#f89406;color:#fff;width:24px;text-align:center;"></span>
+								</a>								
+							</td>
+							<td style="vertical-align:middle;padding:0;height:36px;width:36px;">
+								<button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}" data-ng-hide="disableAllCards" style="line-height:28px;"><i class="icon-plus icon-white"></i></button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 			<div class="pill-pane" data-ng-class="{'active': $stateParams.cardType=='weapon'}" id="weapon">
-				<table class="table table-hover table-striped">
+				<table class="table table-hover table-striped cards">
 					<thead>
 						<tr>
-							<th style="width:10%">&nbsp;</th>
-							<th style="width:45%"><a data-ng-click="predicate = 'name'; reverse=!reverse">Name</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'cost'; reverse=!reverse">Cost</a></th>
-							<th style="width:10%"><a data-ng-click="predicate = 'attack'; reverse=!reverse">Atk</a></th>
-							<th style="width:10%">&nbsp;</th>
-							<th class="hidden-phone" style="width:15%">&nbsp;</th>
+							<th>
+								<a data-ng-repeat="column in columns" data-ng-click="setSorting(column.field)" data-ng-class="columnClass(column.field)"><i class="{{ columnSortingIcon(column.field) }}"></i></a>
+							</th>
+							<th>&nbsp;</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr data-ng-repeat="card in cards.weapon | filter:searchText | orderBy:predicate:reverse">
-							<td><button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}">Add</button></td>
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" class="quality-{{ card.quality }}">{{ card.name }}</a> <span data-ng-show="card.remaining" class="muted" style="font-style:italic;font-weight:normal;">{{ card.limit }} remaining</span></strong> <p class="muted">{{ card.description }}</p></td>
-							<td><span data-ng-bind="card.cost" class="badge badge-info"></span></td>
-							<td colspan="3"><span data-ng-bind="card.attack" class="badge badge-warning"></span></td>
+						<tr data-ng-repeat="card in cards.weapon | filter:searchText | orderBy:sorting.field:!sorting.asc">
+							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
+								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
+										<strong>{{ card.cost }}</strong>
+									</span>
+									<strong class="pull-left" style="padding:7px 0 0 8px">{{ card.name }}</strong>
+									<span data-ng-show="card.health" data-ng-bind="card.health" class="pull-right" style="padding:8px 10px;background:#b94a48;color:#fff;width:24px;text-align:center;"></span>
+									<span data-ng-show="card.attack" data-ng-bind="card.attack" class="pull-right" style="padding:8px 10px;background:#f89406;color:#fff;width:24px;text-align:center;"></span>
+								</a>								
+							</td>
+							<td style="vertical-align:middle;padding:0;height:36px;width:36px;">
+								<button type="button" data-ng-click="addCard()" class="btn btn-flat" data-ng-class="{'btn-flat-green': !card.disabled, 'disabled': card.disabled}" data-ng-hide="disableAllCards" style="line-height:28px;"><i class="icon-plus icon-white"></i></button>
+							</td>
 						</tr>
 					</tbody>
 				</table>

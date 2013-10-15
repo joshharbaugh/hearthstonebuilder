@@ -1,5 +1,24 @@
 @import "bootstrap-sass/lib/responsive";
 
+@media (max-width: 900px) and (min-width: 768px) {
+	.deckbuilder-class-selection {
+		width: 100% !important;
+	}
+	.deckbuilder-class-selection span {
+		width: 100% !important;
+	}
+	.deckbuilder-class-selection .deckbuilder-class-selection-portrait {
+		max-width: 132px !important;
+		width: 100% !important;
+	}
+	.deckbuilder-class-selection .deckbuilder-class-selection-frame .deckbuilder-class-selection-name .deckbuilder-class-selection-icon {
+		display: none;
+	}
+	table.cards .sortable.col-name {
+		max-width: 154px;
+	}
+}
+
 @media (max-width: 767px) {
 	body { padding: 0; }
 	#sidebar-wrapper {
