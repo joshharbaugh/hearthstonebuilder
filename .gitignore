@@ -4,4 +4,4 @@ node_modules
 .sass-cache
 scraper
 npm-debug.log
-.env
+*.env
