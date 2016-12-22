@@ -10,7 +10,7 @@
 					<tbody>
 						<tr data-ng-repeat="card in deck.cards | filter:deckFilterText | orderBy:'cost':reverse">
 							<td class="pull-left" style="width:100%;vertical-align:middle;padding:0;height:36px">
-								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+								<a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}" style="padding:0;display:inline-block;width:100%;" target="_blank">
 									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
 										<strong>{{ card.cost }}</strong>
 									</span>
