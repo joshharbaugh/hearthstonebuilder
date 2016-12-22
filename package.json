@@ -15,7 +15,7 @@
     "http-agent": "*",
     "passport": "*",
     "passport-local": "*",
-    "bcrypt": "*",
+    "bcrypt-nodejs": "*",
     "request": "*",
     "aws-sdk": "*",
     "node-ironio": "*",
