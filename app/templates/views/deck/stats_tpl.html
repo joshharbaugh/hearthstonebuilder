@@ -26,7 +26,7 @@
 			<h2 class="caption">1st</h2>
 			<div class="container-fluid">
 				<div data-ng-repeat="card in startingHandFirst" class="span4">
-					<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}"><img width="193" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt="{{ card.name }}" /></a>
+					<a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}"><img width="193" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt="{{ card.name }}" /></a>
 				</div>
 			</div>
 		</div>
@@ -34,7 +34,7 @@
 			<h2 class="caption">2nd</h2>
 			<div class="container-fluid">
 				<div data-ng-repeat="card in startingHandSecond" class="span3">
-					<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}"><img width="193" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt="{{ card.name }}" /></a>
+					<a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}"><img width="193" data-ng-src="//s3.amazonaws.com/hearthstonebuilder/images/{{ card.image }}.png" alt="{{ card.name }}" /></a>
 				</div>
 			</div>
 		</div>
@@ -73,7 +73,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in deck.cards">
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}">{{ card.name }}</a></strong> x{{ card.qty || 1 }}</td>
+							<td><strong><a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}">{{ card.name }}</a></strong> x{{ card.qty || 1 }}</td>
 							<td><span class="badge badge-info">{{ card.probabilities.first[0] }}</span></td>
 							<td><span class="muted">{{ card.probabilities.first[1] }}</span></td>
 							<td><span class="muted">{{ card.probabilities.first[2] }}</span></td>
@@ -109,7 +109,7 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="card in deck.cards">
-							<td><strong><a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}">{{ card.name }}</a></strong> x{{ card.qty || 1 }}</td>
+							<td><strong><a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}">{{ card.name }}</a></strong> x{{ card.qty || 1 }}</td>
 							<td><span class="badge badge-info">{{ card.probabilities.second[0] }}</span></td>
 							<td><span class="muted">{{ card.probabilities.second[1] }}</span></td>
 							<td><span class="muted">{{ card.probabilities.second[2] }}</span></td>

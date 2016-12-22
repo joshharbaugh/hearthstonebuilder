@@ -25,7 +25,7 @@
 					<tbody>
 						<tr data-ng-repeat="card in cards.all | filter:searchText | orderBy:sorting.field:!sorting.asc">
 							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
-								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+								<a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}" style="padding:0;display:inline-block;width:100%;" target="_blank">
 									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
 										<strong>{{ card.cost }}</strong>
 									</span>
@@ -54,7 +54,7 @@
 					<tbody>
 						<tr data-ng-repeat="card in cards.ability | filter:searchText | orderBy:sorting.field:!sorting.asc">
 							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
-								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+								<a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}" style="padding:0;display:inline-block;width:100%;" target="_blank">
 									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
 										<strong>{{ card.cost }}</strong>
 									</span>
@@ -83,7 +83,7 @@
 					<tbody>
 						<tr data-ng-repeat="card in cards.minion | filter:searchText | orderBy:sorting.field:!sorting.asc">
 							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
-								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+								<a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}" style="padding:0;display:inline-block;width:100%;" target="_blank">
 									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
 										<strong>{{ card.cost }}</strong>
 									</span>
@@ -112,7 +112,7 @@
 					<tbody>
 						<tr data-ng-repeat="card in cards.weapon | filter:searchText | orderBy:sorting.field:!sorting.asc">
 							<td class="pull-left" data-ng-class="{'disabled': card.disabled}">
-								<a data-ng-href="//www.wowhead.com/hearthstone/card={{ card.id }}&amp;image=premium&amp;notip" style="padding:0;display:inline-block;width:100%;" target="_blank">
+								<a data-ng-href="//www.hearthhead.com/cards/{{ card.name | slug }}" style="padding:0;display:inline-block;width:100%;" target="_blank">
 									<span class="pull-left" style="background:#3a87ad;color:#fff;padding:8px 10px;width:24px;text-align:center;">
 										<strong>{{ card.cost }}</strong>
 									</span>
