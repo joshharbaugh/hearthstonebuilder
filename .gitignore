@@ -5,3 +5,4 @@ node_modules
 scraper
 npm-debug.log
 *.env
+dist
