@@ -11,6 +11,7 @@ angular.module('hsbApp.CardControllers', [])
         $scope.cards.weapon = weaponCards;
 
         $scope.$watch('cards', function(newVal, oldVal) {
+            // Watches for changes to a scope variable named 'cards'.
             if(newVal) {
                 $scope.cards = newVal;
             }

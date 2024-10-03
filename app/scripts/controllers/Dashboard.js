@@ -3,7 +3,7 @@ angular.module('hsbApp.DashboardControllers', [])
 	.controller('DashboardModuleCtrl',['$scope', function ($scope) {
 
 		$scope.$on('$viewContentLoaded', function() {
-			// when the view is loaded
+			// Triggers when the view content is loaded.
 		});
 
 		$scope.onReady();
